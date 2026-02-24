@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#F4F1EA">
-    <title>Kūhaku v6</title>
+    <title>Kūhaku v7</title>
     <style>
         /* --- ESTILOS BASE --- */
         :root {
@@ -31,20 +31,25 @@
         .screen { flex: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 80px; }
         .screen.active { display: flex; }
 
-        /* --- HOME --- */
+        /* --- HOME & ICONOS --- */
         .enso-circle {
-            width: 160px; height: 160px;
             border: 5px solid var(--ink-color);
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             display: flex; align-items: center; justify-content: center;
-            margin-top: 40px; margin-bottom: 20px; position: relative;
+            position: relative;
         }
+        .enso-home { width: 160px; height: 160px; margin-top: 40px; margin-bottom: 20px; }
+        .enso-mini { width: 60px; height: 60px; border-width: 3px; margin: 10px auto; }
+        
         .enso-dot {
-            position: absolute; width: 12px; height: 12px;
-            background: var(--hanko-color); border-radius: 50%; bottom: 15px; right: 15px;
+            position: absolute; background: var(--hanko-color); border-radius: 50%;
         }
+        .dot-home { width: 12px; height: 12px; bottom: 15px; right: 15px; }
+        .dot-mini { width: 6px; height: 6px; bottom: 5px; right: 5px; }
+
         .money-display { font-size: 2.2rem; font-weight: bold; }
         
+        /* --- ESTADÍSTICAS --- */
         .stats-row { display: flex; gap: 40px; margin-top: 30px; }
         .stat-box { text-align: center; }
         .stat-num { font-size: 1.5rem; font-weight: bold; }
@@ -70,6 +75,7 @@
         .btn-main {
             background: var(--ink-color); color: white; padding: 15px 40px;
             border-radius: 30px; border: none; font-size: 1rem; margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         /* --- LISTAS --- */
@@ -77,20 +83,14 @@
         .tab { padding: 15px; background: none; border: none; color: #aaa; font-size: 0.8rem; text-transform: uppercase; }
         .tab.active { color: black; border-bottom: 2px solid var(--hanko-color); }
 
+        .santuario-header { display: none; width: 100%; text-align: center; margin-bottom: 20px; animation: fadeIn 0.5s; }
+
         .card {
             background: white; width: 95%; padding: 15px; margin-bottom: 10px;
             border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             display: flex; justify-content: space-between; align-items: center;
         }
         .card-actions button { background: none; border: none; font-size: 1.2rem; padding: 5px; margin-left: 5px; }
-
-        /* --- MODAL --- */
-        #modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 2000;
-            display: none; justify-content: center; align-items: center; flex-direction: column;
-        }
-        #json-box { width: 80%; height: 50%; background: white; padding: 10px; font-family: monospace; font-size: 0.8rem; }
 
         /* --- NAV --- */
         .nav {
@@ -102,20 +102,21 @@
         .nav-btn.active { opacity: 1; color: var(--hanko-color); }
         
         .version-tag { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; color: #ccc; }
+        @keyframes fadeIn { from {opacity:0} to {opacity:1} }
 
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v6.0</div>
+    <div class="version-tag">v7.0</div>
 
     <div id="screen-home" class="screen active">
-        <div class="enso-circle">
+        <div class="enso-circle enso-home">
             <div style="text-align:center">
                 <div class="money-display" id="total-money">0€</div>
                 <div class="stat-label">GANADO</div>
             </div>
-            <div class="enso-dot"></div>
+            <div class="enso-dot dot-home"></div>
         </div>
         
         <div class="stats-row ui-text">
@@ -128,10 +129,6 @@
                 <div class="stat-label">PENDIENTE</div>
             </div>
         </div>
-        
-        <p class="ui-text" style="margin-top:50px; color:#999; font-size:0.9rem; text-align:center;">
-            "El vacío es el principio de todo."
-        </p>
     </div>
 
     <div id="screen-add" class="screen">
@@ -160,7 +157,14 @@
             <button class="tab" onclick="setTab('sold')">Cuentas</button>
         </div>
         
-        <input type="text" id="search-inp" placeholder="Buscar..." onkeyup="render()" style="display:none; font-size:0.9rem; margin-top:10px;">
+        <div id="santuario-header" class="santuario-header">
+            <div class="enso-circle enso-mini">
+                <div class="enso-dot dot-mini"></div>
+            </div>
+            <div style="color:#666; font-size:0.9rem; margin-top:5px; font-family:'Georgia', serif;">Mis Tesoros</div>
+        </div>
+        
+        <input type="text" id="search-inp" placeholder="Buscar en santuario..." onkeyup="render()" style="display:none; font-size:0.9rem; margin-top:10px;">
         
         <div id="list-content" style="width:100%; display:flex; flex-direction:column; align-items:center; padding-bottom: 80px;"></div>
     </div>
@@ -168,18 +172,15 @@
     <div id="screen-settings" class="screen">
         <h2 class="ui-text">Datos</h2>
         <p class="ui-text" style="font-size:0.8rem; color:#888; text-align:center; margin:20px;">
-            Copia el código para guardar tus datos.<br>
-            Pégalo para recuperarlos.
+            Guarda una copia de seguridad en tus archivos.
         </p>
-        <button class="btn-main ui-text" onclick="openExport()">COPIAR DATOS (JSON)</button>
-        <button class="ui-text" style="background:none; border:none; margin-top:30px; color:black; text-decoration:underline;" onclick="doImport()">PEGAR DATOS</button>
-        <button class="ui-text" style="background:none; border:none; margin-top:50px; color:red;" onclick="wipeData()">BORRAR TODO</button>
-    </div>
-
-    <div id="modal-overlay">
-        <p style="color:white; margin-bottom:10px;" class="ui-text">Copia este texto y guárdalo:</p>
-        <textarea id="json-box"></textarea>
-        <button class="btn-main ui-text" onclick="document.getElementById('modal-overlay').style.display='none'">CERRAR</button>
+        
+        <button class="btn-main ui-text" onclick="nativeExport()">📤 EXPORTAR ARCHIVO</button>
+        
+        <br><br>
+        <input type="file" id="file-input" style="display:none" onchange="nativeImport(this)">
+        <button class="ui-text" style="background:none; border:none; color:black; text-decoration:underline;" onclick="document.getElementById('file-input').click()">📥 IMPORTAR ARCHIVO</button>
+        
     </div>
 
     <nav class="nav">
@@ -190,40 +191,34 @@
     </nav>
 
     <script>
-        // --- LÓGICA SEGURA ---
+        // --- ESTADO & INIT ---
         let db = [];
         let curAct = null;
         let curTab = 'process';
 
-        // 1. Carga segura de datos
         function init() {
             try {
                 const raw = localStorage.getItem('kuhakuDB');
                 if (raw) db = JSON.parse(raw);
-            } catch (e) {
-                console.log('Error de datos, reseteando para evitar bloqueo');
-                db = [];
-            }
+            } catch (e) { db = []; }
             updateHome();
         }
 
-        // 2. Guardado
         function save() {
             localStorage.setItem('kuhakuDB', JSON.stringify(db));
             updateHome();
         }
 
-        // 3. Navegación
+        // --- NAV ---
         function go(id, btn) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            
             if (id === 'screen-list') render();
         }
 
-        // 4. Añadir
+        // --- AÑADIR ---
         function setAct(btn, act) {
             document.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected', 'sell'));
             btn.classList.add('selected');
@@ -239,36 +234,38 @@
         function saveNewItem() {
             const name = document.getElementById('inp-name').value;
             if (!name || !curAct) return alert("Falta nombre o acción");
-            
             const item = {
                 id: Date.now(),
-                name: name,
-                act: curAct,
+                name: name, act: curAct,
                 price: document.getElementById('inp-price').value || 0,
                 final: 0,
                 st: (curAct === 'conservar') ? 'kept' : 'active',
                 date: new Date().toLocaleDateString()
             };
-            
-            db.push(item);
-            save();
-            
-            // Reset
+            db.push(item); save();
             document.getElementById('inp-name').value = '';
             document.getElementById('inp-price').value = '';
-            setAct(document.querySelector('.btn-opt'), null); // Hack para limpiar
+            setAct(document.querySelector('.btn-opt'), null);
             go('screen-list', document.querySelectorAll('.nav-btn')[2]);
         }
 
-        // 5. Listas
+        // --- LISTAS ---
         function setTab(t) {
             curTab = t;
-            document.querySelectorAll('.tab').forEach((b, i) => {
-                b.classList.toggle('active', ['process','kept','sold'][i] === t);
-            });
+            document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', ['process','kept','sold'][i] === t));
+            
+            // Lógica visual Santuario
+            const header = document.getElementById('santuario-header');
             const search = document.getElementById('search-inp');
-            if (t === 'kept') { search.style.display = 'block'; } 
-            else { search.style.display = 'none'; search.value = ''; }
+            
+            if (t === 'kept') {
+                header.style.display = 'block';
+                search.style.display = 'block';
+            } else {
+                header.style.display = 'none';
+                search.style.display = 'none';
+                search.value = '';
+            }
             render();
         }
 
@@ -276,20 +273,17 @@
             const list = document.getElementById('list-content');
             list.innerHTML = '';
             const query = document.getElementById('search-inp').value.toLowerCase();
-            
             let data = [];
             
-            if (curTab === 'process') {
-                data = db.filter(i => i.st === 'active');
-            } else if (curTab === 'kept') {
+            if (curTab === 'process') data = db.filter(i => i.st === 'active');
+            else if (curTab === 'kept') {
                 data = db.filter(i => i.st === 'kept');
                 if(query) data = data.filter(i => i.name.toLowerCase().includes(query));
-            } else if (curTab === 'sold') {
-                data = db.filter(i => i.st === 'done');
-            }
+            } 
+            else if (curTab === 'sold') data = db.filter(i => i.st === 'done');
 
             if (data.length === 0) {
-                list.innerHTML = '<div style="margin-top:50px; color:#ccc;">Vacío</div>';
+                list.innerHTML = '<div style="margin-top:40px; color:#ccc;">Vacío</div>';
                 return;
             }
 
@@ -297,26 +291,17 @@
                 const el = document.createElement('div');
                 el.className = 'card ui-text';
                 
-                // Texto
                 let txt = `<div><div style="font-size:1.1rem">${item.name}</div><div style="font-size:0.7rem; color:#888">${item.act.toUpperCase()}</div></div>`;
                 if(curTab === 'sold' && item.act === 'vender') {
                     txt = `<div><div style="font-size:1.1rem">${item.name}</div><div style="font-size:0.9rem; color:var(--hanko-color); font-weight:bold">+${item.final}€</div></div>`;
                 }
 
-                // Botones
                 let btns = '';
                 if (curTab === 'process') {
-                    if (item.act === 'vender') {
-                        btns = `<button onclick="sold(${item.id})" style="background:var(--hanko-color); color:white; border-radius:20px; font-size:0.8rem; padding:5px 15px;">Vendido</button>`;
-                    } else {
-                        btns = `<button onclick="done(${item.id})" style="background:black; color:white; border-radius:20px; font-size:0.8rem; padding:5px 15px;">Listo</button>`;
-                    }
+                    if (item.act === 'vender') btns = `<button onclick="sold(${item.id})" style="background:var(--hanko-color); color:white; border-radius:20px; font-size:0.8rem; padding:5px 15px;">Vendido</button>`;
+                    else btns = `<button onclick="done(${item.id})" style="background:black; color:white; border-radius:20px; font-size:0.8rem; padding:5px 15px;">Listo</button>`;
                 } else {
-                    // Botones para Santuario y Cuentas (Devolver y Borrar)
-                    btns = `
-                        <button onclick="restore(${item.id})">↺</button>
-                        <button onclick="del(${item.id})" style="color:red">✕</button>
-                    `;
+                    btns = `<button onclick="restore(${item.id})">↺</button><button onclick="del(${item.id})" style="color:red">✕</button>`;
                 }
 
                 el.innerHTML = txt + `<div class="card-actions">${btns}</div>`;
@@ -324,30 +309,15 @@
             });
         }
 
-        // 6. Acciones Item
+        // --- ACCIONES ---
         function sold(id) {
             const p = prompt("Precio final venta:");
-            if(p !== null) {
-                const i = db.find(x => x.id === id);
-                i.final = p; i.st = 'done'; save(); render();
-            }
+            if(p !== null) { const i = db.find(x => x.id === id); i.final = p; i.st = 'done'; save(); render(); }
         }
-        function done(id) {
-            const i = db.find(x => x.id === id); i.st = 'done'; save(); render();
-        }
-        function restore(id) {
-            if(confirm("¿Devolver a pendientes?")) {
-                const i = db.find(x => x.id === id);
-                i.st = 'active'; save(); render();
-            }
-        }
-        function del(id) {
-            if(confirm("¿Eliminar definitivamente?")) {
-                db = db.filter(x => x.id !== id); save(); render();
-            }
-        }
+        function done(id) { const i = db.find(x => x.id === id); i.st = 'done'; save(); render(); }
+        function restore(id) { if(confirm("¿Devolver a pendientes?")) { const i = db.find(x => x.id === id); i.st = 'active'; save(); render(); } }
+        function del(id) { if(confirm("¿Eliminar definitivamente?")) { db = db.filter(x => x.id !== id); save(); render(); } }
 
-        // 7. Globales
         function updateHome() {
             const earned = db.filter(i => i.st === 'done').reduce((acc, i) => acc + parseFloat(i.final||0), 0);
             document.getElementById('total-money').innerText = earned + '€';
@@ -355,29 +325,38 @@
             document.getElementById('stat-pending').innerText = db.filter(i => i.st === 'active').length;
         }
 
-        function openExport() {
-            document.getElementById('json-box').value = JSON.stringify(db);
-            document.getElementById('modal-overlay').style.display = 'flex';
-        }
+        // --- IMPORTAR / EXPORTAR NATIVO ---
+        async function nativeExport() {
+            const dataStr = JSON.stringify(db, null, 2);
+            const file = new File([dataStr], "kuhaku_backup.json", { type: "application/json" });
 
-        function doImport() {
-            const raw = prompt("Pega el JSON aquí:");
-            if(raw) {
+            if (navigator.share) {
                 try {
-                    db = JSON.parse(raw); save(); alert("Importado!");
-                } catch(e) { alert("Error en el formato"); }
+                    await navigator.share({
+                        files: [file],
+                        title: 'Kuhaku Backup',
+                    });
+                } catch (err) { console.log("Cancelado"); }
+            } else {
+                alert("Función no soportada en este navegador. Usa Safari en iPhone.");
             }
         }
 
-        function wipeData() {
-            if(confirm("¿BORRAR TODO?")) {
-                db = []; save();
-            }
+        function nativeImport(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    db = JSON.parse(e.target.result);
+                    save();
+                    alert("¡Datos importados correctamente!");
+                } catch(err) { alert("El archivo no es válido."); }
+            };
+            reader.readAsText(file);
         }
 
-        // Arranque
         init();
-
     </script>
 </body>
 </html>
