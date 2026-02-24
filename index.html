@@ -8,11 +8,10 @@
     <meta name="theme-color" content="#F4F1EA">
     <title>Kūhaku</title>
     <style>
-        /* --- ESTÉTICA JAPONESA MINIMALISTA --- */
         :root {
-            --bg-color: #F4F1EA; /* Blanco Washi */
-            --ink-color: #111111; /* Negro Tinta */
-            --hanko-color: #CC0000; /* Rojo Sello */
+            --bg-color: #F4F1EA;
+            --ink-color: #111111;
+            --hanko-color: #CC0000;
             --gray-text: #888888;
             --light-gray: #DCDCDC;
         }
@@ -25,21 +24,17 @@
             height: 100vh;
             display: flex; flex-direction: column;
             overflow: hidden;
-            -webkit-user-select: none;
         }
 
-        h2 { font-weight: normal; margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
         .ui-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-        /* --- PANTALLAS --- */
         .screen {
             flex: 1; display: none; flex-direction: column;
             padding: 20px; overflow-y: auto; align-items: center;
         }
         .screen.active { display: flex; }
 
-        /* --- PANTALLA INICIO --- */
-        #home-screen { justify-content: center; }
+        /* --- HOME --- */
         .enso-circle {
             width: 180px; height: 180px;
             border: 6px solid var(--ink-color);
@@ -53,98 +48,66 @@
             border-radius: 50%; bottom: 15px; right: 15px;
         }
         .counter-big { font-size: 2.5rem; font-weight: bold; }
-        .counter-label { font-size: 0.8rem; color: var(--gray-text); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; }
 
-        /* --- FORMULARIO AÑADIR --- */
-        #add-screen { justify-content: flex-start; padding-top: 40px; }
-        input[type="text"], input[type="number"], input[type="search"] {
+        /* --- INPUTS --- */
+        input[type="text"], input[type="number"], input[type="search"], textarea {
             background: transparent; border: none;
             border-bottom: 1px solid var(--ink-color);
-            font-size: 1.3rem; color: var(--ink-color);
+            font-size: 1.1rem; color: var(--ink-color);
             text-align: center; padding: 10px; outline: none;
             width: 90%; margin-bottom: 20px;
             font-family: 'Georgia', serif;
         }
-        
-        /* Estilo específico buscador */
-        #search-container { width: 100%; display: none; animation: fadeIn 0.3s; margin-bottom: 15px; }
-        input[type="search"] { font-size: 1rem; border-color: #aaa; color: #555; }
 
         .action-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;
         }
         .action-btn {
             padding: 15px; border: 1px solid var(--light-gray);
             background: transparent; color: var(--gray-text);
-            border-radius: 5px; cursor: pointer; transition: 0.3s;
+            border-radius: 5px; cursor: pointer;
         }
-        .action-btn.selected {
-            border-color: var(--ink-color); color: var(--ink-color); background: white;
-        }
-        .action-btn.sell-selected {
-            border-color: var(--hanko-color); color: var(--hanko-color);
-        }
-
-        #price-input-container { display: none; width: 100%; text-align: center; animation: fadeIn 0.5s; }
+        .action-btn.selected { border-color: var(--ink-color); color: var(--ink-color); background: white; }
+        .action-btn.sell-selected { border-color: var(--hanko-color); color: var(--hanko-color); }
 
         .btn-main {
             background-color: var(--ink-color); color: white;
             padding: 15px 50px; border-radius: 30px; border: none;
             font-size: 1rem; margin-top: 20px; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* --- LISTAS Y TABS --- */
+        /* --- LISTAS --- */
         .tabs {
             display: flex; width: 100%; justify-content: space-around;
-            margin-bottom: 20px; border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 15px; border-bottom: 1px solid var(--light-gray);
         }
-        .tab-btn {
-            padding: 15px; background: none; border: none;
-            color: var(--gray-text); font-size: 0.9rem; text-transform: uppercase;
-        }
+        .tab-btn { padding: 15px; background: none; border: none; color: var(--gray-text); font-size: 0.8rem; text-transform: uppercase; }
         .tab-btn.active { color: var(--ink-color); border-bottom: 2px solid var(--hanko-color); }
 
-        .list-container { width: 100%; padding-bottom: 80px; }
-        
         .item-card {
             background: white; border: 1px solid #eee;
             padding: 15px; margin-bottom: 10px; border-radius: 8px;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center; width: 90%;
         }
-        .item-info { display: flex; flex-direction: column; }
-        .item-name { font-size: 1.1rem; margin-bottom: 4px; }
-        .item-meta { font-size: 0.8rem; color: var(--gray-text); }
         
-        .pill {
-            font-size: 0.7rem; padding: 4px 8px; border-radius: 10px; margin-left: 5px;
-            border: 1px solid #ddd;
-        }
-        .pill-sell { color: var(--hanko-color); border-color: var(--hanko-color); }
+        .action-icons { display: flex; gap: 10px; }
+        .icon-btn { background: none; border: none; font-size: 1.2rem; padding: 5px; }
 
-        .btn-action-small {
-            background: var(--ink-color); color: white;
-            border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem;
+        /* --- EXPORT MODAL --- */
+        #export-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px;
         }
+        #export-text { width: 100%; height: 60%; background: white; font-family: monospace; font-size: 0.8rem; padding: 10px; border-radius: 10px; }
 
-        .action-icons { display: flex; gap: 15px; }
-        .icon-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; }
-        
-        .total-money {
-            font-size: 2rem; color: var(--hanko-color); margin: 20px 0;
-            font-family: 'Georgia', serif;
-        }
-
-        /* --- NAVEGACIÓN --- */
         .nav-bar {
             height: 65px; display: flex; justify-content: space-around; align-items: center;
-            background-color: rgba(244, 241, 234, 0.98); border-top: 1px solid #eee;
-            position: fixed; bottom: 0; width: 100%; z-index: 100;
+            background-color: var(--bg-color); border-top: 1px solid #eee;
+            position: fixed; bottom: 0; width: 100%;
         }
-        .nav-btn { background: none; border: none; font-size: 1.4rem; opacity: 0.4; transition: 0.3s; }
+        .nav-btn { background: none; border: none; font-size: 1.4rem; opacity: 0.3; }
         .nav-btn.active { opacity: 1; color: var(--hanko-color); }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -153,26 +116,19 @@
         <div class="enso-circle">
             <div style="text-align:center;">
                 <div class="counter-big" id="home-money">0</div>
-                <div class="counter-label">Ganado</div>
+                <div style="font-size:0.7rem; color:var(--gray-text); letter-spacing:1px;">GANADO</div>
             </div>
             <div class="enso-dot"></div>
         </div>
         <div class="ui-text" style="display:flex; gap:30px; margin-top:20px;">
-            <div style="text-align:center">
-                <div style="font-weight:bold; font-size:1.2rem;" id="count-kept">0</div>
-                <div style="font-size:0.7rem; color:#888;">CONSERVADO</div>
-            </div>
-            <div style="text-align:center">
-                <div style="font-weight:bold; font-size:1.2rem;" id="count-pending">0</div>
-                <div style="font-size:0.7rem; color:#888;">EN PROCESO</div>
-            </div>
+            <div style="text-align:center"><div style="font-weight:bold;" id="count-kept">0</div><div style="font-size:0.6rem; color:#888;">CONSERVADO</div></div>
+            <div style="text-align:center"><div style="font-weight:bold;" id="count-pending">0</div><div style="font-size:0.6rem; color:#888;">PENDIENTE</div></div>
         </div>
     </div>
 
     <div id="add-screen" class="screen">
-        <h2 style="margin-bottom:30px;">Nuevo Objeto</h2>
-        <input type="text" id="new-name" placeholder="¿Qué objeto es?" autocomplete="off">
-        
+        <h2 class="ui-text" style="font-weight:normal;">Nuevo Objeto</h2>
+        <input type="text" id="new-name" placeholder="Nombre..." autocomplete="off">
         <div class="action-grid ui-text">
             <button class="action-btn" onclick="selectAction(this, 'conservar')">Conservar</button>
             <button class="action-btn" onclick="selectAction(this, 'regalar')">Regalar</button>
@@ -180,44 +136,34 @@
             <button class="action-btn" onclick="selectAction(this, 'tirar')">Tirar</button>
             <button class="action-btn" style="grid-column: span 2;" onclick="selectAction(this, 'vender')">Vender</button>
         </div>
-
-        <div id="price-input-container">
-            <input type="number" id="target-price" placeholder="Precio Estimado (€)" inputmode="numeric">
+        <div id="price-input-container" style="display:none; width:100%; margin-top:10px;">
+            <input type="number" id="target-price" placeholder="Precio (€)" inputmode="numeric">
         </div>
-
         <button class="btn-main ui-text" onclick="addItem()">REGISTRAR</button>
     </div>
 
-    <div id="list-screen" class="screen" style="padding-top:0;">
+    <div id="list-screen" class="screen" style="padding:0;">
         <div class="tabs ui-text">
-            <button class="tab-btn active" onclick="switchTab('process')">En Proceso</button>
+            <button class="tab-btn active" onclick="switchTab('process')">Proceso</button>
             <button class="tab-btn" onclick="switchTab('kept')">Santuario</button>
             <button class="tab-btn" onclick="switchTab('sold')">Cuentas</button>
         </div>
-
-        <div id="search-container">
-            <input type="search" id="search-bar" placeholder="Buscar en santuario..." oninput="renderList()">
-        </div>
-
-        <div id="list-container" class="list-container ui-text">
-            </div>
+        <input type="search" id="search-bar" placeholder="Buscar..." oninput="renderList()" style="width:85%; display:none; font-size:0.9rem;">
+        <div id="list-container" style="width:100%; display:flex; flex-direction:column; align-items:center; padding-bottom:80px;"></div>
     </div>
 
     <div id="settings-screen" class="screen">
-        <h2>Datos</h2>
-        <p class="ui-text" style="text-align:center; margin:20px; color:#888;">
-            Tus datos son tuyos.<br>
-            Guardar copia de seguridad.
-        </p>
-        
-        <button class="btn-main ui-text" style="background:white; color:black; border:1px solid black;" onclick="exportData()">📤 Exportar / Guardar</button>
-        
-        <br><br>
-        <input type="file" id="import-file" style="display:none" onchange="importData(this)">
-        <button class="ui-text" style="background:none; border:none; color:#888; text-decoration:underline;" onclick="document.getElementById('import-file').click()">Importar JSON</button>
-        
-        <br><br><br>
-        <button class="ui-text" style="color:red; background:none; border:none;" onclick="clearAllData()">Borrar Todo</button>
+        <h2 class="ui-text">Backup</h2>
+        <p class="ui-text" style="font-size:0.8rem; color:#888; text-align:center; margin:20px;">Si el botón de compartir falla, usa "Copiar Código".</p>
+        <button class="btn-main ui-text" onclick="showExportModal()">📤 COPIAR CÓDIGO JSON</button>
+        <button class="ui-text" style="background:none; border:none; color:var(--hanko-color); margin-top:30px;" onclick="importPrompt()">📥 IMPORTAR CÓDIGO</button>
+        <button class="ui-text" style="margin-top:50px; color:#ccc; border:none; background:none;" onclick="clearAllData()">BORRAR TODO</button>
+    </div>
+
+    <div id="export-modal">
+        <p class="ui-text" style="color:white; margin-bottom:10px;">Copia este texto y guárdalo:</p>
+        <textarea id="export-text" readonly></textarea>
+        <button class="btn-main ui-text" onclick="closeExportModal()">CERRAR</button>
     </div>
 
     <nav class="nav-bar">
@@ -228,261 +174,110 @@
     </nav>
 
     <script>
-        // --- ESTADO ---
-        let items = JSON.parse(localStorage.getItem('kuhakuItemsV2')) || [];
+        let items = JSON.parse(localStorage.getItem('kuhakuV5')) || [];
         let currentAction = null;
         let currentTab = 'process';
 
-        // --- NAVEGACIÓN ---
         function navTo(screenId, btn) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            
-            if(screenId === 'home-screen') updateHome();
-            if(screenId === 'list-screen') renderList();
+            updateHome(); renderList();
         }
 
-        function switchTab(tabName) {
-            currentTab = tabName;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            const index = ['process', 'kept', 'sold'].indexOf(tabName);
-            document.querySelectorAll('.tab-btn')[index].classList.add('active');
-            
-            // Mostrar buscador solo en Santuario
-            const searchContainer = document.getElementById('search-container');
-            if(tabName === 'kept') {
-                searchContainer.style.display = 'block';
-            } else {
-                searchContainer.style.display = 'none';
-                document.getElementById('search-bar').value = ''; // Limpiar búsqueda al salir
-            }
-
+        function switchTab(t) {
+            currentTab = t;
+            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', ['process','kept','sold'][i] === t));
+            document.getElementById('search-bar').style.display = (t === 'kept') ? 'block' : 'none';
             renderList();
         }
 
-        // --- AÑADIR ITEMS ---
-        function selectAction(btn, action) {
-            document.querySelectorAll('.action-btn').forEach(b => {
-                b.classList.remove('selected');
-                b.classList.remove('sell-selected');
-            });
-            
+        function selectAction(btn, a) {
+            document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('selected', 'sell-selected'));
             btn.classList.add('selected');
-            if(action === 'vender') {
-                btn.classList.add('sell-selected');
-                document.getElementById('price-input-container').style.display = 'block';
-            } else {
-                document.getElementById('price-input-container').style.display = 'none';
-            }
-            currentAction = action;
+            if(a === 'vender') btn.classList.add('sell-selected');
+            document.getElementById('price-input-container').style.display = (a === 'vender') ? 'block' : 'none';
+            currentAction = a;
         }
 
         function addItem() {
             const name = document.getElementById('new-name').value.trim();
-            if(!name || !currentAction) {
-                alert("Escribe un nombre y elige una acción.");
-                return;
-            }
-
-            const newItem = {
-                id: Date.now(),
-                name: name,
-                action: currentAction,
-                targetPrice: document.getElementById('target-price').value || 0,
-                finalPrice: 0,
-                status: 'active',
-                date: new Date().toLocaleDateString()
-            };
-
-            if(currentAction === 'conservar') newItem.status = 'kept';
-
-            items.push(newItem);
-            saveData();
-            
+            if(!name || !currentAction) return alert("Faltan datos");
+            const item = { id: Date.now(), name, action: currentAction, targetPrice: document.getElementById('target-price').value || 0, finalPrice: 0, status: (currentAction === 'conservar' ? 'kept' : 'active'), date: new Date().toLocaleDateString() };
+            items.push(item); saveData();
             document.getElementById('new-name').value = '';
-            document.getElementById('target-price').value = '';
-            selectAction(document.querySelector('.action-btn'), null);
             navTo('list-screen', document.querySelectorAll('.nav-btn')[2]);
         }
 
-        // --- LISTAS Y LÓGICA ---
         function renderList() {
             const container = document.getElementById('list-container');
             container.innerHTML = '';
-            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+            const search = document.getElementById('search-bar').value.toLowerCase();
+            let filtered = [];
 
-            let filteredItems = [];
-
-            if(currentTab === 'process') {
-                filteredItems = items.filter(i => i.status === 'active' && i.action !== 'conservar');
-            } else if (currentTab === 'kept') {
-                filteredItems = items.filter(i => i.status === 'kept' || (i.action === 'conservar' && i.status === 'active'));
-                // Aplicar filtro de búsqueda solo aquí
-                if(searchTerm) {
-                    filteredItems = filteredItems.filter(i => i.name.toLowerCase().includes(searchTerm));
-                }
-            } else if (currentTab === 'sold') {
-                filteredItems = items.filter(i => i.status === 'done');
-                
-                const total = items.filter(i => i.status === 'done' && i.action === 'vender')
-                                   .reduce((sum, i) => sum + parseFloat(i.finalPrice || 0), 0);
-                container.innerHTML = `<div style="text-align:center;"><div class="total-money">+${total}€</div><div style="color:#888; font-size:0.8rem; margin-bottom:20px;">TOTAL GANADO</div></div>`;
+            if(currentTab === 'process') filtered = items.filter(i => i.status === 'active');
+            else if(currentTab === 'kept') filtered = items.filter(i => i.status === 'kept').filter(i => i.name.toLowerCase().includes(search));
+            else if(currentTab === 'sold') {
+                filtered = items.filter(i => i.status === 'done');
+                const total = filtered.reduce((s, i) => s + parseFloat(i.finalPrice || 0), 0);
+                container.innerHTML = `<div class="counter-big" style="color:var(--hanko-color); margin:20px;">${total}€</div>`;
             }
 
-            if(filteredItems.length === 0 && currentTab !== 'sold') {
-                const msg = searchTerm ? 'No hay coincidencias.' : 'Nada por aquí.';
-                container.innerHTML = `<div style="text-align:center; margin-top:50px; color:#aaa;">${msg}</div>`;
-                return;
-            }
-
-            filteredItems.forEach(item => {
+            filtered.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'item-card';
+                div.className = 'item-card ui-text';
+                div.innerHTML = `<div class="item-info"><div>${item.name}</div><div style="font-size:0.7rem; color:#888;">${item.action.toUpperCase()}</div></div>`;
                 
-                if(currentTab === 'process') {
-                    if(item.action === 'vender') {
-                        div.innerHTML = `
-                            <div class="item-info">
-                                <span class="item-name">${item.name} <span class="pill pill-sell">Vender</span></span>
-                                <span class="item-meta">Meta: ${item.targetPrice}€</span>
-                            </div>
-                            <button class="btn-action-small" onclick="markSold(${item.id})" style="background-color:var(--hanko-color)">Vendido</button>
-                        `;
-                    } else {
-                        div.innerHTML = `
-                            <div class="item-info">
-                                <span class="item-name">${item.name}</span>
-                                <span class="item-meta action-pill">${item.action.toUpperCase()}</span>
-                            </div>
-                            <button class="btn-action-small" onclick="completeItem(${item.id})">Listo</button>
-                        `;
-                    }
-                } else if (currentTab === 'kept') {
-                    // SANTUARIO: Añadidos botones de Devolver y Borrar
-                     div.innerHTML = `
-                        <div class="item-info">
-                            <span class="item-name">${item.name}</span>
-                            <span class="item-meta">Conservado</span>
-                        </div>
-                        <div class="action-icons">
-                            <button class="icon-btn" onclick="restoreItem(${item.id})" title="Devolver a proceso">↺</button>
-                            <button class="icon-btn" onclick="hardDelete(${item.id})" title="Eliminar duplicado" style="color:red;">✕</button>
-                        </div>
-                    `;
-                } else if (currentTab === 'sold') {
-                    let priceDisplay = item.action === 'vender' ? `<span style="color:var(--hanko-color); font-weight:bold;">+${item.finalPrice}€</span>` : '';
-                    div.innerHTML = `
-                        <div class="item-info">
-                            <span class="item-name">${item.name} ${priceDisplay}</span>
-                            <span class="item-meta">${item.action.toUpperCase()} - ${item.date}</span>
-                        </div>
-                        <div class="action-icons">
-                            <button class="icon-btn" onclick="restoreItem(${item.id})" title="Deshacer/Restaurar">↺</button>
-                            <button class="icon-btn" onclick="hardDelete(${item.id})" title="Eliminar definitivamente" style="color:red;">✕</button>
-                        </div>
-                    `;
-                }
+                const actions = document.createElement('div');
+                actions.className = 'action-icons';
 
+                if(currentTab === 'process') {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-action-small';
+                    btn.innerText = item.action === 'vender' ? 'Vendido' : 'Listo';
+                    btn.onclick = () => item.action === 'vender' ? markSold(item.id) : completeItem(item.id);
+                    actions.appendChild(btn);
+                } else {
+                    const undo = document.createElement('button'); undo.className = 'icon-btn'; undo.innerText = '↺';
+                    undo.onclick = () => { item.status = 'active'; saveData(); renderList(); };
+                    const del = document.createElement('button'); del.className = 'icon-btn'; del.innerText = '✕'; del.style.color = 'red';
+                    del.onclick = () => { if(confirm("¿Borrar?")) { items = items.filter(i => i.id !== item.id); saveData(); renderList(); } };
+                    actions.append(undo, del);
+                }
+                div.appendChild(actions);
                 container.appendChild(div);
             });
         }
 
-        // --- ACCIONES DE ESTADO ---
         function markSold(id) {
-            const realPrice = prompt("¿Por cuánto lo has vendido realmente?");
-            if(realPrice !== null) {
-                const item = items.find(i => i.id === id);
-                item.finalPrice = realPrice;
-                item.status = 'done';
-                item.date = new Date().toLocaleDateString();
-                saveData();
-                renderList();
-            }
+            const p = prompt("Precio final:");
+            if(p !== null) { const i = items.find(x => x.id === id); i.finalPrice = p; i.status = 'done'; saveData(); renderList(); }
         }
 
-        function completeItem(id) {
-            if(confirm("¿Ya ha salido de tu casa?")) {
-                const item = items.find(i => i.id === id);
-                item.status = 'done';
-                item.date = new Date().toLocaleDateString();
-                saveData();
-                renderList();
-            }
-        }
+        function completeItem(id) { const i = items.find(x => x.id === id); i.status = 'done'; saveData(); renderList(); }
 
-        // --- FUNCIONES DE RETROCESO Y BORRADO ---
-        function restoreItem(id) {
-            let msg = currentTab === 'kept' ? "¿Dejar de conservar y mover a 'En Proceso'?" : "¿Quieres devolver este objeto a la lista de pendientes?";
-            if(confirm(msg)) {
-                const item = items.find(i => i.id === id);
-                item.status = 'active'; // Vuelve a estar activo en proceso
-                saveData();
-                renderList();
-            }
-        }
-
-        function hardDelete(id) {
-            if(confirm("¿Eliminar este registro para siempre?")) {
-                items = items.filter(item => item.id !== id);
-                saveData();
-                renderList();
-            }
-        }
-
-        function updateHome() {
-            const totalEarned = items.filter(i => i.status === 'done' && i.action === 'vender')
-                                     .reduce((sum, i) => sum + parseFloat(i.finalPrice || 0), 0);
-            
-            const countKept = items.filter(i => i.status === 'kept' || (i.action === 'conservar')).length;
-            const countPending = items.filter(i => i.status === 'active' && i.action !== 'conservar').length;
-
-            document.getElementById('home-money').innerText = totalEarned + "€";
-            document.getElementById('count-kept').innerText = countKept;
-            document.getElementById('count-pending').innerText = countPending;
-        }
-
-        // --- DATA Y EXPORTACIÓN ---
-        function saveData() { localStorage.setItem('kuhakuItemsV2', JSON.stringify(items)); updateHome(); }
-        function clearAllData() { if(confirm("¿Borrar todo?")) { localStorage.removeItem('kuhakuItemsV2'); items=[]; updateHome(); } }
+        function saveData() { localStorage.setItem('kuhakuV5', JSON.stringify(items)); updateHome(); }
         
-        async function exportData() {
-            const dataStr = JSON.stringify(items, null, 2);
-            if (navigator.share) {
-                const file = new File([dataStr], "kuhaku_backup.json", { type: "application/json" });
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Kuhaku Backup',
-                        text: 'Copia de seguridad de mis objetos.'
-                    });
-                    return;
-                } catch (error) { console.log("Cancelado:", error); }
-            }
-            // Fallback
-            const blob = new Blob([dataStr], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = "kuhaku_backup.json";
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        function updateHome() {
+            document.getElementById('home-money').innerText = items.filter(i => i.status === 'done').reduce((s, i) => s + parseFloat(i.finalPrice || 0), 0) + "€";
+            document.getElementById('count-kept').innerText = items.filter(i => i.status === 'kept').length;
+            document.getElementById('count-pending').innerText = items.filter(i => i.status === 'active').length;
         }
 
-        function importData(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    items = JSON.parse(e.target.result);
-                    saveData();
-                    alert("Datos importados con éxito.");
-                } catch(err) { alert("Error al leer el archivo."); }
-            };
-            reader.readAsText(file);
+        function showExportModal() {
+            document.getElementById('export-text').value = JSON.stringify(items);
+            document.getElementById('export-modal').style.display = 'flex';
+        }
+        function closeExportModal() { document.getElementById('export-modal').style.display = 'none'; }
+
+        function importPrompt() {
+            const code = prompt("Pega aquí el código JSON:");
+            if(code) { try { items = JSON.parse(code); saveData(); alert("Importado"); } catch(e) { alert("Error"); } }
         }
 
-        // Init
+        function clearAllData() { if(confirm("BORRAR TODO?")) { items = []; saveData(); } }
+
         updateHome();
     </script>
 </body>
