@@ -6,11 +6,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#F4F1EA">
-    <title>Kūhaku v10</title>
+    <title>Kūhaku v11</title>
     <style>
         /* --- ESTILOS BASE --- */
         :root {
             --bg-color: #F4F1EA;
+            --card-bg: #F2F0E6; /* Beige de tus tarjetas */
             --ink-color: #111111;
             --hanko-color: #CC0000;
             --gray-text: #888888;
@@ -31,7 +32,7 @@
         .screen { flex: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
         .screen.active { display: flex; }
 
-        /* --- ENSO Y CABECERAS --- */
+        /* --- ENSO --- */
         .enso-circle {
             width: 160px; height: 160px;
             border: 5px solid var(--ink-color);
@@ -45,36 +46,51 @@
         }
         .money-display { font-size: 2.2rem; font-weight: bold; }
         
-        /* --- SELECTOR DE ESPACIOS (SVG STYLE) --- */
+        /* --- SELECTOR DE ESPACIOS (TUS TARJETAS) --- */
         .spaces-scroll {
-            display: flex; gap: 15px; overflow-x: auto; width: 100%; padding: 15px 5px;
-            -webkit-overflow-scrolling: touch; scrollbar-width: none; justify-content: center;
+            display: flex; gap: 12px; overflow-x: auto; width: 100%; padding: 10px 5px;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none; 
+            align-items: flex-start; /* Alinear arriba */
         }
         .spaces-scroll::-webkit-scrollbar { display: none; }
         
-        .kamon-btn {
-            min-width: 54px; height: 54px; 
-            border: 1px solid #ccc; border-radius: 8px; /* Cuadrado redondeado como en la foto */
-            display: flex; justify-content: center; align-items: center;
-            background: white; transition: 0.3s; 
-            color: #333;
+        /* DISEÑO DE LA TARJETA RECTANGULAR */
+        .space-card {
+            min-width: 80px; height: 120px; /* Formato rectangular vertical */
+            background-color: var(--card-bg);
+            border: 1px solid #ddd; border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            padding: 10px 5px; margin-bottom: 5px;
+            transition: 0.2s; position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        /* Estilo de los iconos SVG */
-        .kamon-btn svg {
-            width: 28px; height: 28px;
-            stroke: currentColor;
-            stroke-width: 1.5; /* Línea fina */
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+        .space-card svg {
+            width: 32px; height: 32px;
+            stroke: #222; stroke-width: 1.2; fill: none; stroke-linecap: round; stroke-linejoin: round;
+            margin-top: 5px;
+        }
+
+        .space-card .card-text {
+            font-family: 'Georgia', serif; font-size: 0.7rem; text-align: center; color: #333; line-height: 1.1;
+        }
+
+        .space-card .card-kanji {
+            font-size: 0.6rem; color: #ccc; margin-bottom: 2px;
+        }
+
+        /* Estado Seleccionado */
+        .space-card.selected {
+            border: 2px solid var(--hanko-color);
+            background-color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
         }
         
-        .kamon-btn.selected {
-            border-color: var(--hanko-color); 
-            background: var(--hanko-color); 
-            color: white; /* El SVG se vuelve blanco */
-            box-shadow: 0 4px 10px rgba(204,0,0,0.3);
+        /* Pequeño detalle de esquina (opcional) */
+        .space-card::after {
+            content: ''; position: absolute; bottom: 0; right: 0;
+            border-bottom: 8px solid #ddd; border-left: 8px solid transparent; opacity: 0.5;
         }
 
         /* --- INPUTS --- */
@@ -111,10 +127,7 @@
             display: flex; justify-content: space-between; align-items: center;
         }
         
-        /* Icono pequeño en la tarjeta */
-        .space-tag-icon svg {
-            width: 20px; height: 20px; stroke: var(--hanko-color); stroke-width: 1.5; fill: none;
-        }
+        .space-tag-icon svg { width: 18px; height: 18px; stroke: var(--hanko-color); fill: none; }
         .space-tag-icon { margin-right: 10px; display: flex; align-items: center; }
 
         /* --- NAV --- */
@@ -131,7 +144,7 @@
     </style>
 </head>
 <body>
-    <div class="version-tag">v10.0</div>
+    <div class="version-tag">v11.0</div>
 
     <div id="screen-home" class="screen active">
         <div class="enso-circle">
@@ -183,7 +196,7 @@
         </div>
 
         <div id="santuario-header" style="display:none; flex-direction:column; align-items:center; width:100%; background: #fff; padding-bottom:10px; border-bottom:1px solid #eee; margin-bottom:10px;">
-            <div style="margin:10px; font-family:'Georgia'; font-size:1rem; color:#888;">Espacios</div>
+            <div style="margin:10px; font-family:'Georgia'; font-size:1rem; color:#888;">Tus Espacios</div>
             <div class="spaces-scroll" id="filter-space-selector"></div>
         </div>
         
@@ -210,30 +223,61 @@
     </nav>
 
     <script>
-        // --- DEFINICIÓN DE ICONOS SVG (Estilo Line Art) ---
-        // Basados en la imagen proporcionada por el usuario
+        // --- DIBUJOS SVG "A MANO" BASADOS EN TU FOTO ---
         const ICONS = {
-            all: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>',
-            living: '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V6a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v4"/></svg>', // Sofá
-            kitchen: '<svg viewBox="0 0 24 24"><path d="M4 10h16v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-6z"/><path d="M6 10L8 5h8l2 5"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>', // Olla
-            bedroom: '<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7"/><path d="M6 8v-2"/><path d="M18 8v-2"/></svg>', // Cama
-            bath: '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-5z"/><path d="M6 12V8a2 2 0 0 1 2-2h3"/><path d="M11 6v2"/></svg>', // Bañera
-            study: '<svg viewBox="0 0 24 24"><rect x="4" y="12" width="16" height="2"/><path d="M6 14v6"/><path d="M18 14v6"/><path d="M14 12V8a2 2 0 0 0-2-2h-4"/><path d="M12 12l2-2"/></svg>', // Escritorio
-            garden: '<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 0 0-5-5 4 4 0 0 1-3-3 4 4 0 0 1 8 0 4 4 0 0 1 8 0 4 4 0 0 1-3 3 5 5 0 0 0-5 5z"/></svg>', // Árbol
-            entrance: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h.01"/><path d="M6 20h12"/></svg>', // Puerta
-            other: '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18"/><path d="M12 7v4"/></svg>' // Caja
+            all: '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>', // Todo (Capas)
+            
+            // Sala de estar: Sofá minimalista con cojines
+            living: '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M12 10v8"/></svg>',
+            
+            // Dormitorio: Cama con cabecero
+            bedroom: '<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/><path d="M6 14h12"/></svg>',
+            
+            // Cocina: Olla con vapor
+            kitchen: '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/><path d="M2 13h2"/><path d="M20 13h2"/><path d="M12 5V3"/></svg>',
+            
+            // Baño: Bañera y grifo
+            bath: '<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4z"/><path d="M7 14V9a2 2 0 0 1 2-2h1"/><path d="M10 5v4"/><path d="M10 14v-2"/></svg>',
+            
+            // Estudio: Escritorio con papel y pluma
+            study: '<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M6 16v5"/><path d="M18 16v5"/><path d="M14 14V9a2 2 0 0 0-2-2H8"/><path d="M16 6l-2 3"/></svg>',
+            
+            // Jardín: Árbol simple
+            garden: '<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 0 0-5-5 4 4 0 0 1-3-3 4 4 0 0 1 8 0 4 4 0 0 1 8 0 4 4 0 0 1-3 3 5 5 0 0 0-5 5z"/><path d="M8 21h8"/></svg>',
+            
+            // Despensa: Estantería con botes
+            pantry: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16"/><path d="M4 16h16"/><path d="M8 10V6"/><path d="M12 16v-6"/><path d="M16 16v-6"/></svg>',
+            
+            // Garaje: Puerta de garaje
+            garage: '<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/><path d="M2 20h20"/></svg>',
+            
+            // Terraza: Mesa y barandilla
+            terrace: '<svg viewBox="0 0 24 24"><path d="M4 16h16"/><path d="M4 20h16"/><path d="M6 16v4"/><path d="M10 16v4"/><path d="M14 16v4"/><path d="M18 16v4"/><path d="M8 12h8"/><path d="M12 12v4"/><path d="M12 8v-2"/></svg>',
+            
+            // Sótano: Escaleras bajando
+            basement: '<svg viewBox="0 0 24 24"><path d="M3 5h4v4h4v4h4v4h4"/><path d="M3 5v14h16"/></svg>',
+            
+            // Comedor: Mesa redonda y silla
+            dining: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M12 10V6"/><path d="M9 6h6"/><path d="M12 18v4"/><path d="M8 22h8"/></svg>',
+            
+            // Entrada: Puerta
+            entrance: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h1"/><path d="M5 20h14"/></svg>'
         };
 
         const SPACES = [
-            { id: 'all', icon: ICONS.all, label: 'Todo' },
-            { id: 'living', icon: ICONS.living, label: 'Salón' },
-            { id: 'kitchen', icon: ICONS.kitchen, label: 'Cocina' },
-            { id: 'bedroom', icon: ICONS.bedroom, label: 'Cuarto' },
-            { id: 'bath', icon: ICONS.bath, label: 'Baño' },
-            { id: 'study', icon: ICONS.study, label: 'Estudio' },
-            { id: 'garden', icon: ICONS.garden, label: 'Jardín' },
-            { id: 'entrance', icon: ICONS.entrance, label: 'Entrada' },
-            { id: 'other', icon: ICONS.other, label: 'Otro' }
+            { id: 'all', icon: ICONS.all, label: 'Todo', kanji: '全' },
+            { id: 'living', icon: ICONS.living, label: 'Sala de\nEstar', kanji: '居間' },
+            { id: 'bedroom', icon: ICONS.bedroom, label: 'Dormitorio', kanji: '寝室' },
+            { id: 'kitchen', icon: ICONS.kitchen, label: 'Cocina', kanji: '台所' },
+            { id: 'bath', icon: ICONS.bath, label: 'Baño', kanji: '浴室' },
+            { id: 'study', icon: ICONS.study, label: 'Estudio', kanji: '書斎' },
+            { id: 'garden', icon: ICONS.garden, label: 'Jardín', kanji: '庭園' },
+            { id: 'pantry', icon: ICONS.pantry, label: 'Despensa', kanji: '貯蔵' },
+            { id: 'garage', icon: ICONS.garage, label: 'Garaje', kanji: '車庫' },
+            { id: 'terrace', icon: ICONS.terrace, label: 'Terraza', kanji: 'テラス' },
+            { id: 'basement', icon: ICONS.basement, label: 'Sótano', kanji: '地下室' },
+            { id: 'dining', icon: ICONS.dining, label: 'Comedor', kanji: '食堂' },
+            { id: 'entrance', icon: ICONS.entrance, label: 'Entrada', kanji: '玄関' }
         ];
 
         let db = [];
@@ -256,15 +300,15 @@
             updateHome();
         }
 
-        // --- RENDERIZADO DE ESPACIOS ---
+        // --- RENDERIZADO TIPO TARJETA ---
         function renderSpaceSelectors() {
             // Añadir
             const addContainer = document.getElementById('add-space-selector');
             addContainer.innerHTML = '';
             SPACES.slice(1).forEach(s => {
                 const btn = document.createElement('div');
-                btn.className = `kamon-btn ${s.id === curSpaceAdd ? 'selected' : ''}`;
-                btn.innerHTML = s.icon;
+                btn.className = `space-card ${s.id === curSpaceAdd ? 'selected' : ''}`;
+                btn.innerHTML = `${s.icon}<div class="card-text">${s.label}</div><div class="card-kanji">${s.kanji}</div>`;
                 btn.onclick = () => { curSpaceAdd = s.id; renderSpaceSelectors(); };
                 addContainer.appendChild(btn);
             });
@@ -274,8 +318,8 @@
             filterContainer.innerHTML = '';
             SPACES.forEach(s => {
                 const btn = document.createElement('div');
-                btn.className = `kamon-btn ${s.id === curSpaceFilter ? 'selected' : ''}`;
-                btn.innerHTML = s.icon;
+                btn.className = `space-card ${s.id === curSpaceFilter ? 'selected' : ''}`;
+                btn.innerHTML = `${s.icon}<div class="card-text">${s.label}</div><div class="card-kanji">${s.kanji}</div>`;
                 btn.onclick = () => { curSpaceFilter = s.id; renderSpaceSelectors(); render(); };
                 filterContainer.appendChild(btn);
             });
@@ -353,7 +397,7 @@
             } else if (curTab === 'kept') {
                 data = db.filter(i => i.st === 'kept');
                 if (curSpaceFilter !== 'all') {
-                    data = data.filter(i => (i.space || 'other') === curSpaceFilter);
+                    data = data.filter(i => (i.space || 'living') === curSpaceFilter);
                 }
                 if(query) data = data.filter(i => i.name.toLowerCase().includes(query));
             } else if (curTab === 'sold') {
@@ -369,8 +413,8 @@
                 const el = document.createElement('div');
                 el.className = 'card ui-text';
                 
-                const spaceObj = SPACES.find(s => s.id === (item.space || 'other'));
-                const spaceIcon = spaceObj ? spaceObj.icon : ICONS.other;
+                const spaceObj = SPACES.find(s => s.id === (item.space || 'living'));
+                const spaceIcon = spaceObj ? spaceObj.icon : ICONS.living;
 
                 let txt = `<div><div style="font-size:1.1rem; display:flex; align-items:center;"><span class="space-tag-icon">${spaceIcon}</span>${item.name}</div><div style="font-size:0.7rem; color:#888; margin-left:30px;">${item.act.toUpperCase()}</div></div>`;
                 
