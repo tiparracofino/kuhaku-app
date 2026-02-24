@@ -122,9 +122,6 @@
             background: var(--ink-color); color: white;
             border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem;
         }
-
-        .action-icons { display: flex; gap: 15px; }
-        .icon-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; }
         
         .total-money {
             font-size: 2rem; color: var(--hanko-color); margin: 20px 0;
@@ -197,16 +194,13 @@
     <div id="settings-screen" class="screen">
         <h2>Datos</h2>
         <p class="ui-text" style="text-align:center; margin:20px; color:#888;">
-            Tus datos son tuyos.<br>
-            Guardar copia de seguridad.
+            Aquí controlas tu información.<br>
+            Exporta tu archivo JSON para seguridad.
         </p>
-        
-        <button class="btn-main ui-text" style="background:white; color:black; border:1px solid black;" onclick="exportData()">📤 Exportar / Guardar</button>
-        
+        <button class="btn-main ui-text" style="background:white; color:black; border:1px solid black;" onclick="exportData()">Descargar JSON</button>
         <br><br>
         <input type="file" id="import-file" style="display:none" onchange="importData(this)">
         <button class="ui-text" style="background:none; border:none; color:#888; text-decoration:underline;" onclick="document.getElementById('import-file').click()">Importar JSON</button>
-        
         <br><br><br>
         <button class="ui-text" style="color:red; background:none; border:none;" onclick="clearAllData()">Borrar Todo</button>
     </div>
@@ -238,6 +232,7 @@
         function switchTab(tabName) {
             currentTab = tabName;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            // Lógica simple para resaltar tab (mejora visual rápida)
             const index = ['process', 'kept', 'sold'].indexOf(tabName);
             document.querySelectorAll('.tab-btn')[index].classList.add('active');
             renderList();
@@ -270,21 +265,23 @@
             const newItem = {
                 id: Date.now(),
                 name: name,
-                action: currentAction,
+                action: currentAction, // conservar, vender, regalar...
                 targetPrice: document.getElementById('target-price').value || 0,
                 finalPrice: 0,
-                status: 'active',
+                status: 'active', // active, sold, done
                 date: new Date().toLocaleDateString()
             };
 
+            // Si es conservar, pasa directo a estado 'kept'
             if(currentAction === 'conservar') newItem.status = 'kept';
 
             items.push(newItem);
             saveData();
             
+            // Reset
             document.getElementById('new-name').value = '';
             document.getElementById('target-price').value = '';
-            selectAction(document.querySelector('.action-btn'), null);
+            selectAction(document.querySelector('.action-btn'), null); // Deseleccionar
             navTo('list-screen', document.querySelectorAll('.nav-btn')[2]);
         }
 
@@ -296,12 +293,16 @@
             let filteredItems = [];
 
             if(currentTab === 'process') {
+                // Muestra cosas activas que NO son conservar
                 filteredItems = items.filter(i => i.status === 'active' && i.action !== 'conservar');
             } else if (currentTab === 'kept') {
+                // El santuario
                 filteredItems = items.filter(i => i.status === 'kept' || (i.action === 'conservar' && i.status === 'active'));
             } else if (currentTab === 'sold') {
+                // Historial de ventas y salidas
                 filteredItems = items.filter(i => i.status === 'done');
                 
+                // Mostrar total ganado arriba
                 const total = items.filter(i => i.status === 'done' && i.action === 'vender')
                                    .reduce((sum, i) => sum + parseFloat(i.finalPrice || 0), 0);
                 container.innerHTML = `<div style="text-align:center;"><div class="total-money">+${total}€</div><div style="color:#888; font-size:0.8rem; margin-bottom:20px;">TOTAL GANADO</div></div>`;
@@ -316,6 +317,9 @@
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 
+                let actionHtml = '';
+                
+                // Lógica de botones según pestaña
                 if(currentTab === 'process') {
                     if(item.action === 'vender') {
                         div.innerHTML = `
@@ -326,6 +330,7 @@
                             <button class="btn-action-small" onclick="markSold(${item.id})" style="background-color:var(--hanko-color)">Vendido</button>
                         `;
                     } else {
+                        // Donar, tirar, regalar
                         div.innerHTML = `
                             <div class="item-info">
                                 <span class="item-name">${item.name}</span>
@@ -338,22 +343,18 @@
                      div.innerHTML = `
                         <div class="item-info">
                             <span class="item-name">${item.name}</span>
-                            <span class="item-meta">Conservado</span>
+                            <span class="item-meta">Conservado en el santuario</span>
                         </div>
                         <span style="font-size:1.2rem;">⛩️</span>
                     `;
                 } else if (currentTab === 'sold') {
-                    // PESTAÑA CUENTAS: Aquí añadimos el botón restaurar y eliminar
-                    let priceDisplay = item.action === 'vender' ? `<span style="color:var(--hanko-color); font-weight:bold;">+${item.finalPrice}€</span>` : '';
+                    let priceDisplay = item.action === 'vender' ? `<span style="color:var(--hanko-color); font-weight:bold;">+${item.finalPrice}€</span>` : '0€';
                     div.innerHTML = `
                         <div class="item-info">
-                            <span class="item-name">${item.name} ${priceDisplay}</span>
+                            <span class="item-name">${item.name}</span>
                             <span class="item-meta">${item.action.toUpperCase()} - ${item.date}</span>
                         </div>
-                        <div class="action-icons">
-                            <button class="icon-btn" onclick="restoreItem(${item.id})" title="Deshacer/Restaurar">↺</button>
-                            <button class="icon-btn" onclick="hardDelete(${item.id})" title="Eliminar definitivamente" style="color:red;">✕</button>
-                        </div>
+                        ${priceDisplay}
                     `;
                 }
 
@@ -361,7 +362,7 @@
             });
         }
 
-        // --- ACCIONES DE ESTADO ---
+        // --- ACCIONES ---
         function markSold(id) {
             const realPrice = prompt("¿Por cuánto lo has vendido realmente?");
             if(realPrice !== null) {
@@ -371,6 +372,7 @@
                 item.date = new Date().toLocaleDateString();
                 saveData();
                 renderList();
+                alert("Dinero añadido a tu cuenta.");
             }
         }
 
@@ -379,25 +381,6 @@
                 const item = items.find(i => i.id === id);
                 item.status = 'done';
                 item.date = new Date().toLocaleDateString();
-                saveData();
-                renderList();
-            }
-        }
-
-        // --- NUEVAS FUNCIONES DE RETROCESO Y BORRADO ---
-        function restoreItem(id) {
-            if(confirm("¿Quieres devolver este objeto a la lista de pendientes?")) {
-                const item = items.find(i => i.id === id);
-                item.status = 'active'; // Vuelve a estar activo
-                if(item.action === 'conservar') item.status = 'kept';
-                saveData();
-                renderList();
-            }
-        }
-
-        function hardDelete(id) {
-            if(confirm("¿Eliminar este registro para siempre? Esto no se puede deshacer.")) {
-                items = items.filter(item => item.id !== id);
                 saveData();
                 renderList();
             }
@@ -415,38 +398,18 @@
             document.getElementById('count-pending').innerText = countPending;
         }
 
-        // --- DATA Y EXPORTACIÓN MEJORADA ---
+        // --- DATA ---
         function saveData() { localStorage.setItem('kuhakuItemsV2', JSON.stringify(items)); updateHome(); }
         function clearAllData() { if(confirm("¿Borrar todo?")) { localStorage.removeItem('kuhakuItemsV2'); items=[]; updateHome(); } }
         
-        async function exportData() {
-            const dataStr = JSON.stringify(items, null, 2);
-            
-            // Intenta usar la función nativa de compartir del iPhone
-            if (navigator.share) {
-                const file = new File([dataStr], "kuhaku_backup.json", { type: "application/json" });
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Kuhaku Backup',
-                        text: 'Copia de seguridad de mis objetos.'
-                    });
-                    return;
-                } catch (error) {
-                    console.log("Error al compartir o cancelado:", error);
-                    // Si falla, sigue al método antiguo abajo
-                }
-            }
-
-            // Método clásico (Descarga directa)
-            const blob = new Blob([dataStr], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "kuhaku_backup.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "kuhaku_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
         }
 
         function importData(input) {
