@@ -14,299 +14,420 @@
             --ink-color: #111111; /* Negro Tinta */
             --hanko-color: #CC0000; /* Rojo Sello */
             --gray-text: #888888;
+            --light-gray: #DCDCDC;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--ink-color);
-            font-family: 'Georgia', serif; /* Toque tradicional */
-            margin: 0;
-            padding: 0;
+            font-family: 'Georgia', serif; 
+            margin: 0; padding: 0;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             overflow: hidden;
             -webkit-user-select: none;
         }
 
-        h1, h2, h3 { font-weight: normal; margin: 0; }
-        
-        /* Tipografía Sans para UI */
-        .ui-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        h2 { font-weight: normal; margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
+        .ui-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
         /* --- PANTALLAS --- */
         .screen {
-            flex: 1;
-            display: none; /* Ocultas por defecto */
-            flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
-            align-items: center;
-            justify-content: center;
+            flex: 1; display: none; flex-direction: column;
+            padding: 20px; overflow-y: auto; align-items: center;
         }
-
         .screen.active { display: flex; }
 
-        /* --- PANTALLA INICIO (HOME) --- */
+        /* --- PANTALLA INICIO --- */
+        #home-screen { justify-content: center; }
         .enso-circle {
-            width: 200px;
-            height: 200px;
-            border: 8px solid var(--ink-color);
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; /* Imperfección Wabi-sabi */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            position: relative;
+            width: 180px; height: 180px;
+            border: 6px solid var(--ink-color);
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; position: relative;
         }
-
         .enso-dot {
-            position: absolute;
-            width: 15px;
-            height: 15px;
+            position: absolute; width: 12px; height: 12px;
             background-color: var(--hanko-color);
-            border-radius: 50%;
-            bottom: 20px;
-            right: 20px;
+            border-radius: 50%; bottom: 15px; right: 15px;
         }
-
-        .counter { font-size: 3rem; font-weight: bold; }
-        .quote { margin-top: 20px; text-align: center; color: var(--gray-text); font-style: italic; max-width: 80%; }
-
-        /* --- PANTALLA LISTA --- */
-        #inventory-list { width: 100%; max-width: 400px; padding-bottom: 80px; }
-        
-        .item-card {
-            border-bottom: 1px solid #ddd;
-            padding: 20px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .item-name { font-size: 1.2rem; }
-        
-        .btn-sell {
-            background: none;
-            border: 1px solid var(--hanko-color);
-            color: var(--hanko-color);
-            padding: 5px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
+        .counter-big { font-size: 2.5rem; font-weight: bold; }
+        .counter-label { font-size: 0.8rem; color: var(--gray-text); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; }
 
         /* --- FORMULARIO AÑADIR --- */
-        input[type="text"] {
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid var(--ink-color);
-            font-size: 1.5rem;
-            color: var(--ink-color);
-            text-align: center;
-            padding: 10px;
-            outline: none;
-            width: 80%;
-            margin-bottom: 30px;
+        #add-screen { justify-content: flex-start; padding-top: 40px; }
+        input[type="text"], input[type="number"] {
+            background: transparent; border: none;
+            border-bottom: 1px solid var(--ink-color);
+            font-size: 1.3rem; color: var(--ink-color);
+            text-align: center; padding: 10px; outline: none;
+            width: 90%; margin-bottom: 20px;
             font-family: 'Georgia', serif;
         }
+        
+        .action-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 20px;
+        }
+        .action-btn {
+            padding: 15px; border: 1px solid var(--light-gray);
+            background: transparent; color: var(--gray-text);
+            border-radius: 5px; cursor: pointer; transition: 0.3s;
+        }
+        .action-btn.selected {
+            border-color: var(--ink-color); color: var(--ink-color); background: white;
+        }
+        .action-btn.sell-selected {
+            border-color: var(--hanko-color); color: var(--hanko-color);
+        }
+
+        #price-input-container { display: none; width: 100%; text-align: center; animation: fadeIn 0.5s; }
 
         .btn-main {
-            background-color: var(--ink-color);
-            color: white;
-            padding: 15px 40px;
-            border-radius: 30px;
-            border: none;
-            font-size: 1rem;
-            letter-spacing: 1px;
-            cursor: pointer;
+            background-color: var(--ink-color); color: white;
+            padding: 15px 50px; border-radius: 30px; border: none;
+            font-size: 1rem; margin-top: 20px; cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* --- NAVEGACIÓN INFERIOR --- */
+        /* --- LISTAS Y TABS --- */
+        .tabs {
+            display: flex; width: 100%; justify-content: space-around;
+            margin-bottom: 20px; border-bottom: 1px solid var(--light-gray);
+        }
+        .tab-btn {
+            padding: 15px; background: none; border: none;
+            color: var(--gray-text); font-size: 0.9rem; text-transform: uppercase;
+        }
+        .tab-btn.active { color: var(--ink-color); border-bottom: 2px solid var(--hanko-color); }
+
+        .list-container { width: 100%; padding-bottom: 80px; }
+        
+        .item-card {
+            background: white; border: 1px solid #eee;
+            padding: 15px; margin-bottom: 10px; border-radius: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .item-info { display: flex; flex-direction: column; }
+        .item-name { font-size: 1.1rem; margin-bottom: 4px; }
+        .item-meta { font-size: 0.8rem; color: var(--gray-text); }
+        
+        .pill {
+            font-size: 0.7rem; padding: 4px 8px; border-radius: 10px; margin-left: 5px;
+            border: 1px solid #ddd;
+        }
+        .pill-sell { color: var(--hanko-color); border-color: var(--hanko-color); }
+
+        .btn-action-small {
+            background: var(--ink-color); color: white;
+            border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem;
+        }
+        
+        .total-money {
+            font-size: 2rem; color: var(--hanko-color); margin: 20px 0;
+            font-family: 'Georgia', serif;
+        }
+
+        /* --- NAVEGACIÓN --- */
         .nav-bar {
-            height: 70px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background-color: rgba(244, 241, 234, 0.95);
-            border-top: 1px solid #eee;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            height: 65px; display: flex; justify-content: space-around; align-items: center;
+            background-color: rgba(244, 241, 234, 0.98); border-top: 1px solid #eee;
+            position: fixed; bottom: 0; width: 100%; z-index: 100;
         }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem; /* Iconos grandes */
-            opacity: 0.4;
-            transition: 0.3s;
-        }
-
+        .nav-btn { background: none; border: none; font-size: 1.4rem; opacity: 0.4; transition: 0.3s; }
         .nav-btn.active { opacity: 1; color: var(--hanko-color); }
 
-        /* --- EXPORTAR --- */
-        .btn-export {
-            margin-top: 20px;
-            background-color: white;
-            border: 1px solid var(--ink-color);
-            color: var(--ink-color);
-            padding: 10px 20px;
-            border-radius: 5px;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="home-screen" class="screen active">
         <div class="enso-circle">
-            <span class="counter" id="item-count">0</span>
+            <div style="text-align:center;">
+                <div class="counter-big" id="home-money">0</div>
+                <div class="counter-label">Ganado</div>
+            </div>
             <div class="enso-dot"></div>
         </div>
-        <div class="ui-text" style="font-weight: bold; letter-spacing: 2px;">KŪHAKU</div>
-        <p class="quote ui-text" id="daily-quote">"La felicidad no es tener, es ser."</p>
+        <div class="ui-text" style="display:flex; gap:30px; margin-top:20px;">
+            <div style="text-align:center">
+                <div style="font-weight:bold; font-size:1.2rem;" id="count-kept">0</div>
+                <div style="font-size:0.7rem; color:#888;">CONSERVADO</div>
+            </div>
+            <div style="text-align:center">
+                <div style="font-weight:bold; font-size:1.2rem;" id="count-pending">0</div>
+                <div style="font-size:0.7rem; color:#888;">EN PROCESO</div>
+            </div>
+        </div>
     </div>
 
     <div id="add-screen" class="screen">
-        <h2 style="margin-bottom: 40px;">¿Qué pesa en tu mente?</h2>
-        <input type="text" id="new-item-input" placeholder="Nombre del objeto" autocomplete="off">
-        <button class="btn-main ui-text" onclick="addItem()">SOLTAR AQUÍ</button>
+        <h2 style="margin-bottom:30px;">Nuevo Objeto</h2>
+        <input type="text" id="new-name" placeholder="¿Qué objeto es?" autocomplete="off">
+        
+        <div class="action-grid ui-text">
+            <button class="action-btn" onclick="selectAction(this, 'conservar')">Conservar</button>
+            <button class="action-btn" onclick="selectAction(this, 'regalar')">Regalar</button>
+            <button class="action-btn" onclick="selectAction(this, 'donar')">Donar</button>
+            <button class="action-btn" onclick="selectAction(this, 'tirar')">Tirar</button>
+            <button class="action-btn" style="grid-column: span 2;" onclick="selectAction(this, 'vender')">Vender</button>
+        </div>
+
+        <div id="price-input-container">
+            <input type="number" id="target-price" placeholder="Precio Estimado (€)" inputmode="numeric">
+        </div>
+
+        <button class="btn-main ui-text" onclick="addItem()">REGISTRAR</button>
     </div>
 
-    <div id="list-screen" class="screen" style="justify-content: flex-start;">
-        <h2 style="margin: 20px 0; font-size: 1.5rem;">Cosas por dejar ir</h2>
-        <div id="inventory-list" class="ui-text">
+    <div id="list-screen" class="screen" style="padding-top:0;">
+        <div class="tabs ui-text">
+            <button class="tab-btn active" onclick="switchTab('process')">En Proceso</button>
+            <button class="tab-btn" onclick="switchTab('kept')">Santuario</button>
+            <button class="tab-btn" onclick="switchTab('sold')">Cuentas</button>
+        </div>
+        <div id="list-container" class="list-container ui-text">
             </div>
     </div>
 
     <div id="settings-screen" class="screen">
         <h2>Datos</h2>
-        <p class="ui-text" style="text-align: center; margin: 20px;">Tus datos son tuyos.<br>Expórtalos antes de borrar la app.</p>
-        <button class="btn-export ui-text" onclick="exportData()">Descargar JSON</button>
+        <p class="ui-text" style="text-align:center; margin:20px; color:#888;">
+            Aquí controlas tu información.<br>
+            Exporta tu archivo JSON para seguridad.
+        </p>
+        <button class="btn-main ui-text" style="background:white; color:black; border:1px solid black;" onclick="exportData()">Descargar JSON</button>
         <br><br>
-        <button class="btn-sell" style="border-color: #999; color: #999;" onclick="clearAllData()">Borrar Todo</button>
+        <input type="file" id="import-file" style="display:none" onchange="importData(this)">
+        <button class="ui-text" style="background:none; border:none; color:#888; text-decoration:underline;" onclick="document.getElementById('import-file').click()">Importar JSON</button>
+        <br><br><br>
+        <button class="ui-text" style="color:red; background:none; border:none;" onclick="clearAllData()">Borrar Todo</button>
     </div>
 
     <nav class="nav-bar">
-        <button class="nav-btn active" onclick="showScreen('home-screen', this)">●</button> <button class="nav-btn" onclick="showScreen('add-screen', this)">+</button> <button class="nav-btn" onclick="showScreen('list-screen', this)">☰</button> <button class="nav-btn" onclick="showScreen('settings-screen', this)">⚙</button> </nav>
+        <button class="nav-btn active" onclick="navTo('home-screen', this)">●</button>
+        <button class="nav-btn" onclick="navTo('add-screen', this)">+</button>
+        <button class="nav-btn" onclick="navTo('list-screen', this)">☰</button>
+        <button class="nav-btn" onclick="navTo('settings-screen', this)">⚙</button>
+    </nav>
 
     <script>
-        // --- LÓGICA DE LA APP ---
+        // --- ESTADO ---
+        let items = JSON.parse(localStorage.getItem('kuhakuItemsV2')) || [];
+        let currentAction = null;
+        let currentTab = 'process';
 
-        // 1. Estado Inicial
-        let items = JSON.parse(localStorage.getItem('kuhakuItems')) || [];
-        const quotes = [
-            "La felicidad no es tener, es ser.",
-            "Despídete de tus cosas con gratitud.",
-            "El espacio vacío es potencial puro.",
-            "¿Te da alegría o te da peso?",
-            "Menos cosas, más significado."
-        ];
-
-        // 2. Funciones de Navegación
-        function showScreen(screenId, btnElement) {
-            // Ocultar todas las pantallas
+        // --- NAVEGACIÓN ---
+        function navTo(screenId, btn) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            // Mostrar la seleccionada
             document.getElementById(screenId).classList.add('active');
-            
-            // Actualizar botones nav
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            if(btnElement) btnElement.classList.add('active');
-
+            if(btn) btn.classList.add('active');
+            
             if(screenId === 'home-screen') updateHome();
             if(screenId === 'list-screen') renderList();
         }
 
-        // 3. Funciones Principales
-        function updateHome() {
-            document.getElementById('item-count').innerText = items.length;
-            // Frase aleatoria
-            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            document.getElementById('daily-quote').innerText = `"${randomQuote}"`;
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            // Lógica simple para resaltar tab (mejora visual rápida)
+            const index = ['process', 'kept', 'sold'].indexOf(tabName);
+            document.querySelectorAll('.tab-btn')[index].classList.add('active');
+            renderList();
+        }
+
+        // --- AÑADIR ITEMS ---
+        function selectAction(btn, action) {
+            document.querySelectorAll('.action-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.classList.remove('sell-selected');
+            });
+            
+            btn.classList.add('selected');
+            if(action === 'vender') {
+                btn.classList.add('sell-selected');
+                document.getElementById('price-input-container').style.display = 'block';
+            } else {
+                document.getElementById('price-input-container').style.display = 'none';
+            }
+            currentAction = action;
         }
 
         function addItem() {
-            const input = document.getElementById('new-item-input');
-            const name = input.value.trim();
+            const name = document.getElementById('new-name').value.trim();
+            if(!name || !currentAction) {
+                alert("Escribe un nombre y elige una acción.");
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                action: currentAction, // conservar, vender, regalar...
+                targetPrice: document.getElementById('target-price').value || 0,
+                finalPrice: 0,
+                status: 'active', // active, sold, done
+                date: new Date().toLocaleDateString()
+            };
+
+            // Si es conservar, pasa directo a estado 'kept'
+            if(currentAction === 'conservar') newItem.status = 'kept';
+
+            items.push(newItem);
+            saveData();
             
-            if (name) {
-                const newItem = {
-                    id: Date.now(),
-                    name: name,
-                    dateAdded: new Date().toISOString(),
-                    status: 'active'
-                };
-                items.push(newItem);
+            // Reset
+            document.getElementById('new-name').value = '';
+            document.getElementById('target-price').value = '';
+            selectAction(document.querySelector('.action-btn'), null); // Deseleccionar
+            navTo('list-screen', document.querySelectorAll('.nav-btn')[2]);
+        }
+
+        // --- LISTAS Y LÓGICA ---
+        function renderList() {
+            const container = document.getElementById('list-container');
+            container.innerHTML = '';
+
+            let filteredItems = [];
+
+            if(currentTab === 'process') {
+                // Muestra cosas activas que NO son conservar
+                filteredItems = items.filter(i => i.status === 'active' && i.action !== 'conservar');
+            } else if (currentTab === 'kept') {
+                // El santuario
+                filteredItems = items.filter(i => i.status === 'kept' || (i.action === 'conservar' && i.status === 'active'));
+            } else if (currentTab === 'sold') {
+                // Historial de ventas y salidas
+                filteredItems = items.filter(i => i.status === 'done');
+                
+                // Mostrar total ganado arriba
+                const total = items.filter(i => i.status === 'done' && i.action === 'vender')
+                                   .reduce((sum, i) => sum + parseFloat(i.finalPrice || 0), 0);
+                container.innerHTML = `<div style="text-align:center;"><div class="total-money">+${total}€</div><div style="color:#888; font-size:0.8rem; margin-bottom:20px;">TOTAL GANADO</div></div>`;
+            }
+
+            if(filteredItems.length === 0 && currentTab !== 'sold') {
+                container.innerHTML = '<div style="text-align:center; margin-top:50px; color:#aaa;">Nada por aquí.</div>';
+                return;
+            }
+
+            filteredItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'item-card';
+                
+                let actionHtml = '';
+                
+                // Lógica de botones según pestaña
+                if(currentTab === 'process') {
+                    if(item.action === 'vender') {
+                        div.innerHTML = `
+                            <div class="item-info">
+                                <span class="item-name">${item.name} <span class="pill pill-sell">Vender</span></span>
+                                <span class="item-meta">Meta: ${item.targetPrice}€</span>
+                            </div>
+                            <button class="btn-action-small" onclick="markSold(${item.id})" style="background-color:var(--hanko-color)">Vendido</button>
+                        `;
+                    } else {
+                        // Donar, tirar, regalar
+                        div.innerHTML = `
+                            <div class="item-info">
+                                <span class="item-name">${item.name}</span>
+                                <span class="item-meta action-pill">${item.action.toUpperCase()}</span>
+                            </div>
+                            <button class="btn-action-small" onclick="completeItem(${item.id})">Listo</button>
+                        `;
+                    }
+                } else if (currentTab === 'kept') {
+                     div.innerHTML = `
+                        <div class="item-info">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-meta">Conservado en el santuario</span>
+                        </div>
+                        <span style="font-size:1.2rem;">⛩️</span>
+                    `;
+                } else if (currentTab === 'sold') {
+                    let priceDisplay = item.action === 'vender' ? `<span style="color:var(--hanko-color); font-weight:bold;">+${item.finalPrice}€</span>` : '0€';
+                    div.innerHTML = `
+                        <div class="item-info">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-meta">${item.action.toUpperCase()} - ${item.date}</span>
+                        </div>
+                        ${priceDisplay}
+                    `;
+                }
+
+                container.appendChild(div);
+            });
+        }
+
+        // --- ACCIONES ---
+        function markSold(id) {
+            const realPrice = prompt("¿Por cuánto lo has vendido realmente?");
+            if(realPrice !== null) {
+                const item = items.find(i => i.id === id);
+                item.finalPrice = realPrice;
+                item.status = 'done';
+                item.date = new Date().toLocaleDateString();
                 saveData();
-                input.value = '';
-                alert(`"${name}" ha sido registrado para salir.`);
-                showScreen('home-screen', document.querySelectorAll('.nav-btn')[0]);
+                renderList();
+                alert("Dinero añadido a tu cuenta.");
             }
         }
 
-        function deleteItem(id) {
-            if(confirm("¿Ya has vendido o donado este objeto?")) {
-                items = items.filter(item => item.id !== id);
+        function completeItem(id) {
+            if(confirm("¿Ya ha salido de tu casa?")) {
+                const item = items.find(i => i.id === id);
+                item.status = 'done';
+                item.date = new Date().toLocaleDateString();
                 saveData();
                 renderList();
             }
         }
 
-        function renderList() {
-            const listContainer = document.getElementById('inventory-list');
-            listContainer.innerHTML = '';
+        function updateHome() {
+            const totalEarned = items.filter(i => i.status === 'done' && i.action === 'vender')
+                                     .reduce((sum, i) => sum + parseFloat(i.finalPrice || 0), 0);
+            
+            const countKept = items.filter(i => i.status === 'kept' || (i.action === 'conservar')).length;
+            const countPending = items.filter(i => i.status === 'active' && i.action !== 'conservar').length;
 
-            if (items.length === 0) {
-                listContainer.innerHTML = '<p style="text-align:center; color:#999; margin-top:50px;">El vacío es hermoso.<br>No tienes cosas pendientes.</p>';
-                return;
-            }
-
-            items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'item-card';
-                div.innerHTML = `
-                    <span class="item-name">${item.name}</span>
-                    <button class="btn-sell" onclick="deleteItem(${item.id})">Soltar</button>
-                `;
-                listContainer.appendChild(div);
-            });
+            document.getElementById('home-money').innerText = totalEarned + "€";
+            document.getElementById('count-kept').innerText = countKept;
+            document.getElementById('count-pending').innerText = countPending;
         }
 
-        // 4. Persistencia y Exportación
-        function saveData() {
-            localStorage.setItem('kuhakuItems', JSON.stringify(items));
-            updateHome();
-        }
-
+        // --- DATA ---
+        function saveData() { localStorage.setItem('kuhakuItemsV2', JSON.stringify(items)); updateHome(); }
+        function clearAllData() { if(confirm("¿Borrar todo?")) { localStorage.removeItem('kuhakuItemsV2'); items=[]; updateHome(); } }
+        
         function exportData() {
-            const dataStr = JSON.stringify(items, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = 'kuhaku_data.json';
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "kuhaku_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
         }
 
-        function clearAllData() {
-            if(confirm("¿Borrar todos los datos y empezar de cero?")) {
-                items = [];
-                saveData();
-                alert("Tabula rasa. Todo borrado.");
-            }
+        function importData(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    items = JSON.parse(e.target.result);
+                    saveData();
+                    alert("Datos importados con éxito.");
+                } catch(err) { alert("Error al leer el archivo."); }
+            };
+            reader.readAsText(file);
         }
 
-        // Inicializar
+        // Init
         updateHome();
-
     </script>
 </body>
 </html>
