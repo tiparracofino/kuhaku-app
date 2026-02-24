@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#F4F1EA">
-    <title>Kūhaku v7</title>
+    <title>Kūhaku v8</title>
     <style>
         /* --- ESTILOS BASE --- */
         :root {
@@ -31,31 +31,38 @@
         .screen { flex: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
         .screen.active { display: flex; }
 
-        /* --- ENSO (ICONO) --- */
+        /* --- ENSO Y CABECERAS --- */
         .enso-circle {
             width: 160px; height: 160px;
             border: 5px solid var(--ink-color);
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             display: flex; align-items: center; justify-content: center;
             margin-top: 40px; margin-bottom: 20px; position: relative;
-            transition: all 0.5s ease;
         }
         .enso-dot {
             position: absolute; width: 12px; height: 12px;
             background: var(--hanko-color); border-radius: 50%; bottom: 15px; right: 15px;
         }
-        
-        /* Versión reducida para la cabecera del Santuario */
-        .enso-small {
-            width: 80px; height: 80px; margin-top: 10px; margin-bottom: 10px; border-width: 3px;
-        }
-        .enso-small .enso-dot { width: 6px; height: 6px; bottom: 8px; right: 8px; }
-
         .money-display { font-size: 2.2rem; font-weight: bold; }
-        .stats-row { display: flex; gap: 40px; margin-top: 30px; }
-        .stat-box { text-align: center; }
-        .stat-num { font-size: 1.5rem; font-weight: bold; }
-        .stat-label { font-size: 0.7rem; color: var(--gray-text); letter-spacing: 1px; }
+        
+        /* --- FILTRO DE ESPACIOS (KAMON) --- */
+        .spaces-scroll {
+            display: flex; gap: 15px; overflow-x: auto; width: 100%; padding: 10px 5px;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none; justify-content: center;
+        }
+        .spaces-scroll::-webkit-scrollbar { display: none; }
+        
+        .kamon-btn {
+            min-width: 50px; height: 50px; border: 1px solid #ccc; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; background: white; transition: 0.3s; flex-direction: column;
+        }
+        .kamon-btn span { font-size: 0.6rem; margin-top: 2px; display: none; } /* Texto opcional */
+        
+        .kamon-btn.selected {
+            border-color: var(--hanko-color); background: var(--hanko-color); color: white;
+            transform: scale(1.1); box-shadow: 0 4px 8px rgba(204,0,0,0.2);
+        }
 
         /* --- INPUTS --- */
         input {
@@ -65,7 +72,7 @@
             font-family: 'Georgia', serif;
         }
 
-        /* --- BOTONES --- */
+        /* --- BOTONES ACCIÓN --- */
         .grid-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 20px; }
         .btn-opt {
             padding: 15px; border: 1px solid #ccc; background: transparent;
@@ -90,42 +97,43 @@
             border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .card-actions button { background: none; border: none; font-size: 1.2rem; padding: 5px; margin-left: 5px; }
+        
+        /* Icono de espacio pequeño en la tarjeta */
+        .space-tag { font-size: 0.8rem; margin-right: 8px; opacity: 0.6; }
 
         /* --- NAV --- */
         .nav {
             position: fixed; bottom: 0; width: 100%; height: 70px;
             background: var(--bg-color); border-top: 1px solid #eee;
             display: flex; justify-content: space-around; align-items: center; z-index: 1000;
-            padding-bottom: 10px; /* Safe area for iPhone home bar */
+            padding-bottom: 10px; 
         }
         .nav-btn { background: none; border: none; font-size: 1.5rem; opacity: 0.3; }
         .nav-btn.active { opacity: 1; color: var(--hanko-color); }
-        
         .version-tag { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; color: #ccc; }
 
     </style>
 </head>
 <body>
-    <div class="version-tag">v7.0</div>
+    <div class="version-tag">v8.0</div>
 
     <div id="screen-home" class="screen active">
         <div class="enso-circle">
             <div style="text-align:center">
                 <div class="money-display" id="total-money">0€</div>
-                <div class="stat-label">GANADO</div>
+                <div style="font-size:0.7rem; color:#888; letter-spacing:1px;">GANADO</div>
             </div>
             <div class="enso-dot"></div>
         </div>
         
-        <div class="stats-row ui-text">
-            <div class="stat-box">
-                <div class="stat-num" id="stat-kept">0</div>
-                <div class="stat-label">SANTUARIO</div>
+        <div class="ui-text" style="display:flex; gap:40px; margin-top:30px; text-align:center;">
+            <div>
+                <div style="font-size:1.5rem; font-weight:bold;" id="stat-kept">0</div>
+                <div style="font-size:0.7rem; color:#888;">SANTUARIO</div>
             </div>
-            <div class="stat-box">
-                <div class="stat-num" id="stat-pending">0</div>
-                <div class="stat-label">PENDIENTE</div>
+            <div>
+                <div style="font-size:1.5rem; font-weight:bold;" id="stat-pending">0</div>
+                <div style="font-size:0.7rem; color:#888;">PENDIENTE</div>
             </div>
         </div>
     </div>
@@ -134,6 +142,10 @@
         <h2 class="ui-text">Nuevo Objeto</h2>
         <input type="text" id="inp-name" placeholder="Nombre..." autocomplete="off">
         
+        <p class="ui-text" style="font-size:0.8rem; color:#888; margin-bottom:10px;">¿De qué espacio es?</p>
+        <div class="spaces-scroll" id="add-space-selector" style="margin-bottom:20px;">
+            </div>
+
         <div class="grid-actions ui-text">
             <button class="btn-opt" onclick="setAct(this, 'conservar')">Conservar</button>
             <button class="btn-opt" onclick="setAct(this, 'regalar')">Regalar</button>
@@ -156,14 +168,13 @@
             <button class="tab" onclick="setTab('sold')">Cuentas</button>
         </div>
 
-        <div id="santuario-header" style="display:none; flex-direction:column; align-items:center; width:100%;">
-            <div class="enso-circle enso-small">
-                <div class="enso-dot"></div>
-            </div>
-            <p class="ui-text" style="font-size:0.8rem; color:#888; margin-bottom:15px;">Lo esencial permanece.</p>
+        <div id="santuario-header" style="display:none; flex-direction:column; align-items:center; width:100%; background: #fff; padding-bottom:10px; border-bottom:1px solid #eee; margin-bottom:10px;">
+            <div style="margin:10px; font-family:'Georgia'; font-size:1.2rem;">Espacios</div>
+            <div class="spaces-scroll" id="filter-space-selector">
+                </div>
         </div>
         
-        <input type="text" id="search-inp" placeholder="Buscar en santuario..." onkeyup="render()" style="display:none; font-size:0.9rem; margin-top:10px;">
+        <input type="text" id="search-inp" placeholder="Buscar..." onkeyup="render()" style="display:none; font-size:0.9rem; margin-top:10px;">
         
         <div id="list-content" style="width:100%; display:flex; flex-direction:column; align-items:center; padding-bottom: 90px;"></div>
     </div>
@@ -171,11 +182,9 @@
     <div id="screen-settings" class="screen">
         <h2 class="ui-text">Copia de Seguridad</h2>
         <p class="ui-text" style="font-size:0.8rem; color:#888; text-align:center; margin:20px 40px;">
-            Guarda una copia de tus datos en "Archivos" de tu iPhone regularmente.
+            Guarda una copia en "Archivos" de tu iPhone regularmente.
         </p>
-
         <button class="btn-main ui-text" onclick="nativeExport()">📤 GUARDAR COPIA</button>
-        
         <input type="file" id="file-input" style="display:none" onchange="nativeImport(this)">
         <button class="ui-text" style="background:none; border:none; margin-top:40px; color:black; text-decoration:underline;" onclick="document.getElementById('file-input').click()">📥 CARGAR COPIA</button>
     </div>
@@ -188,22 +197,69 @@
     </nav>
 
     <script>
-        // --- BASE DE DATOS ---
+        // --- CONFIGURACIÓN DE ESPACIOS (KAMON) ---
+        const SPACES = [
+            { id: 'all', icon: '⚪', label: 'Todo' }, // Solo para filtro
+            { id: 'living', icon: '🛋️', label: 'Salón' },
+            { id: 'kitchen', icon: '🍵', label: 'Cocina' },
+            { id: 'bedroom', icon: '🛏️', label: 'Cuarto' },
+            { id: 'bath', icon: '🚿', label: 'Baño' },
+            { id: 'study', icon: '🖊️', label: 'Estudio' },
+            { id: 'other', icon: '📦', label: 'Otro' }
+        ];
+
         let db = [];
         let curAct = null;
         let curTab = 'process';
+        let curSpaceAdd = 'living'; // Default al añadir
+        let curSpaceFilter = 'all'; // Default al filtrar
 
         function init() {
             try {
                 const raw = localStorage.getItem('kuhakuDB');
                 if (raw) db = JSON.parse(raw);
             } catch (e) { db = []; }
+            
+            // Generar selectores
+            renderSpaceSelectors();
             updateHome();
         }
 
         function save() {
             localStorage.setItem('kuhakuDB', JSON.stringify(db));
             updateHome();
+        }
+
+        // --- RENDERIZADO DE ESPACIOS ---
+        function renderSpaceSelectors() {
+            // 1. Selector en "Añadir" (Sin opción 'Todo')
+            const addContainer = document.getElementById('add-space-selector');
+            addContainer.innerHTML = '';
+            SPACES.slice(1).forEach(s => {
+                const btn = document.createElement('div');
+                btn.className = `kamon-btn ${s.id === curSpaceAdd ? 'selected' : ''}`;
+                btn.innerHTML = s.icon;
+                btn.onclick = () => { 
+                    curSpaceAdd = s.id; 
+                    renderSpaceSelectors(); // Re-render para actualizar selección visual
+                };
+                addContainer.appendChild(btn);
+            });
+
+            // 2. Selector en "Filtro Santuario" (Con opción 'Todo')
+            const filterContainer = document.getElementById('filter-space-selector');
+            filterContainer.innerHTML = '';
+            SPACES.forEach(s => {
+                const btn = document.createElement('div');
+                btn.className = `kamon-btn ${s.id === curSpaceFilter ? 'selected' : ''}`;
+                btn.innerHTML = s.icon;
+                btn.onclick = () => { 
+                    curSpaceFilter = s.id; 
+                    renderSpaceSelectors(); 
+                    render(); // Filtrar lista inmediatamente
+                };
+                filterContainer.appendChild(btn);
+            });
         }
 
         // --- NAVEGACIÓN ---
@@ -235,6 +291,7 @@
                 id: Date.now(),
                 name: name,
                 act: curAct,
+                space: curSpaceAdd, // Guardamos el espacio seleccionado
                 price: document.getElementById('inp-price').value || 0,
                 final: 0,
                 st: (curAct === 'conservar') ? 'kept' : 'active',
@@ -247,23 +304,23 @@
             go('screen-list', document.querySelectorAll('.nav-btn')[2]);
         }
 
-        // --- LISTAS Y SANTUARIO ---
+        // --- LISTAS ---
         function setTab(t) {
             curTab = t;
             document.querySelectorAll('.tab').forEach((b, i) => {
                 b.classList.toggle('active', ['process','kept','sold'][i] === t);
             });
             
-            // Lógica visual Santuario
+            // Mostrar/Ocultar Filtros de Santuario
             const search = document.getElementById('search-inp');
             const header = document.getElementById('santuario-header');
 
             if (t === 'kept') { 
                 search.style.display = 'block'; 
-                header.style.display = 'flex'; // Mostrar Icono
+                header.style.display = 'flex'; 
             } else { 
                 search.style.display = 'none'; search.value = '';
-                header.style.display = 'none'; // Ocultar Icono
+                header.style.display = 'none'; 
             }
             render();
         }
@@ -274,11 +331,21 @@
             const query = document.getElementById('search-inp').value.toLowerCase();
             
             let data = [];
-            if (curTab === 'process') data = db.filter(i => i.st === 'active');
-            else if (curTab === 'kept') {
+            
+            if (curTab === 'process') {
+                data = db.filter(i => i.st === 'active');
+            } else if (curTab === 'kept') {
+                // Filtro 1: Solo conservados
                 data = db.filter(i => i.st === 'kept');
+                // Filtro 2: Por Espacio (Kamon)
+                if (curSpaceFilter !== 'all') {
+                    data = data.filter(i => (i.space || 'other') === curSpaceFilter);
+                }
+                // Filtro 3: Búsqueda texto
                 if(query) data = data.filter(i => i.name.toLowerCase().includes(query));
-            } else if (curTab === 'sold') data = db.filter(i => i.st === 'done');
+            } else if (curTab === 'sold') {
+                data = db.filter(i => i.st === 'done');
+            }
 
             if (data.length === 0) {
                 list.innerHTML = '<div style="margin-top:20px; color:#ccc;">Vacío</div>';
@@ -289,7 +356,12 @@
                 const el = document.createElement('div');
                 el.className = 'card ui-text';
                 
-                let txt = `<div><div style="font-size:1.1rem">${item.name}</div><div style="font-size:0.7rem; color:#888">${item.act.toUpperCase()}</div></div>`;
+                // Buscar icono del espacio del item
+                const spaceObj = SPACES.find(s => s.id === (item.space || 'other'));
+                const spaceIcon = spaceObj ? spaceObj.icon : '📦';
+
+                let txt = `<div><div style="font-size:1.1rem"><span class="space-tag">${spaceIcon}</span>${item.name}</div><div style="font-size:0.7rem; color:#888; margin-left:25px;">${item.act.toUpperCase()}</div></div>`;
+                
                 if(curTab === 'sold' && item.act === 'vender') {
                     txt = `<div><div style="font-size:1.1rem">${item.name}</div><div style="font-size:0.9rem; color:var(--hanko-color); font-weight:bold">+${item.final}€</div></div>`;
                 }
@@ -307,13 +379,10 @@
             });
         }
 
-        function sold(id) {
-            const p = prompt("Precio final venta:");
-            if(p !== null) { const i = db.find(x => x.id === id); i.final = p; i.st = 'done'; save(); render(); }
-        }
+        function sold(id) { const p = prompt("Precio final:"); if(p) { const i = db.find(x => x.id === id); i.final = p; i.st = 'done'; save(); render(); } }
         function done(id) { const i = db.find(x => x.id === id); i.st = 'done'; save(); render(); }
         function restore(id) { if(confirm("¿Devolver a pendientes?")) { const i = db.find(x => x.id === id); i.st = 'active'; save(); render(); } }
-        function del(id) { if(confirm("¿Eliminar para siempre?")) { db = db.filter(x => x.id !== id); save(); render(); } }
+        function del(id) { if(confirm("¿Eliminar?")) { db = db.filter(x => x.id !== id); save(); render(); } }
 
         function updateHome() {
             const earned = db.filter(i => i.st === 'done').reduce((acc, i) => acc + parseFloat(i.final||0), 0);
@@ -322,46 +391,16 @@
             document.getElementById('stat-pending').innerText = db.filter(i => i.st === 'active').length;
         }
 
-        // --- EXPORTAR / IMPORTAR NATIVO (iPhone Friendly) ---
+        // --- EXPORT/IMPORT ---
         async function nativeExport() {
             const dataStr = JSON.stringify(db, null, 2);
             const file = new File([dataStr], "kuhaku_backup.json", { type: "application/json" });
-            
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Kuhaku Backup',
-                    });
-                } catch (error) {
-                    // Si cancela o falla, fallback a descarga clásica
-                    downloadFallback(dataStr);
-                }
-            } else {
-                downloadFallback(dataStr);
-            }
+            if (navigator.share) { try { await navigator.share({ files: [file], title: 'Kuhaku Backup' }); } catch (e) { dl(dataStr); } } else { dl(dataStr); }
         }
-
-        function downloadFallback(dataStr) {
-            const blob = new Blob([dataStr], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = "kuhaku_backup.json";
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
+        function dl(s) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([s], {type:"application/json"})); a.download = "kuhaku.json"; document.body.appendChild(a); a.click(); a.remove(); }
         function nativeImport(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    db = JSON.parse(e.target.result);
-                    save();
-                    alert("¡Copia cargada correctamente!");
-                } catch(err) { alert("El archivo no es válido."); }
-            };
-            reader.readAsText(file);
+            const f = input.files[0]; if(!f) return;
+            const r = new FileReader(); r.onload = e => { try { db = JSON.parse(e.target.result); save(); alert("¡Cargado!"); } catch(err) { alert("Error"); } }; r.readAsText(f);
         }
 
         init();
