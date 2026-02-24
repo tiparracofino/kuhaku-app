@@ -46,10 +46,11 @@
         }
         .money-display { font-size: 2.2rem; font-weight: bold; }
         
-        /* --- TARJETAS DE ESPACIO --- */
+        /* --- SELECTOR DE ESPACIOS (TARJETAS) --- */
         .spaces-scroll {
             display: flex; gap: 12px; overflow-x: auto; width: 100%; padding: 10px 5px;
-            -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: flex-start;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none; 
+            align-items: flex-start;
         }
         .spaces-scroll::-webkit-scrollbar { display: none; }
         
@@ -62,10 +63,27 @@
             transition: 0.2s; position: relative;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .space-card svg { width: 32px; height: 32px; stroke: #222; stroke-width: 1.2; fill: none; margin-top: 5px; }
-        .space-card .card-text { font-family: 'Georgia', serif; font-size: 0.7rem; text-align: center; color: #333; line-height: 1.1; }
-        .space-card .card-kanji { font-size: 0.6rem; color: #ccc; margin-bottom: 2px; }
-        .space-card.selected { border: 2px solid var(--hanko-color); background-color: #fff; transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+        
+        .space-card svg {
+            width: 32px; height: 32px;
+            stroke: #222; stroke-width: 1.2; fill: none; stroke-linecap: round; stroke-linejoin: round;
+            margin-top: 5px;
+        }
+
+        .space-card .card-text {
+            font-family: 'Georgia', serif; font-size: 0.7rem; text-align: center; color: #333; line-height: 1.1;
+        }
+
+        .space-card .card-kanji {
+            font-size: 0.6rem; color: #ccc; margin-bottom: 2px;
+        }
+
+        .space-card.selected {
+            border: 2px solid var(--hanko-color);
+            background-color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
         
         /* --- INPUTS --- */
         input {
@@ -77,33 +95,52 @@
 
         /* --- BOTONES ACCIÓN --- */
         .grid-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 20px; }
-        .btn-opt { padding: 15px; border: 1px solid #ccc; background: transparent; color: #888; border-radius: 5px; cursor: pointer; }
+        .btn-opt {
+            padding: 15px; border: 1px solid #ccc; background: transparent;
+            color: #888; border-radius: 5px; cursor: pointer;
+        }
         .btn-opt.selected { border-color: black; color: black; background: white; }
         .btn-opt.sell { border-color: var(--hanko-color); color: var(--hanko-color); }
-        .btn-opt-small { padding: 10px; font-size: 0.8rem; } /* Para el modal */
 
-        .btn-main { background: var(--ink-color); color: white; padding: 15px 40px; border-radius: 30px; border: none; font-size: 1rem; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn-secondary { background: transparent; border: 1px solid #ccc; color: #666; padding: 10px 30px; border-radius: 30px; margin-top: 10px; }
+        .btn-main {
+            background: var(--ink-color); color: white; padding: 15px 40px;
+            border-radius: 30px; border: none; font-size: 1rem; margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background: transparent; border: 1px solid #ccc; color: #666; 
+            padding: 10px 30px; border-radius: 30px; margin-top: 10px;
+        }
 
         /* --- LISTAS --- */
         .tabs { display: flex; width: 100%; justify-content: space-around; border-bottom: 1px solid #ddd; margin-bottom: 15px; }
         .tab { padding: 15px; background: none; border: none; color: #aaa; font-size: 0.8rem; text-transform: uppercase; }
         .tab.active { color: black; border-bottom: 2px solid var(--hanko-color); }
 
-        .card { background: white; width: 95%; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .card {
+            background: white; width: 95%; padding: 15px; margin-bottom: 10px;
+            border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
         .space-tag-icon svg { width: 18px; height: 18px; stroke: var(--hanko-color); fill: none; }
         .space-tag-icon { margin-right: 10px; display: flex; align-items: center; }
-        .days-ago { font-size: 0.6rem; color: #bbb; margin-top: 4px; margin-left: 28px; }
 
         /* --- EDIT MODAL --- */
         #edit-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(244, 241, 234, 0.98); z-index: 2000;
-            display: none; flex-direction: column; align-items: center; padding-top: 40px; overflow-y: auto;
+            background: rgba(244, 241, 234, 0.95); z-index: 2000;
+            display: none; flex-direction: column; align-items: center; padding-top: 50px;
         }
 
         /* --- NAV --- */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: var(--bg-color); border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: 10px; }
+        .nav {
+            position: fixed; bottom: 0; width: 100%; height: 70px;
+            background: var(--bg-color); border-top: 1px solid #eee;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            padding-bottom: 10px; 
+        }
         .nav-btn { background: none; border: none; font-size: 1.5rem; opacity: 0.3; }
         .nav-btn.active { opacity: 1; color: var(--hanko-color); }
         .version-tag { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; color: #ccc; }
@@ -184,28 +221,12 @@
     
     <div id="edit-overlay">
         <h2 class="ui-text">Editar</h2>
-        
         <input type="text" id="edit-name" placeholder="Nombre..." autocomplete="off">
-        
-        <p class="ui-text" style="font-size:0.8rem; color:#888; margin-top:10px;">Cambiar Acción</p>
-        <div class="grid-actions ui-text" style="width:90%;">
-            <button class="btn-opt btn-opt-small edit-act-btn" onclick="setEditAct(this, 'conservar')">Conservar</button>
-            <button class="btn-opt btn-opt-small edit-act-btn" onclick="setEditAct(this, 'regalar')">Regalar</button>
-            <button class="btn-opt btn-opt-small edit-act-btn" onclick="setEditAct(this, 'donar')">Donar</button>
-            <button class="btn-opt btn-opt-small edit-act-btn" onclick="setEditAct(this, 'tirar')">Tirar</button>
-            <button class="btn-opt btn-opt-small edit-act-btn" style="grid-column: span 2;" onclick="setEditAct(this, 'vender')">Vender</button>
-        </div>
-
-        <div id="edit-price-box" style="display:none; width:100%;">
-            <input type="number" id="edit-price" placeholder="Nuevo precio (€)" inputmode="decimal">
-        </div>
-
-        <p class="ui-text" style="font-size:0.8rem; color:#888; margin-top:10px;">Cambiar Espacio</p>
+        <p class="ui-text" style="font-size:0.8rem; color:#888;">Cambiar Espacio</p>
         <div class="spaces-scroll" id="edit-space-selector" style="width:95%; margin-bottom:30px;"></div>
         
         <button class="btn-main ui-text" onclick="saveEdit()">GUARDAR CAMBIOS</button>
         <button class="btn-secondary ui-text" onclick="closeEdit()">CANCELAR</button>
-        <div style="height: 50px;"></div>
     </div>
 
     <nav class="nav">
@@ -216,7 +237,7 @@
     </nav>
 
     <script>
-        // --- DATA ---
+        // --- ICONOS & DATA ---
         const ICONS = {
             all: '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
             living: '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M12 10v8"/></svg>',
@@ -254,11 +275,8 @@
         let curTab = 'process';
         let curSpaceAdd = 'living'; 
         let curSpaceFilter = 'all';
-        
-        // Variables edición
         let editId = null;
         let curSpaceEdit = 'living';
-        let curActEdit = null;
 
         function init() {
             try {
@@ -297,7 +315,6 @@
             SPACES.slice(1).forEach(s => editContainer.appendChild(createCard(s, curSpaceEdit, (id) => { curSpaceEdit = id; renderSelectors(); })));
         }
 
-        // --- NAVEGACIÓN Y AÑADIR ---
         function go(id, btn) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -330,7 +347,7 @@
                 price: document.getElementById('inp-price').value || 0,
                 final: 0,
                 st: (curAct === 'conservar') ? 'kept' : 'active',
-                date: new Date().toLocaleDateString() // Guarda formato local
+                date: new Date().toLocaleDateString()
             });
             save();
             document.getElementById('inp-name').value = '';
@@ -339,7 +356,6 @@
             go('screen-list', document.querySelectorAll('.nav-btn')[2]);
         }
 
-        // --- LISTAS ---
         function setTab(t) {
             curTab = t;
             document.querySelectorAll('.tab').forEach((b, i) => {
@@ -375,10 +391,33 @@
                 }
                 if(query) data = data.filter(i => i.name.toLowerCase().includes(query));
             } else if (curTab === 'sold') {
+                // CUENTAS
+                // 1. Mostrar Cabecera Financiera
+                const pendingSales = db.filter(i => i.st === 'active' && i.act === 'vender');
+                const earnedSales = db.filter(i => i.st === 'done' && i.act === 'vender');
+                
+                const totalEarned = earnedSales.reduce((acc, i) => acc + parseFloat(i.final||0), 0);
+                const totalPotential = pendingSales.reduce((acc, i) => acc + parseFloat(i.price||0), 0);
+
+                const statsHTML = `
+                <div style="display:flex; justify-content:space-around; width:90%; margin-bottom:20px; text-align:center; background:#fff; padding:15px; border-radius:8px; border:1px solid #eee;">
+                    <div>
+                        <div style="font-size:1.8rem; font-weight:bold; color:var(--hanko-color);">${totalEarned}€</div>
+                        <div style="font-size:0.7rem; color:#888;">GANADO (REAL)</div>
+                    </div>
+                    <div style="border-left:1px solid #eee;"></div>
+                    <div>
+                        <div style="font-size:1.8rem; font-weight:bold; color:#555;">${totalPotential}€</div>
+                        <div style="font-size:0.7rem; color:#888;">EN VENTA (EST)</div>
+                    </div>
+                </div>`;
+                
+                list.innerHTML = statsHTML;
+
                 data = db.filter(i => i.st === 'done');
             }
 
-            if (data.length === 0) {
+            if (data.length === 0 && curTab !== 'sold') {
                 list.innerHTML = '<div style="margin-top:20px; color:#ccc;">Vacío</div>';
                 return;
             }
@@ -390,20 +429,7 @@
                 const spaceObj = SPACES.find(s => s.id === (item.space || 'living'));
                 const spaceIcon = spaceObj ? spaceObj.icon : ICONS.living;
 
-                // Calcular días (aproximado)
-                // Usamos la fecha guardada, si no existe, usamos hoy
-                // Nota: Date.parse funciona mejor con MM/DD/YYYY, aquí simplificamos visual
-                let dateText = item.date || ""; 
-
-                let txt = `<div>
-                    <div style="font-size:1.1rem; display:flex; align-items:center;">
-                        <span class="space-tag-icon">${spaceIcon}</span>${item.name}
-                    </div>
-                    <div style="font-size:0.7rem; color:#888; margin-left:30px;">
-                        ${item.act.toUpperCase()}
-                    </div>
-                    ${curTab !== 'sold' ? `<div class="days-ago">Añadido: ${dateText}</div>` : ''}
-                </div>`;
+                let txt = `<div><div style="font-size:1.1rem; display:flex; align-items:center;"><span class="space-tag-icon">${spaceIcon}</span>${item.name}</div><div style="font-size:0.7rem; color:#888; margin-left:30px;">${item.act.toUpperCase()}</div></div>`;
                 
                 if(curTab === 'sold' && item.act === 'vender') {
                     txt = `<div><div style="font-size:1.1rem">${item.name}</div><div style="font-size:0.9rem; color:var(--hanko-color); font-weight:bold">+${item.final}€</div></div>`;
@@ -424,66 +450,23 @@
             });
         }
 
-        // --- LÓGICA DE EDICIÓN COMPLETA ---
+        // --- LÓGICA DE EDICIÓN ---
         function openEdit(id) {
             editId = id;
             const item = db.find(i => i.id === id);
-            
-            // Cargar datos
             document.getElementById('edit-name').value = item.name;
-            document.getElementById('edit-price').value = item.price || '';
             curSpaceEdit = item.space || 'living';
-            curActEdit = item.act;
-
-            // Render visual selection
-            renderSelectors();
-            
-            // Actualizar botones de acción visualmente
-            document.querySelectorAll('.edit-act-btn').forEach(btn => {
-                btn.classList.remove('selected', 'sell');
-                if(btn.innerText.toLowerCase() === curActEdit) {
-                    btn.classList.add('selected');
-                    if(curActEdit === 'vender') btn.classList.add('sell');
-                }
-            });
-
-            // Mostrar/ocultar precio
-            document.getElementById('edit-price-box').style.display = (curActEdit === 'vender') ? 'block' : 'none';
-
+            renderSelectors(); 
             document.getElementById('edit-overlay').style.display = 'flex';
-        }
-
-        function setEditAct(btn, act) {
-            document.querySelectorAll('.edit-act-btn').forEach(b => b.classList.remove('selected', 'sell'));
-            btn.classList.add('selected');
-            if (act === 'vender') {
-                btn.classList.add('sell');
-                document.getElementById('edit-price-box').style.display = 'block';
-            } else {
-                document.getElementById('edit-price-box').style.display = 'none';
-            }
-            curActEdit = act;
         }
 
         function saveEdit() {
             if(!editId) return;
             const item = db.find(i => i.id === editId);
             const newName = document.getElementById('edit-name').value;
-            
             if(newName) {
                 item.name = newName;
                 item.space = curSpaceEdit;
-                item.act = curActEdit;
-                item.price = document.getElementById('edit-price').value || 0;
-
-                // Lógica inteligente de cambio de estado
-                if(curActEdit === 'conservar') {
-                    item.st = 'kept'; // Si marco conservar, va al santuario
-                } else {
-                    // Si estaba en kept y ahora es vender/donar, va a active
-                    if(item.st === 'kept') item.st = 'active';
-                }
-
                 save();
                 render();
                 closeEdit();
@@ -495,7 +478,7 @@
             editId = null;
         }
 
-        // --- RESTO ACCIONES ---
+        // --- RESTO DE ACCIONES ---
         function sold(id) { const p = prompt("Precio final:"); if(p) { const i = db.find(x => x.id === id); i.final = p; i.st = 'done'; save(); render(); } }
         function done(id) { const i = db.find(x => x.id === id); i.st = 'done'; save(); render(); }
         function restore(id) { if(confirm("¿Devolver a pendientes?")) { const i = db.find(x => x.id === id); i.st = 'active'; save(); render(); } }
