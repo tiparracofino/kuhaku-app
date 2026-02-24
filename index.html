@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#F4F1EA">
+    <title>Kūhaku</title>
+    <style>
+        /* --- ESTÉTICA JAPONESA MINIMALISTA --- */
+        :root {
+            --bg-color: #F4F1EA; /* Blanco Washi */
+            --ink-color: #111111; /* Negro Tinta */
+            --hanko-color: #CC0000; /* Rojo Sello */
+            --gray-text: #888888;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--ink-color);
+            font-family: 'Georgia', serif; /* Toque tradicional */
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            -webkit-user-select: none;
+        }
+
+        h1, h2, h3 { font-weight: normal; margin: 0; }
+        
+        /* Tipografía Sans para UI */
+        .ui-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        /* --- PANTALLAS --- */
+        .screen {
+            flex: 1;
+            display: none; /* Ocultas por defecto */
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen.active { display: flex; }
+
+        /* --- PANTALLA INICIO (HOME) --- */
+        .enso-circle {
+            width: 200px;
+            height: 200px;
+            border: 8px solid var(--ink-color);
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; /* Imperfección Wabi-sabi */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .enso-dot {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: var(--hanko-color);
+            border-radius: 50%;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .counter { font-size: 3rem; font-weight: bold; }
+        .quote { margin-top: 20px; text-align: center; color: var(--gray-text); font-style: italic; max-width: 80%; }
+
+        /* --- PANTALLA LISTA --- */
+        #inventory-list { width: 100%; max-width: 400px; padding-bottom: 80px; }
+        
+        .item-card {
+            border-bottom: 1px solid #ddd;
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .item-name { font-size: 1.2rem; }
+        
+        .btn-sell {
+            background: none;
+            border: 1px solid var(--hanko-color);
+            color: var(--hanko-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* --- FORMULARIO AÑADIR --- */
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--ink-color);
+            font-size: 1.5rem;
+            color: var(--ink-color);
+            text-align: center;
+            padding: 10px;
+            outline: none;
+            width: 80%;
+            margin-bottom: 30px;
+            font-family: 'Georgia', serif;
+        }
+
+        .btn-main {
+            background-color: var(--ink-color);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- NAVEGACIÓN INFERIOR --- */
+        .nav-bar {
+            height: 70px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: rgba(244, 241, 234, 0.95);
+            border-top: 1px solid #eee;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem; /* Iconos grandes */
+            opacity: 0.4;
+            transition: 0.3s;
+        }
+
+        .nav-btn.active { opacity: 1; color: var(--hanko-color); }
+
+        /* --- EXPORTAR --- */
+        .btn-export {
+            margin-top: 20px;
+            background-color: white;
+            border: 1px solid var(--ink-color);
+            color: var(--ink-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="home-screen" class="screen active">
+        <div class="enso-circle">
+            <span class="counter" id="item-count">0</span>
+            <div class="enso-dot"></div>
+        </div>
+        <div class="ui-text" style="font-weight: bold; letter-spacing: 2px;">KŪHAKU</div>
+        <p class="quote ui-text" id="daily-quote">"La felicidad no es tener, es ser."</p>
+    </div>
+
+    <div id="add-screen" class="screen">
+        <h2 style="margin-bottom: 40px;">¿Qué pesa en tu mente?</h2>
+        <input type="text" id="new-item-input" placeholder="Nombre del objeto" autocomplete="off">
+        <button class="btn-main ui-text" onclick="addItem()">SOLTAR AQUÍ</button>
+    </div>
+
+    <div id="list-screen" class="screen" style="justify-content: flex-start;">
+        <h2 style="margin: 20px 0; font-size: 1.5rem;">Cosas por dejar ir</h2>
+        <div id="inventory-list" class="ui-text">
+            </div>
+    </div>
+
+    <div id="settings-screen" class="screen">
+        <h2>Datos</h2>
+        <p class="ui-text" style="text-align: center; margin: 20px;">Tus datos son tuyos.<br>Expórtalos antes de borrar la app.</p>
+        <button class="btn-export ui-text" onclick="exportData()">Descargar JSON</button>
+        <br><br>
+        <button class="btn-sell" style="border-color: #999; color: #999;" onclick="clearAllData()">Borrar Todo</button>
+    </div>
+
+    <nav class="nav-bar">
+        <button class="nav-btn active" onclick="showScreen('home-screen', this)">●</button> <button class="nav-btn" onclick="showScreen('add-screen', this)">+</button> <button class="nav-btn" onclick="showScreen('list-screen', this)">☰</button> <button class="nav-btn" onclick="showScreen('settings-screen', this)">⚙</button> </nav>
+
+    <script>
+        // --- LÓGICA DE LA APP ---
+
+        // 1. Estado Inicial
+        let items = JSON.parse(localStorage.getItem('kuhakuItems')) || [];
+        const quotes = [
+            "La felicidad no es tener, es ser.",
+            "Despídete de tus cosas con gratitud.",
+            "El espacio vacío es potencial puro.",
+            "¿Te da alegría o te da peso?",
+            "Menos cosas, más significado."
+        ];
+
+        // 2. Funciones de Navegación
+        function showScreen(screenId, btnElement) {
+            // Ocultar todas las pantallas
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Mostrar la seleccionada
+            document.getElementById(screenId).classList.add('active');
+            
+            // Actualizar botones nav
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            if(screenId === 'home-screen') updateHome();
+            if(screenId === 'list-screen') renderList();
+        }
+
+        // 3. Funciones Principales
+        function updateHome() {
+            document.getElementById('item-count').innerText = items.length;
+            // Frase aleatoria
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('daily-quote').innerText = `"${randomQuote}"`;
+        }
+
+        function addItem() {
+            const input = document.getElementById('new-item-input');
+            const name = input.value.trim();
+            
+            if (name) {
+                const newItem = {
+                    id: Date.now(),
+                    name: name,
+                    dateAdded: new Date().toISOString(),
+                    status: 'active'
+                };
+                items.push(newItem);
+                saveData();
+                input.value = '';
+                alert(`"${name}" ha sido registrado para salir.`);
+                showScreen('home-screen', document.querySelectorAll('.nav-btn')[0]);
+            }
+        }
+
+        function deleteItem(id) {
+            if(confirm("¿Ya has vendido o donado este objeto?")) {
+                items = items.filter(item => item.id !== id);
+                saveData();
+                renderList();
+            }
+        }
+
+        function renderList() {
+            const listContainer = document.getElementById('inventory-list');
+            listContainer.innerHTML = '';
+
+            if (items.length === 0) {
+                listContainer.innerHTML = '<p style="text-align:center; color:#999; margin-top:50px;">El vacío es hermoso.<br>No tienes cosas pendientes.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'item-card';
+                div.innerHTML = `
+                    <span class="item-name">${item.name}</span>
+                    <button class="btn-sell" onclick="deleteItem(${item.id})">Soltar</button>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        // 4. Persistencia y Exportación
+        function saveData() {
+            localStorage.setItem('kuhakuItems', JSON.stringify(items));
+            updateHome();
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(items, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'kuhaku_data.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function clearAllData() {
+            if(confirm("¿Borrar todos los datos y empezar de cero?")) {
+                items = [];
+                saveData();
+                alert("Tabula rasa. Todo borrado.");
+            }
+        }
+
+        // Inicializar
+        updateHome();
+
+    </script>
+</body>
+</html>
