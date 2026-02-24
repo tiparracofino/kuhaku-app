@@ -57,7 +57,7 @@
 
         /* --- FORMULARIO AÑADIR --- */
         #add-screen { justify-content: flex-start; padding-top: 40px; }
-        input[type="text"], input[type="number"] {
+        input[type="text"], input[type="number"], input[type="search"] {
             background: transparent; border: none;
             border-bottom: 1px solid var(--ink-color);
             font-size: 1.3rem; color: var(--ink-color);
@@ -66,6 +66,10 @@
             font-family: 'Georgia', serif;
         }
         
+        /* Estilo específico buscador */
+        #search-container { width: 100%; display: none; animation: fadeIn 0.3s; margin-bottom: 15px; }
+        input[type="search"] { font-size: 1rem; border-color: #aaa; color: #555; }
+
         .action-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 20px;
         }
@@ -122,6 +126,9 @@
             background: var(--ink-color); color: white;
             border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem;
         }
+
+        .action-icons { display: flex; gap: 15px; }
+        .icon-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; }
         
         .total-money {
             font-size: 2rem; color: var(--hanko-color); margin: 20px 0;
@@ -187,6 +194,11 @@
             <button class="tab-btn" onclick="switchTab('kept')">Santuario</button>
             <button class="tab-btn" onclick="switchTab('sold')">Cuentas</button>
         </div>
+
+        <div id="search-container">
+            <input type="search" id="search-bar" placeholder="Buscar en santuario..." oninput="renderList()">
+        </div>
+
         <div id="list-container" class="list-container ui-text">
             </div>
     </div>
@@ -194,13 +206,16 @@
     <div id="settings-screen" class="screen">
         <h2>Datos</h2>
         <p class="ui-text" style="text-align:center; margin:20px; color:#888;">
-            Aquí controlas tu información.<br>
-            Exporta tu archivo JSON para seguridad.
+            Tus datos son tuyos.<br>
+            Guardar copia de seguridad.
         </p>
-        <button class="btn-main ui-text" style="background:white; color:black; border:1px solid black;" onclick="exportData()">Descargar JSON</button>
+        
+        <button class="btn-main ui-text" style="background:white; color:black; border:1px solid black;" onclick="exportData()">📤 Exportar / Guardar</button>
+        
         <br><br>
         <input type="file" id="import-file" style="display:none" onchange="importData(this)">
         <button class="ui-text" style="background:none; border:none; color:#888; text-decoration:underline;" onclick="document.getElementById('import-file').click()">Importar JSON</button>
+        
         <br><br><br>
         <button class="ui-text" style="color:red; background:none; border:none;" onclick="clearAllData()">Borrar Todo</button>
     </div>
@@ -232,9 +247,18 @@
         function switchTab(tabName) {
             currentTab = tabName;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            // Lógica simple para resaltar tab (mejora visual rápida)
             const index = ['process', 'kept', 'sold'].indexOf(tabName);
             document.querySelectorAll('.tab-btn')[index].classList.add('active');
+            
+            // Mostrar buscador solo en Santuario
+            const searchContainer = document.getElementById('search-container');
+            if(tabName === 'kept') {
+                searchContainer.style.display = 'block';
+            } else {
+                searchContainer.style.display = 'none';
+                document.getElementById('search-bar').value = ''; // Limpiar búsqueda al salir
+            }
+
             renderList();
         }
 
@@ -265,23 +289,21 @@
             const newItem = {
                 id: Date.now(),
                 name: name,
-                action: currentAction, // conservar, vender, regalar...
+                action: currentAction,
                 targetPrice: document.getElementById('target-price').value || 0,
                 finalPrice: 0,
-                status: 'active', // active, sold, done
+                status: 'active',
                 date: new Date().toLocaleDateString()
             };
 
-            // Si es conservar, pasa directo a estado 'kept'
             if(currentAction === 'conservar') newItem.status = 'kept';
 
             items.push(newItem);
             saveData();
             
-            // Reset
             document.getElementById('new-name').value = '';
             document.getElementById('target-price').value = '';
-            selectAction(document.querySelector('.action-btn'), null); // Deseleccionar
+            selectAction(document.querySelector('.action-btn'), null);
             navTo('list-screen', document.querySelectorAll('.nav-btn')[2]);
         }
 
@@ -289,27 +311,29 @@
         function renderList() {
             const container = document.getElementById('list-container');
             container.innerHTML = '';
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
 
             let filteredItems = [];
 
             if(currentTab === 'process') {
-                // Muestra cosas activas que NO son conservar
                 filteredItems = items.filter(i => i.status === 'active' && i.action !== 'conservar');
             } else if (currentTab === 'kept') {
-                // El santuario
                 filteredItems = items.filter(i => i.status === 'kept' || (i.action === 'conservar' && i.status === 'active'));
+                // Aplicar filtro de búsqueda solo aquí
+                if(searchTerm) {
+                    filteredItems = filteredItems.filter(i => i.name.toLowerCase().includes(searchTerm));
+                }
             } else if (currentTab === 'sold') {
-                // Historial de ventas y salidas
                 filteredItems = items.filter(i => i.status === 'done');
                 
-                // Mostrar total ganado arriba
                 const total = items.filter(i => i.status === 'done' && i.action === 'vender')
                                    .reduce((sum, i) => sum + parseFloat(i.finalPrice || 0), 0);
                 container.innerHTML = `<div style="text-align:center;"><div class="total-money">+${total}€</div><div style="color:#888; font-size:0.8rem; margin-bottom:20px;">TOTAL GANADO</div></div>`;
             }
 
             if(filteredItems.length === 0 && currentTab !== 'sold') {
-                container.innerHTML = '<div style="text-align:center; margin-top:50px; color:#aaa;">Nada por aquí.</div>';
+                const msg = searchTerm ? 'No hay coincidencias.' : 'Nada por aquí.';
+                container.innerHTML = `<div style="text-align:center; margin-top:50px; color:#aaa;">${msg}</div>`;
                 return;
             }
 
@@ -317,9 +341,6 @@
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 
-                let actionHtml = '';
-                
-                // Lógica de botones según pestaña
                 if(currentTab === 'process') {
                     if(item.action === 'vender') {
                         div.innerHTML = `
@@ -330,7 +351,6 @@
                             <button class="btn-action-small" onclick="markSold(${item.id})" style="background-color:var(--hanko-color)">Vendido</button>
                         `;
                     } else {
-                        // Donar, tirar, regalar
                         div.innerHTML = `
                             <div class="item-info">
                                 <span class="item-name">${item.name}</span>
@@ -340,21 +360,28 @@
                         `;
                     }
                 } else if (currentTab === 'kept') {
+                    // SANTUARIO: Añadidos botones de Devolver y Borrar
                      div.innerHTML = `
                         <div class="item-info">
                             <span class="item-name">${item.name}</span>
-                            <span class="item-meta">Conservado en el santuario</span>
+                            <span class="item-meta">Conservado</span>
                         </div>
-                        <span style="font-size:1.2rem;">⛩️</span>
+                        <div class="action-icons">
+                            <button class="icon-btn" onclick="restoreItem(${item.id})" title="Devolver a proceso">↺</button>
+                            <button class="icon-btn" onclick="hardDelete(${item.id})" title="Eliminar duplicado" style="color:red;">✕</button>
+                        </div>
                     `;
                 } else if (currentTab === 'sold') {
-                    let priceDisplay = item.action === 'vender' ? `<span style="color:var(--hanko-color); font-weight:bold;">+${item.finalPrice}€</span>` : '0€';
+                    let priceDisplay = item.action === 'vender' ? `<span style="color:var(--hanko-color); font-weight:bold;">+${item.finalPrice}€</span>` : '';
                     div.innerHTML = `
                         <div class="item-info">
-                            <span class="item-name">${item.name}</span>
+                            <span class="item-name">${item.name} ${priceDisplay}</span>
                             <span class="item-meta">${item.action.toUpperCase()} - ${item.date}</span>
                         </div>
-                        ${priceDisplay}
+                        <div class="action-icons">
+                            <button class="icon-btn" onclick="restoreItem(${item.id})" title="Deshacer/Restaurar">↺</button>
+                            <button class="icon-btn" onclick="hardDelete(${item.id})" title="Eliminar definitivamente" style="color:red;">✕</button>
+                        </div>
                     `;
                 }
 
@@ -362,7 +389,7 @@
             });
         }
 
-        // --- ACCIONES ---
+        // --- ACCIONES DE ESTADO ---
         function markSold(id) {
             const realPrice = prompt("¿Por cuánto lo has vendido realmente?");
             if(realPrice !== null) {
@@ -372,7 +399,6 @@
                 item.date = new Date().toLocaleDateString();
                 saveData();
                 renderList();
-                alert("Dinero añadido a tu cuenta.");
             }
         }
 
@@ -381,6 +407,25 @@
                 const item = items.find(i => i.id === id);
                 item.status = 'done';
                 item.date = new Date().toLocaleDateString();
+                saveData();
+                renderList();
+            }
+        }
+
+        // --- FUNCIONES DE RETROCESO Y BORRADO ---
+        function restoreItem(id) {
+            let msg = currentTab === 'kept' ? "¿Dejar de conservar y mover a 'En Proceso'?" : "¿Quieres devolver este objeto a la lista de pendientes?";
+            if(confirm(msg)) {
+                const item = items.find(i => i.id === id);
+                item.status = 'active'; // Vuelve a estar activo en proceso
+                saveData();
+                renderList();
+            }
+        }
+
+        function hardDelete(id) {
+            if(confirm("¿Eliminar este registro para siempre?")) {
+                items = items.filter(item => item.id !== id);
                 saveData();
                 renderList();
             }
@@ -398,18 +443,29 @@
             document.getElementById('count-pending').innerText = countPending;
         }
 
-        // --- DATA ---
+        // --- DATA Y EXPORTACIÓN ---
         function saveData() { localStorage.setItem('kuhakuItemsV2', JSON.stringify(items)); updateHome(); }
         function clearAllData() { if(confirm("¿Borrar todo?")) { localStorage.removeItem('kuhakuItemsV2'); items=[]; updateHome(); } }
         
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "kuhaku_backup.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+        async function exportData() {
+            const dataStr = JSON.stringify(items, null, 2);
+            if (navigator.share) {
+                const file = new File([dataStr], "kuhaku_backup.json", { type: "application/json" });
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Kuhaku Backup',
+                        text: 'Copia de seguridad de mis objetos.'
+                    });
+                    return;
+                } catch (error) { console.log("Cancelado:", error); }
+            }
+            // Fallback
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = "kuhaku_backup.json";
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         function importData(input) {
