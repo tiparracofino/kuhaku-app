@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#F4F1EA">
-    <title>Kūhaku v8</title>
+    <title>Kūhaku v9</title>
     <style>
         /* --- ESTILOS BASE --- */
         :root {
@@ -45,23 +45,38 @@
         }
         .money-display { font-size: 2.2rem; font-weight: bold; }
         
-        /* --- FILTRO DE ESPACIOS (KAMON) --- */
+        /* --- FILTRO DE ESPACIOS (ESTILO SELLO KANJI) --- */
         .spaces-scroll {
-            display: flex; gap: 15px; overflow-x: auto; width: 100%; padding: 10px 5px;
+            display: flex; gap: 15px; overflow-x: auto; width: 100%; padding: 15px 5px;
             -webkit-overflow-scrolling: touch; scrollbar-width: none; justify-content: center;
         }
         .spaces-scroll::-webkit-scrollbar { display: none; }
         
         .kamon-btn {
-            min-width: 50px; height: 50px; border: 1px solid #ccc; border-radius: 50%;
+            min-width: 50px; height: 50px; 
+            border: 1px solid #ccc; border-radius: 50%; /* Círculo perfecto */
             display: flex; justify-content: center; align-items: center;
-            font-size: 1.2rem; background: white; transition: 0.3s; flex-direction: column;
+            background: white; transition: 0.3s; flex-direction: column;
+            
+            /* Tipografía Kanji */
+            font-family: "Hiragino Mincho ProN", "Yu Mincho", "MS PMincho", serif;
+            font-size: 1.4rem; 
+            color: #555;
+            line-height: 1;
         }
-        .kamon-btn span { font-size: 0.6rem; margin-top: 2px; display: none; } /* Texto opcional */
         
         .kamon-btn.selected {
-            border-color: var(--hanko-color); background: var(--hanko-color); color: white;
-            transform: scale(1.1); box-shadow: 0 4px 8px rgba(204,0,0,0.2);
+            border-color: var(--hanko-color); 
+            background: var(--hanko-color); 
+            color: white;
+            box-shadow: 0 4px 10px rgba(204,0,0,0.3);
+            border: 2px solid var(--hanko-color); /* Borde más grueso al seleccionar */
+        }
+        
+        /* Etiqueta pequeña debajo del kanji (opcional, para claridad) */
+        .kamon-label {
+            font-size: 0.6rem; margin-top: 5px; font-family: sans-serif; opacity: 0.6;
+            display: none; /* Quita esto si quieres ver el nombre debajo */
         }
 
         /* --- INPUTS --- */
@@ -98,8 +113,16 @@
             display: flex; justify-content: space-between; align-items: center;
         }
         
-        /* Icono de espacio pequeño en la tarjeta */
-        .space-tag { font-size: 0.8rem; margin-right: 8px; opacity: 0.6; }
+        /* Icono de espacio pequeño en la tarjeta (Kanji rojo pequeño) */
+        .space-tag { 
+            font-size: 0.9rem; margin-right: 10px; 
+            color: var(--hanko-color); 
+            font-family: "Hiragino Mincho ProN", serif;
+            border: 1px solid var(--hanko-color);
+            border-radius: 50%;
+            width: 24px; height: 24px;
+            display: inline-flex; justify-content: center; align-items: center;
+        }
 
         /* --- NAV --- */
         .nav {
@@ -115,7 +138,7 @@
     </style>
 </head>
 <body>
-    <div class="version-tag">v8.0</div>
+    <div class="version-tag">v9.0</div>
 
     <div id="screen-home" class="screen active">
         <div class="enso-circle">
@@ -142,7 +165,7 @@
         <h2 class="ui-text">Nuevo Objeto</h2>
         <input type="text" id="inp-name" placeholder="Nombre..." autocomplete="off">
         
-        <p class="ui-text" style="font-size:0.8rem; color:#888; margin-bottom:10px;">¿De qué espacio es?</p>
+        <p class="ui-text" style="font-size:0.8rem; color:#888; margin-bottom:10px;">Selecciona el Espacio</p>
         <div class="spaces-scroll" id="add-space-selector" style="margin-bottom:20px;">
             </div>
 
@@ -169,7 +192,7 @@
         </div>
 
         <div id="santuario-header" style="display:none; flex-direction:column; align-items:center; width:100%; background: #fff; padding-bottom:10px; border-bottom:1px solid #eee; margin-bottom:10px;">
-            <div style="margin:10px; font-family:'Georgia'; font-size:1.2rem;">Espacios</div>
+            <div style="margin:10px; font-family:'Georgia'; font-size:1rem; color:#888;">Filtrar por Espacio</div>
             <div class="spaces-scroll" id="filter-space-selector">
                 </div>
         </div>
@@ -182,7 +205,7 @@
     <div id="screen-settings" class="screen">
         <h2 class="ui-text">Copia de Seguridad</h2>
         <p class="ui-text" style="font-size:0.8rem; color:#888; text-align:center; margin:20px 40px;">
-            Guarda una copia en "Archivos" de tu iPhone regularmente.
+            Guarda una copia en "Archivos".
         </p>
         <button class="btn-main ui-text" onclick="nativeExport()">📤 GUARDAR COPIA</button>
         <input type="file" id="file-input" style="display:none" onchange="nativeImport(this)">
@@ -197,30 +220,28 @@
     </nav>
 
     <script>
-        // --- CONFIGURACIÓN DE ESPACIOS (KAMON) ---
+        // --- ICONOS KANJI ---
         const SPACES = [
-            { id: 'all', icon: '⚪', label: 'Todo' }, // Solo para filtro
-            { id: 'living', icon: '🛋️', label: 'Salón' },
-            { id: 'kitchen', icon: '🍵', label: 'Cocina' },
-            { id: 'bedroom', icon: '🛏️', label: 'Cuarto' },
-            { id: 'bath', icon: '🚿', label: 'Baño' },
-            { id: 'study', icon: '🖊️', label: 'Estudio' },
-            { id: 'other', icon: '📦', label: 'Otro' }
+            { id: 'all', icon: '全', label: 'Todo' }, // Zen (Todo)
+            { id: 'living', icon: '居', label: 'Salón' }, // Ima (Sala de estar)
+            { id: 'kitchen', icon: '食', label: 'Cocina' }, // Shoku (Comida)
+            { id: 'bedroom', icon: '寝', label: 'Dormitorio' }, // Shin (Dormir)
+            { id: 'bath', icon: '浄', label: 'Baño' }, // Jō (Purificar)
+            { id: 'study', icon: '書', label: 'Estudio' }, // Sho (Escribir)
+            { id: 'other', icon: '箱', label: 'Otro' } // Hako (Caja)
         ];
 
         let db = [];
         let curAct = null;
         let curTab = 'process';
-        let curSpaceAdd = 'living'; // Default al añadir
-        let curSpaceFilter = 'all'; // Default al filtrar
+        let curSpaceAdd = 'living'; 
+        let curSpaceFilter = 'all';
 
         function init() {
             try {
                 const raw = localStorage.getItem('kuhakuDB');
                 if (raw) db = JSON.parse(raw);
             } catch (e) { db = []; }
-            
-            // Generar selectores
             renderSpaceSelectors();
             updateHome();
         }
@@ -232,32 +253,25 @@
 
         // --- RENDERIZADO DE ESPACIOS ---
         function renderSpaceSelectors() {
-            // 1. Selector en "Añadir" (Sin opción 'Todo')
+            // Añadir
             const addContainer = document.getElementById('add-space-selector');
             addContainer.innerHTML = '';
             SPACES.slice(1).forEach(s => {
                 const btn = document.createElement('div');
                 btn.className = `kamon-btn ${s.id === curSpaceAdd ? 'selected' : ''}`;
-                btn.innerHTML = s.icon;
-                btn.onclick = () => { 
-                    curSpaceAdd = s.id; 
-                    renderSpaceSelectors(); // Re-render para actualizar selección visual
-                };
+                btn.innerHTML = s.icon + `<span class="kamon-label">${s.label}</span>`;
+                btn.onclick = () => { curSpaceAdd = s.id; renderSpaceSelectors(); };
                 addContainer.appendChild(btn);
             });
 
-            // 2. Selector en "Filtro Santuario" (Con opción 'Todo')
+            // Filtro
             const filterContainer = document.getElementById('filter-space-selector');
             filterContainer.innerHTML = '';
             SPACES.forEach(s => {
                 const btn = document.createElement('div');
                 btn.className = `kamon-btn ${s.id === curSpaceFilter ? 'selected' : ''}`;
                 btn.innerHTML = s.icon;
-                btn.onclick = () => { 
-                    curSpaceFilter = s.id; 
-                    renderSpaceSelectors(); 
-                    render(); // Filtrar lista inmediatamente
-                };
+                btn.onclick = () => { curSpaceFilter = s.id; renderSpaceSelectors(); render(); };
                 filterContainer.appendChild(btn);
             });
         }
@@ -291,7 +305,7 @@
                 id: Date.now(),
                 name: name,
                 act: curAct,
-                space: curSpaceAdd, // Guardamos el espacio seleccionado
+                space: curSpaceAdd, 
                 price: document.getElementById('inp-price').value || 0,
                 final: 0,
                 st: (curAct === 'conservar') ? 'kept' : 'active',
@@ -311,7 +325,6 @@
                 b.classList.toggle('active', ['process','kept','sold'][i] === t);
             });
             
-            // Mostrar/Ocultar Filtros de Santuario
             const search = document.getElementById('search-inp');
             const header = document.getElementById('santuario-header');
 
@@ -335,13 +348,10 @@
             if (curTab === 'process') {
                 data = db.filter(i => i.st === 'active');
             } else if (curTab === 'kept') {
-                // Filtro 1: Solo conservados
                 data = db.filter(i => i.st === 'kept');
-                // Filtro 2: Por Espacio (Kamon)
                 if (curSpaceFilter !== 'all') {
                     data = data.filter(i => (i.space || 'other') === curSpaceFilter);
                 }
-                // Filtro 3: Búsqueda texto
                 if(query) data = data.filter(i => i.name.toLowerCase().includes(query));
             } else if (curTab === 'sold') {
                 data = db.filter(i => i.st === 'done');
@@ -356,11 +366,10 @@
                 const el = document.createElement('div');
                 el.className = 'card ui-text';
                 
-                // Buscar icono del espacio del item
                 const spaceObj = SPACES.find(s => s.id === (item.space || 'other'));
-                const spaceIcon = spaceObj ? spaceObj.icon : '📦';
+                const spaceIcon = spaceObj ? spaceObj.icon : '箱';
 
-                let txt = `<div><div style="font-size:1.1rem"><span class="space-tag">${spaceIcon}</span>${item.name}</div><div style="font-size:0.7rem; color:#888; margin-left:25px;">${item.act.toUpperCase()}</div></div>`;
+                let txt = `<div><div style="font-size:1.1rem; display:flex; align-items:center;"><span class="space-tag">${spaceIcon}</span>${item.name}</div><div style="font-size:0.7rem; color:#888; margin-left:34px;">${item.act.toUpperCase()}</div></div>`;
                 
                 if(curTab === 'sold' && item.act === 'vender') {
                     txt = `<div><div style="font-size:1.1rem">${item.name}</div><div style="font-size:0.9rem; color:var(--hanko-color); font-weight:bold">+${item.final}€</div></div>`;
@@ -391,7 +400,6 @@
             document.getElementById('stat-pending').innerText = db.filter(i => i.st === 'active').length;
         }
 
-        // --- EXPORT/IMPORT ---
         async function nativeExport() {
             const dataStr = JSON.stringify(db, null, 2);
             const file = new File([dataStr], "kuhaku_backup.json", { type: "application/json" });
