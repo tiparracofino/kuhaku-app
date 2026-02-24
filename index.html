@@ -28,35 +28,37 @@
         .ui-text { font-family: -apple-system, sans-serif; }
 
         /* --- PANTALLAS --- */
-        .screen { flex: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 80px; }
+        .screen { flex: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
         .screen.active { display: flex; }
 
-        /* --- HOME & ICONOS --- */
+        /* --- ENSO (ICONO) --- */
         .enso-circle {
+            width: 160px; height: 160px;
             border: 5px solid var(--ink-color);
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
             display: flex; align-items: center; justify-content: center;
-            position: relative;
+            margin-top: 40px; margin-bottom: 20px; position: relative;
+            transition: all 0.5s ease;
         }
-        .enso-home { width: 160px; height: 160px; margin-top: 40px; margin-bottom: 20px; }
-        .enso-mini { width: 60px; height: 60px; border-width: 3px; margin: 10px auto; }
-        
         .enso-dot {
-            position: absolute; background: var(--hanko-color); border-radius: 50%;
+            position: absolute; width: 12px; height: 12px;
+            background: var(--hanko-color); border-radius: 50%; bottom: 15px; right: 15px;
         }
-        .dot-home { width: 12px; height: 12px; bottom: 15px; right: 15px; }
-        .dot-mini { width: 6px; height: 6px; bottom: 5px; right: 5px; }
+        
+        /* Versión reducida para la cabecera del Santuario */
+        .enso-small {
+            width: 80px; height: 80px; margin-top: 10px; margin-bottom: 10px; border-width: 3px;
+        }
+        .enso-small .enso-dot { width: 6px; height: 6px; bottom: 8px; right: 8px; }
 
         .money-display { font-size: 2.2rem; font-weight: bold; }
-        
-        /* --- ESTADÍSTICAS --- */
         .stats-row { display: flex; gap: 40px; margin-top: 30px; }
         .stat-box { text-align: center; }
         .stat-num { font-size: 1.5rem; font-weight: bold; }
         .stat-label { font-size: 0.7rem; color: var(--gray-text); letter-spacing: 1px; }
 
         /* --- INPUTS --- */
-        input, textarea {
+        input {
             background: transparent; border: none; border-bottom: 1px solid var(--ink-color);
             font-size: 1.2rem; color: var(--ink-color); text-align: center;
             padding: 10px; width: 90%; margin-bottom: 20px; outline: none;
@@ -83,8 +85,6 @@
         .tab { padding: 15px; background: none; border: none; color: #aaa; font-size: 0.8rem; text-transform: uppercase; }
         .tab.active { color: black; border-bottom: 2px solid var(--hanko-color); }
 
-        .santuario-header { display: none; width: 100%; text-align: center; margin-bottom: 20px; animation: fadeIn 0.5s; }
-
         .card {
             background: white; width: 95%; padding: 15px; margin-bottom: 10px;
             border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -94,29 +94,28 @@
 
         /* --- NAV --- */
         .nav {
-            position: fixed; bottom: 0; width: 100%; height: 65px;
+            position: fixed; bottom: 0; width: 100%; height: 70px;
             background: var(--bg-color); border-top: 1px solid #eee;
             display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            padding-bottom: 10px; /* Safe area for iPhone home bar */
         }
         .nav-btn { background: none; border: none; font-size: 1.5rem; opacity: 0.3; }
         .nav-btn.active { opacity: 1; color: var(--hanko-color); }
         
         .version-tag { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; color: #ccc; }
-        @keyframes fadeIn { from {opacity:0} to {opacity:1} }
 
     </style>
 </head>
 <body>
-
     <div class="version-tag">v7.0</div>
 
     <div id="screen-home" class="screen active">
-        <div class="enso-circle enso-home">
+        <div class="enso-circle">
             <div style="text-align:center">
                 <div class="money-display" id="total-money">0€</div>
                 <div class="stat-label">GANADO</div>
             </div>
-            <div class="enso-dot dot-home"></div>
+            <div class="enso-dot"></div>
         </div>
         
         <div class="stats-row ui-text">
@@ -133,7 +132,7 @@
 
     <div id="screen-add" class="screen">
         <h2 class="ui-text">Nuevo Objeto</h2>
-        <input type="text" id="inp-name" placeholder="Nombre del objeto...">
+        <input type="text" id="inp-name" placeholder="Nombre..." autocomplete="off">
         
         <div class="grid-actions ui-text">
             <button class="btn-opt" onclick="setAct(this, 'conservar')">Conservar</button>
@@ -144,7 +143,7 @@
         </div>
 
         <div id="price-box" style="display:none; width:100%;">
-            <input type="number" id="inp-price" placeholder="Precio estimado (€)">
+            <input type="number" id="inp-price" placeholder="Precio estimado (€)" inputmode="decimal">
         </div>
 
         <button class="btn-main ui-text" onclick="saveNewItem()">REGISTRAR</button>
@@ -156,31 +155,29 @@
             <button class="tab" onclick="setTab('kept')">Santuario</button>
             <button class="tab" onclick="setTab('sold')">Cuentas</button>
         </div>
-        
-        <div id="santuario-header" class="santuario-header">
-            <div class="enso-circle enso-mini">
-                <div class="enso-dot dot-mini"></div>
+
+        <div id="santuario-header" style="display:none; flex-direction:column; align-items:center; width:100%;">
+            <div class="enso-circle enso-small">
+                <div class="enso-dot"></div>
             </div>
-            <div style="color:#666; font-size:0.9rem; margin-top:5px; font-family:'Georgia', serif;">Mis Tesoros</div>
+            <p class="ui-text" style="font-size:0.8rem; color:#888; margin-bottom:15px;">Lo esencial permanece.</p>
         </div>
         
         <input type="text" id="search-inp" placeholder="Buscar en santuario..." onkeyup="render()" style="display:none; font-size:0.9rem; margin-top:10px;">
         
-        <div id="list-content" style="width:100%; display:flex; flex-direction:column; align-items:center; padding-bottom: 80px;"></div>
+        <div id="list-content" style="width:100%; display:flex; flex-direction:column; align-items:center; padding-bottom: 90px;"></div>
     </div>
 
     <div id="screen-settings" class="screen">
-        <h2 class="ui-text">Datos</h2>
-        <p class="ui-text" style="font-size:0.8rem; color:#888; text-align:center; margin:20px;">
-            Guarda una copia de seguridad en tus archivos.
+        <h2 class="ui-text">Copia de Seguridad</h2>
+        <p class="ui-text" style="font-size:0.8rem; color:#888; text-align:center; margin:20px 40px;">
+            Guarda una copia de tus datos en "Archivos" de tu iPhone regularmente.
         </p>
+
+        <button class="btn-main ui-text" onclick="nativeExport()">📤 GUARDAR COPIA</button>
         
-        <button class="btn-main ui-text" onclick="nativeExport()">📤 EXPORTAR ARCHIVO</button>
-        
-        <br><br>
         <input type="file" id="file-input" style="display:none" onchange="nativeImport(this)">
-        <button class="ui-text" style="background:none; border:none; color:black; text-decoration:underline;" onclick="document.getElementById('file-input').click()">📥 IMPORTAR ARCHIVO</button>
-        
+        <button class="ui-text" style="background:none; border:none; margin-top:40px; color:black; text-decoration:underline;" onclick="document.getElementById('file-input').click()">📥 CARGAR COPIA</button>
     </div>
 
     <nav class="nav">
@@ -191,7 +188,7 @@
     </nav>
 
     <script>
-        // --- ESTADO & INIT ---
+        // --- BASE DE DATOS ---
         let db = [];
         let curAct = null;
         let curTab = 'process';
@@ -209,7 +206,7 @@
             updateHome();
         }
 
-        // --- NAV ---
+        // --- NAVEGACIÓN ---
         function go(id, btn) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -218,7 +215,6 @@
             if (id === 'screen-list') render();
         }
 
-        // --- AÑADIR ---
         function setAct(btn, act) {
             document.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected', 'sell'));
             btn.classList.add('selected');
@@ -233,38 +229,41 @@
 
         function saveNewItem() {
             const name = document.getElementById('inp-name').value;
-            if (!name || !curAct) return alert("Falta nombre o acción");
-            const item = {
+            if (!name || !curAct) return alert("Faltan datos");
+            
+            db.push({
                 id: Date.now(),
-                name: name, act: curAct,
+                name: name,
+                act: curAct,
                 price: document.getElementById('inp-price').value || 0,
                 final: 0,
                 st: (curAct === 'conservar') ? 'kept' : 'active',
                 date: new Date().toLocaleDateString()
-            };
-            db.push(item); save();
+            });
+            save();
             document.getElementById('inp-name').value = '';
             document.getElementById('inp-price').value = '';
-            setAct(document.querySelector('.btn-opt'), null);
+            setAct(document.querySelector('.btn-opt'), null); 
             go('screen-list', document.querySelectorAll('.nav-btn')[2]);
         }
 
-        // --- LISTAS ---
+        // --- LISTAS Y SANTUARIO ---
         function setTab(t) {
             curTab = t;
-            document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', ['process','kept','sold'][i] === t));
+            document.querySelectorAll('.tab').forEach((b, i) => {
+                b.classList.toggle('active', ['process','kept','sold'][i] === t);
+            });
             
             // Lógica visual Santuario
-            const header = document.getElementById('santuario-header');
             const search = document.getElementById('search-inp');
-            
-            if (t === 'kept') {
-                header.style.display = 'block';
-                search.style.display = 'block';
-            } else {
-                header.style.display = 'none';
-                search.style.display = 'none';
-                search.value = '';
+            const header = document.getElementById('santuario-header');
+
+            if (t === 'kept') { 
+                search.style.display = 'block'; 
+                header.style.display = 'flex'; // Mostrar Icono
+            } else { 
+                search.style.display = 'none'; search.value = '';
+                header.style.display = 'none'; // Ocultar Icono
             }
             render();
         }
@@ -273,17 +272,16 @@
             const list = document.getElementById('list-content');
             list.innerHTML = '';
             const query = document.getElementById('search-inp').value.toLowerCase();
-            let data = [];
             
+            let data = [];
             if (curTab === 'process') data = db.filter(i => i.st === 'active');
             else if (curTab === 'kept') {
                 data = db.filter(i => i.st === 'kept');
                 if(query) data = data.filter(i => i.name.toLowerCase().includes(query));
-            } 
-            else if (curTab === 'sold') data = db.filter(i => i.st === 'done');
+            } else if (curTab === 'sold') data = db.filter(i => i.st === 'done');
 
             if (data.length === 0) {
-                list.innerHTML = '<div style="margin-top:40px; color:#ccc;">Vacío</div>';
+                list.innerHTML = '<div style="margin-top:20px; color:#ccc;">Vacío</div>';
                 return;
             }
 
@@ -309,14 +307,13 @@
             });
         }
 
-        // --- ACCIONES ---
         function sold(id) {
             const p = prompt("Precio final venta:");
             if(p !== null) { const i = db.find(x => x.id === id); i.final = p; i.st = 'done'; save(); render(); }
         }
         function done(id) { const i = db.find(x => x.id === id); i.st = 'done'; save(); render(); }
         function restore(id) { if(confirm("¿Devolver a pendientes?")) { const i = db.find(x => x.id === id); i.st = 'active'; save(); render(); } }
-        function del(id) { if(confirm("¿Eliminar definitivamente?")) { db = db.filter(x => x.id !== id); save(); render(); } }
+        function del(id) { if(confirm("¿Eliminar para siempre?")) { db = db.filter(x => x.id !== id); save(); render(); } }
 
         function updateHome() {
             const earned = db.filter(i => i.st === 'done').reduce((acc, i) => acc + parseFloat(i.final||0), 0);
@@ -325,21 +322,32 @@
             document.getElementById('stat-pending').innerText = db.filter(i => i.st === 'active').length;
         }
 
-        // --- IMPORTAR / EXPORTAR NATIVO ---
+        // --- EXPORTAR / IMPORTAR NATIVO (iPhone Friendly) ---
         async function nativeExport() {
             const dataStr = JSON.stringify(db, null, 2);
             const file = new File([dataStr], "kuhaku_backup.json", { type: "application/json" });
-
+            
             if (navigator.share) {
                 try {
                     await navigator.share({
                         files: [file],
                         title: 'Kuhaku Backup',
                     });
-                } catch (err) { console.log("Cancelado"); }
+                } catch (error) {
+                    // Si cancela o falla, fallback a descarga clásica
+                    downloadFallback(dataStr);
+                }
             } else {
-                alert("Función no soportada en este navegador. Usa Safari en iPhone.");
+                downloadFallback(dataStr);
             }
+        }
+
+        function downloadFallback(dataStr) {
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = "kuhaku_backup.json";
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
         function nativeImport(input) {
@@ -350,7 +358,7 @@
                 try {
                     db = JSON.parse(e.target.result);
                     save();
-                    alert("¡Datos importados correctamente!");
+                    alert("¡Copia cargada correctamente!");
                 } catch(err) { alert("El archivo no es válido."); }
             };
             reader.readAsText(file);
