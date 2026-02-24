@@ -6,12 +6,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#F4F1EA">
-    <title>Kūhaku v11</title>
+    <title>Kūhaku v12</title>
     <style>
         /* --- ESTILOS BASE --- */
         :root {
             --bg-color: #F4F1EA;
-            --card-bg: #F2F0E6; /* Beige de tus tarjetas */
+            --card-bg: #F2F0E6; 
             --ink-color: #111111;
             --hanko-color: #CC0000;
             --gray-text: #888888;
@@ -46,17 +46,16 @@
         }
         .money-display { font-size: 2.2rem; font-weight: bold; }
         
-        /* --- SELECTOR DE ESPACIOS (TUS TARJETAS) --- */
+        /* --- SELECTOR DE ESPACIOS (TARJETAS) --- */
         .spaces-scroll {
             display: flex; gap: 12px; overflow-x: auto; width: 100%; padding: 10px 5px;
             -webkit-overflow-scrolling: touch; scrollbar-width: none; 
-            align-items: flex-start; /* Alinear arriba */
+            align-items: flex-start;
         }
         .spaces-scroll::-webkit-scrollbar { display: none; }
         
-        /* DISEÑO DE LA TARJETA RECTANGULAR */
         .space-card {
-            min-width: 80px; height: 120px; /* Formato rectangular vertical */
+            min-width: 80px; height: 120px; 
             background-color: var(--card-bg);
             border: 1px solid #ddd; border-radius: 4px;
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
@@ -79,7 +78,6 @@
             font-size: 0.6rem; color: #ccc; margin-bottom: 2px;
         }
 
-        /* Estado Seleccionado */
         .space-card.selected {
             border: 2px solid var(--hanko-color);
             background-color: #fff;
@@ -87,12 +85,6 @@
             box-shadow: 0 5px 10px rgba(0,0,0,0.1);
         }
         
-        /* Pequeño detalle de esquina (opcional) */
-        .space-card::after {
-            content: ''; position: absolute; bottom: 0; right: 0;
-            border-bottom: 8px solid #ddd; border-left: 8px solid transparent; opacity: 0.5;
-        }
-
         /* --- INPUTS --- */
         input {
             background: transparent; border: none; border-bottom: 1px solid var(--ink-color);
@@ -115,6 +107,11 @@
             border-radius: 30px; border: none; font-size: 1rem; margin-top: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+        
+        .btn-secondary {
+            background: transparent; border: 1px solid #ccc; color: #666; 
+            padding: 10px 30px; border-radius: 30px; margin-top: 10px;
+        }
 
         /* --- LISTAS --- */
         .tabs { display: flex; width: 100%; justify-content: space-around; border-bottom: 1px solid #ddd; margin-bottom: 15px; }
@@ -130,6 +127,13 @@
         .space-tag-icon svg { width: 18px; height: 18px; stroke: var(--hanko-color); fill: none; }
         .space-tag-icon { margin-right: 10px; display: flex; align-items: center; }
 
+        /* --- EDIT MODAL --- */
+        #edit-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(244, 241, 234, 0.95); z-index: 2000;
+            display: none; flex-direction: column; align-items: center; padding-top: 50px;
+        }
+
         /* --- NAV --- */
         .nav {
             position: fixed; bottom: 0; width: 100%; height: 70px;
@@ -144,7 +148,7 @@
     </style>
 </head>
 <body>
-    <div class="version-tag">v11.0</div>
+    <div class="version-tag">v12.0</div>
 
     <div id="screen-home" class="screen active">
         <div class="enso-circle">
@@ -214,6 +218,16 @@
         <input type="file" id="file-input" style="display:none" onchange="nativeImport(this)">
         <button class="ui-text" style="background:none; border:none; margin-top:40px; color:black; text-decoration:underline;" onclick="document.getElementById('file-input').click()">📥 CARGAR COPIA</button>
     </div>
+    
+    <div id="edit-overlay">
+        <h2 class="ui-text">Editar</h2>
+        <input type="text" id="edit-name" placeholder="Nombre..." autocomplete="off">
+        <p class="ui-text" style="font-size:0.8rem; color:#888;">Cambiar Espacio</p>
+        <div class="spaces-scroll" id="edit-space-selector" style="width:95%; margin-bottom:30px;"></div>
+        
+        <button class="btn-main ui-text" onclick="saveEdit()">GUARDAR CAMBIOS</button>
+        <button class="btn-secondary ui-text" onclick="closeEdit()">CANCELAR</button>
+    </div>
 
     <nav class="nav">
         <button class="nav-btn active" onclick="go('screen-home', this)">●</button>
@@ -223,44 +237,20 @@
     </nav>
 
     <script>
-        // --- DIBUJOS SVG "A MANO" BASADOS EN TU FOTO ---
+        // --- ICONOS & DATA ---
         const ICONS = {
-            all: '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>', // Todo (Capas)
-            
-            // Sala de estar: Sofá minimalista con cojines
+            all: '<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
             living: '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M12 10v8"/></svg>',
-            
-            // Dormitorio: Cama con cabecero
             bedroom: '<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/><path d="M6 14h12"/></svg>',
-            
-            // Cocina: Olla con vapor
             kitchen: '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/><path d="M2 13h2"/><path d="M20 13h2"/><path d="M12 5V3"/></svg>',
-            
-            // Baño: Bañera y grifo
             bath: '<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4z"/><path d="M7 14V9a2 2 0 0 1 2-2h1"/><path d="M10 5v4"/><path d="M10 14v-2"/></svg>',
-            
-            // Estudio: Escritorio con papel y pluma
             study: '<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M6 16v5"/><path d="M18 16v5"/><path d="M14 14V9a2 2 0 0 0-2-2H8"/><path d="M16 6l-2 3"/></svg>',
-            
-            // Jardín: Árbol simple
             garden: '<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 0 0-5-5 4 4 0 0 1-3-3 4 4 0 0 1 8 0 4 4 0 0 1 8 0 4 4 0 0 1-3 3 5 5 0 0 0-5 5z"/><path d="M8 21h8"/></svg>',
-            
-            // Despensa: Estantería con botes
             pantry: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16"/><path d="M4 16h16"/><path d="M8 10V6"/><path d="M12 16v-6"/><path d="M16 16v-6"/></svg>',
-            
-            // Garaje: Puerta de garaje
             garage: '<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/><path d="M2 20h20"/></svg>',
-            
-            // Terraza: Mesa y barandilla
             terrace: '<svg viewBox="0 0 24 24"><path d="M4 16h16"/><path d="M4 20h16"/><path d="M6 16v4"/><path d="M10 16v4"/><path d="M14 16v4"/><path d="M18 16v4"/><path d="M8 12h8"/><path d="M12 12v4"/><path d="M12 8v-2"/></svg>',
-            
-            // Sótano: Escaleras bajando
             basement: '<svg viewBox="0 0 24 24"><path d="M3 5h4v4h4v4h4v4h4"/><path d="M3 5v14h16"/></svg>',
-            
-            // Comedor: Mesa redonda y silla
             dining: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M12 10V6"/><path d="M9 6h6"/><path d="M12 18v4"/><path d="M8 22h8"/></svg>',
-            
-            // Entrada: Puerta
             entrance: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h1"/><path d="M5 20h14"/></svg>'
         };
 
@@ -285,13 +275,15 @@
         let curTab = 'process';
         let curSpaceAdd = 'living'; 
         let curSpaceFilter = 'all';
+        let editId = null; // ID del objeto que estamos editando
+        let curSpaceEdit = 'living'; // Espacio temporal en edición
 
         function init() {
             try {
                 const raw = localStorage.getItem('kuhakuDB');
                 if (raw) db = JSON.parse(raw);
             } catch (e) { db = []; }
-            renderSpaceSelectors();
+            renderSelectors();
             updateHome();
         }
 
@@ -300,31 +292,34 @@
             updateHome();
         }
 
-        // --- RENDERIZADO TIPO TARJETA ---
-        function renderSpaceSelectors() {
-            // Añadir
+        // --- RENDERIZADO SELECTORES ---
+        function renderSelectors() {
+            // Helper para crear cards
+            const createCard = (s, selectedId, callback) => {
+                const btn = document.createElement('div');
+                btn.className = `space-card ${s.id === selectedId ? 'selected' : ''}`;
+                btn.innerHTML = `${s.icon}<div class="card-text">${s.label}</div><div class="card-kanji">${s.kanji}</div>`;
+                btn.onclick = () => callback(s.id);
+                return btn;
+            };
+
+            // Add Screen
             const addContainer = document.getElementById('add-space-selector');
             addContainer.innerHTML = '';
-            SPACES.slice(1).forEach(s => {
-                const btn = document.createElement('div');
-                btn.className = `space-card ${s.id === curSpaceAdd ? 'selected' : ''}`;
-                btn.innerHTML = `${s.icon}<div class="card-text">${s.label}</div><div class="card-kanji">${s.kanji}</div>`;
-                btn.onclick = () => { curSpaceAdd = s.id; renderSpaceSelectors(); };
-                addContainer.appendChild(btn);
-            });
+            SPACES.slice(1).forEach(s => addContainer.appendChild(createCard(s, curSpaceAdd, (id) => { curSpaceAdd = id; renderSelectors(); })));
 
-            // Filtro
+            // Filter Screen
             const filterContainer = document.getElementById('filter-space-selector');
             filterContainer.innerHTML = '';
-            SPACES.forEach(s => {
-                const btn = document.createElement('div');
-                btn.className = `space-card ${s.id === curSpaceFilter ? 'selected' : ''}`;
-                btn.innerHTML = `${s.icon}<div class="card-text">${s.label}</div><div class="card-kanji">${s.kanji}</div>`;
-                btn.onclick = () => { curSpaceFilter = s.id; renderSpaceSelectors(); render(); };
-                filterContainer.appendChild(btn);
-            });
+            SPACES.forEach(s => filterContainer.appendChild(createCard(s, curSpaceFilter, (id) => { curSpaceFilter = id; renderSelectors(); render(); })));
+
+            // Edit Screen
+            const editContainer = document.getElementById('edit-space-selector');
+            editContainer.innerHTML = '';
+            SPACES.slice(1).forEach(s => editContainer.appendChild(createCard(s, curSpaceEdit, (id) => { curSpaceEdit = id; renderSelectors(); })));
         }
 
+        // --- NAVEGACIÓN ---
         function go(id, btn) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -423,18 +418,50 @@
                 }
 
                 let btns = '';
+                // Botón Editar para todos
+                let editBtn = `<button onclick="openEdit(${item.id})" style="color:#666; font-size:1.2rem; margin-right:10px;">✎</button>`;
+
                 if (curTab === 'process') {
-                    if (item.act === 'vender') btns = `<button onclick="sold(${item.id})" style="background:var(--hanko-color); color:white; border-radius:20px; font-size:0.8rem; padding:5px 15px;">Vendido</button>`;
-                    else btns = `<button onclick="done(${item.id})" style="background:black; color:white; border-radius:20px; font-size:0.8rem; padding:5px 15px;">Listo</button>`;
+                    if (item.act === 'vender') btns = editBtn + `<button onclick="sold(${item.id})" style="background:var(--hanko-color); color:white; border-radius:20px; font-size:0.8rem; padding:5px 15px;">Vendido</button>`;
+                    else btns = editBtn + `<button onclick="done(${item.id})" style="background:black; color:white; border-radius:20px; font-size:0.8rem; padding:5px 15px;">Listo</button>`;
                 } else {
-                    btns = `<button onclick="restore(${item.id})">↺</button><button onclick="del(${item.id})" style="color:red">✕</button>`;
+                    btns = editBtn + `<button onclick="restore(${item.id})">↺</button><button onclick="del(${item.id})" style="color:red">✕</button>`;
                 }
 
-                el.innerHTML = txt + `<div class="card-actions">${btns}</div>`;
+                el.innerHTML = txt + `<div class="card-actions" style="display:flex; align-items:center;">${btns}</div>`;
                 list.appendChild(el);
             });
         }
 
+        // --- LÓGICA DE EDICIÓN ---
+        function openEdit(id) {
+            editId = id;
+            const item = db.find(i => i.id === id);
+            document.getElementById('edit-name').value = item.name;
+            curSpaceEdit = item.space || 'living';
+            renderSelectors(); // Actualiza visualmente la selección en el modal
+            document.getElementById('edit-overlay').style.display = 'flex';
+        }
+
+        function saveEdit() {
+            if(!editId) return;
+            const item = db.find(i => i.id === editId);
+            const newName = document.getElementById('edit-name').value;
+            if(newName) {
+                item.name = newName;
+                item.space = curSpaceEdit;
+                save();
+                render();
+                closeEdit();
+            }
+        }
+
+        function closeEdit() {
+            document.getElementById('edit-overlay').style.display = 'none';
+            editId = null;
+        }
+
+        // --- RESTO DE ACCIONES ---
         function sold(id) { const p = prompt("Precio final:"); if(p) { const i = db.find(x => x.id === id); i.final = p; i.st = 'done'; save(); render(); } }
         function done(id) { const i = db.find(x => x.id === id); i.st = 'done'; save(); render(); }
         function restore(id) { if(confirm("¿Devolver a pendientes?")) { const i = db.find(x => x.id === id); i.st = 'active'; save(); render(); } }
