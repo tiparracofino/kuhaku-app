@@ -1,373 +1,941 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#F4F1EA">
-    <title>Kūhaku v16</title>
+    <meta name="theme-color" content="#F7F5F0">
+    <title>空白 Kūhaku</title>
     <style>
-        /* --- ESTILOS BASE --- */
-        :root {
-            --bg-color: #F4F1EA;
-            --card-bg: #F2F0E6; 
-            --ink-color: #111111;
-            --hanko-color: #CC0000;
-            --gray-text: #888888;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--ink-color);
-            font-family: 'Georgia', serif;
-            margin: 0; padding: 0;
-            height: 100vh;
-            display: flex; flex-direction: column;
-            overflow: hidden;
-            -webkit-user-select: none;
-        }
-        .ui-text { font-family: -apple-system, sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400;700;900&family=Shippori+Mincho:wght@400;700;800&family=Noto+Sans:wght@300;400;600;700&display=swap');
 
-        /* --- PANTALLAS --- */
-        .screen { flex: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
-        .screen.active { display: flex; }
+```
+    :root {
+        --washi: #F7F5F0;
+        --washi-warm: #F0EDE5;
+        --ink: #000000;
+        --ink-soft: #1a1a1a;
+        --vermillion: #D42B2B;
+        --vermillion-deep: #A51C1C;
+        --vermillion-pale: rgba(212,43,43,0.06);
+        --indigo: #6B8FA3;
+        --indigo-light: #8FB4C9;
+        --indigo-pale: #A8C8D8;
+        --indigo-ghost: rgba(107,143,163,0.15);
+        --white: #FFFFFF;
+    }
 
-        /* --- ENSO --- */
-        .enso-circle {
-            width: 160px; height: 160px;
-            border: 5px solid var(--ink-color);
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            display: flex; align-items: center; justify-content: center;
-            margin-top: 40px; margin-bottom: 20px; position: relative;
-        }
-        .enso-dot {
-            position: absolute; width: 12px; height: 12px;
-            background: var(--hanko-color); border-radius: 50%; bottom: 15px; right: 15px;
-        }
-        .money-display { font-size: 2.2rem; font-weight: bold; }
-        
-        /* --- SELECTOR DE ESPACIOS (TARJETAS) --- */
-        .spaces-scroll {
-            display: flex; gap: 12px; overflow-x: auto; width: 100%; padding: 10px 5px;
-            -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: flex-start;
-        }
-        .spaces-scroll::-webkit-scrollbar { display: none; }
-        
-        .space-card {
-            min-width: 80px; height: 120px; background-color: var(--card-bg);
-            border: 1px solid #ddd; border-radius: 4px;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            padding: 10px 5px; margin-bottom: 5px; transition: 0.2s; position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .space-card svg { width: 32px; height: 32px; stroke: #222; stroke-width: 1.2; fill: none; stroke-linecap: round; stroke-linejoin: round; margin-top: 5px; }
-        .space-card .card-text { font-family: 'Georgia', serif; font-size: 0.7rem; text-align: center; color: #333; line-height: 1.1; }
-        .space-card .card-kanji { font-size: 0.6rem; color: #ccc; margin-bottom: 2px; }
-        .space-card.selected { border: 2px solid var(--hanko-color); background-color: #fff; transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
-        
-        /* --- CANTIDAD --- */
-        .qty-wrapper { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--ink-color); padding-bottom: 10px; }
-        .qty-btn { background: none; border: 1px solid #ccc; width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; color: #555; }
-        .qty-val { font-size: 1.5rem; font-weight: bold; width: 40px; text-align: center; }
+    * { margin:0; padding:0; box-sizing:border-box; }
 
-        /* --- INPUTS --- */
-        input { background: transparent; border: none; border-bottom: 1px solid var(--ink-color); font-size: 1.2rem; color: var(--ink-color); text-align: center; padding: 10px; width: 90%; margin-bottom: 20px; outline: none; font-family: 'Georgia', serif; }
+    body {
+        background:var(--washi); color:var(--ink);
+        font-family:'Noto Sans',sans-serif;
+        height:100vh; height:100dvh;
+        display:flex; flex-direction:column;
+        overflow:hidden; -webkit-user-select:none;
+    }
 
-        /* --- BOTONES ACCIÓN --- */
-        .grid-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 20px; }
-        .btn-opt { padding: 15px; border: 1px solid #ccc; background: transparent; color: #888; border-radius: 5px; cursor: pointer; }
-        .btn-opt.selected { border-color: black; color: black; background: white; }
-        .btn-opt.sell { border-color: var(--hanko-color); color: var(--hanko-color); }
-        .btn-main { background: var(--ink-color); color: white; padding: 15px 40px; border-radius: 30px; border: none; font-size: 1rem; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn-secondary { background: transparent; border: 1px solid #ccc; color: #666; padding: 10px 30px; border-radius: 30px; margin-top: 10px; }
+    /* Washi texture */
+    body::before {
+        content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.4;
+        background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23f)' opacity='0.035'/%3E%3C/svg%3E");
+    }
 
-        /* --- LISTAS --- */
-        .tabs { display: flex; width: 100%; justify-content: space-around; border-bottom: 1px solid #ddd; margin-bottom: 15px; }
-        .tab { padding: 15px; background: none; border: none; color: #aaa; font-size: 0.8rem; text-transform: uppercase; }
-        .tab.active { color: black; border-bottom: 2px solid var(--hanko-color); }
+    .jp { font-family:'Shippori Mincho','Noto Serif JP',serif; }
 
-        .card { background: white; width: 95%; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
-        .card-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .card-bottom { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 10px; border-top: 1px solid #f5f5f5; padding-top: 10px; }
-        
-        .space-tag-icon svg { width: 18px; height: 18px; stroke: var(--hanko-color); fill: none; }
-        .space-tag-icon { margin-right: 10px; display: flex; align-items: center; }
-        .qty-badge { background: #eee; color: #555; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: bold; }
-        .date-badge { font-size: 0.65rem; color: #999; margin-left: auto; }
-        .date-badge.alert { color: var(--hanko-color); font-weight: bold; }
+    /* ═══════════════ SCREENS ═══════════════ */
+    .screen {
+        flex:1; display:none; flex-direction:column; align-items:center;
+        overflow-y:auto; padding-bottom:90px;
+        position:relative; z-index:1;
+        scroll-behavior:smooth;
+    }
+    .screen.active { display:flex; animation:screenIn 0.35s ease; }
+    .screen::-webkit-scrollbar { display:none; }
 
-        /* --- GROUP HEADERS --- */
-        .group-header { width: 100%; padding: 15px 5px 5px 5px; font-size: 0.8rem; color: var(--gray-text); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #ddd; margin-bottom: 15px; margin-top: 10px; }
+    @keyframes screenIn {
+        from { opacity:0; } to { opacity:1; }
+    }
 
-        /* --- EDIT MODAL --- */
-        #edit-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(244, 241, 234, 0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; padding-top: 40px; overflow-y: auto; }
+    /* ═══════════════ HOME ═══════════════ */
+    #screen-home { padding:0 24px; }
 
-        /* --- NAV --- */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: var(--bg-color); border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: 10px; }
-        .nav-btn { background: none; border: none; font-size: 1.5rem; opacity: 0.3; position: relative; }
-        .nav-btn.active { opacity: 1; color: var(--hanko-color); }
-        .version-tag { position: absolute; top: 10px; right: 10px; font-size: 0.6rem; color: #ccc; }
-        
-        .alert-dot { position: absolute; top: 12px; right: 15px; width: 8px; height: 8px; background: var(--hanko-color); border-radius: 50%; display: none; }
+    .home-header {
+        width:100%; display:flex; justify-content:space-between; align-items:center;
+        padding:16px 0 0;
+    }
+    .home-greeting {
+        font-family:'Shippori Mincho',serif; font-size:0.75rem;
+        color:var(--indigo); font-weight:400;
+    }
+    .home-ver { font-size:0.5rem; color:var(--indigo-pale); letter-spacing:1px; }
 
-        /* --- SORT BTN --- */
-        .sort-btn { font-size: 0.8rem; background: none; border: 1px solid #ddd; border-radius: 15px; padding: 2px 10px; color: #888; margin-bottom: 10px; }
+    .enso-container {
+        display:flex; flex-direction:column; align-items:center;
+        margin:30px 0 0; position:relative;
+    }
+    .enso {
+        width:210px; height:210px; position:relative;
+        display:flex; align-items:center; justify-content:center;
+    }
+    .enso svg { position:absolute; inset:0; width:100%; height:100%; }
+    .enso-center { text-align:center; z-index:1; }
+    .enso-num {
+        font-family:'Shippori Mincho',serif; font-size:3.2rem;
+        font-weight:800; line-height:1; letter-spacing:-3px;
+    }
+    .enso-cur { font-size:1.8rem; font-weight:400; }
+    .enso-sub {
+        font-size:0.5rem; letter-spacing:6px; color:var(--indigo);
+        text-transform:uppercase; margin-top:8px; font-weight:600;
+    }
 
-    </style>
+    /* Hanko — square seal, more authentic */
+    .hanko-seal {
+        position:absolute; bottom:-4px; right:-4px;
+        width:40px; height:40px;
+        border:2px solid var(--vermillion);
+        border-radius:4px; transform:rotate(-6deg);
+        display:flex; align-items:center; justify-content:center;
+        font-family:'Shippori Mincho',serif; font-size:0.85rem;
+        color:var(--vermillion); font-weight:800;
+        background:var(--washi);
+        box-shadow:0 0 0 1px rgba(212,43,43,0.1);
+        line-height:1;
+    }
+
+    /* Stats row */
+    .stats-row {
+        display:flex; gap:0; width:100%; margin-top:32px;
+        border-top:1px solid var(--indigo-ghost);
+        border-bottom:1px solid var(--indigo-ghost);
+    }
+    .stat-cell {
+        flex:1; text-align:center; padding:18px 8px;
+        cursor:pointer; transition:background 0.2s;
+        position:relative;
+    }
+    .stat-cell:active { background:var(--indigo-ghost); }
+    .stat-cell+.stat-cell { border-left:1px solid var(--indigo-ghost); }
+    .stat-num { font-family:'Shippori Mincho',serif; font-size:1.6rem; font-weight:700; line-height:1; }
+    .stat-num.red { color:var(--vermillion); }
+    .stat-lbl {
+        font-size:0.45rem; letter-spacing:3px; color:var(--indigo);
+        text-transform:uppercase; margin-top:5px; font-weight:600;
+    }
+
+    /* Koan — a meditative quote at the bottom */
+    .koan {
+        margin-top:auto; padding:30px 20px 10px;
+        text-align:center;
+    }
+    .koan-text {
+        font-family:'Shippori Mincho',serif; font-size:0.8rem;
+        color:var(--indigo-light); font-weight:400;
+        font-style:italic; line-height:1.6;
+    }
+    .koan-attr {
+        font-size:0.5rem; color:var(--indigo-pale);
+        margin-top:6px; letter-spacing:2px;
+    }
+
+    /* ═══════════════ ADD ═══════════════ */
+    #screen-add { padding:0 24px; }
+
+    .add-header {
+        width:100%; padding:20px 0 16px; display:flex; align-items:baseline; gap:10px;
+    }
+    .add-kanji {
+        font-family:'Shippori Mincho',serif; font-size:2rem; font-weight:800;
+        line-height:1;
+    }
+    .add-word { font-size:0.55rem; letter-spacing:4px; color:var(--indigo); text-transform:uppercase; font-weight:600; padding-bottom:4px; }
+
+    .fg { width:100%; margin-bottom:20px; }
+    .fg-label {
+        font-size:0.5rem; letter-spacing:3px; color:var(--indigo);
+        text-transform:uppercase; margin-bottom:6px; font-weight:600;
+    }
+    .fg-input {
+        background:transparent; border:none;
+        border-bottom:1.5px solid var(--indigo-pale);
+        font-family:'Shippori Mincho',serif; font-size:1.15rem; color:var(--ink);
+        padding:10px 0; width:100%; outline:none;
+        transition:border-color 0.3s;
+    }
+    .fg-input:focus { border-color:var(--ink); }
+    .fg-input::placeholder { color:var(--indigo-pale); }
+
+    .qty-row { display:flex; align-items:center; gap:16px; }
+    .q-btn {
+        width:36px; height:36px; border-radius:50%;
+        border:1.5px solid var(--indigo-pale); background:transparent;
+        font-size:1.1rem; color:var(--indigo);
+        display:flex; align-items:center; justify-content:center; cursor:pointer;
+        transition:all 0.15s;
+    }
+    .q-btn:active { background:var(--ink); color:white; border-color:var(--ink); }
+    .q-val { font-family:'Shippori Mincho',serif; font-size:1.8rem; font-weight:700; width:44px; text-align:center; }
+
+    /* Space chips */
+    .chips {
+        display:flex; gap:8px; overflow-x:auto; width:100%;
+        padding:4px 0; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    }
+    .chips::-webkit-scrollbar { display:none; }
+    .chip {
+        min-width:66px; height:84px; background:var(--white);
+        border:1.5px solid var(--indigo-ghost);
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+        padding:6px 4px; cursor:pointer; transition:all 0.2s; flex-shrink:0;
+    }
+    .chip svg { width:20px; height:20px; stroke:var(--indigo); stroke-width:1.5; fill:none; stroke-linecap:round; stroke-linejoin:round; transition:all 0.2s; }
+    .chip-lbl { font-size:0.5rem; color:var(--indigo); text-align:center; line-height:1.15; transition:all 0.2s; }
+    .chip-kj { font-family:'Shippori Mincho',serif; font-size:0.5rem; color:var(--indigo-pale); transition:all 0.2s; }
+    .chip.sel {
+        border-color:var(--ink); background:var(--ink);
+        box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    }
+    .chip.sel svg { stroke:#fff; }
+    .chip.sel .chip-lbl { color:#fff; }
+    .chip.sel .chip-kj { color:rgba(255,255,255,0.35); }
+
+    /* Decision buttons */
+    .dg { display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; }
+    .d-btn {
+        padding:14px 6px; background:var(--white);
+        border:1.5px solid var(--indigo-ghost);
+        cursor:pointer; text-align:center;
+        font-size:0.6rem; letter-spacing:2px; color:var(--indigo);
+        text-transform:uppercase; font-family:'Noto Sans',sans-serif;
+        transition:all 0.2s; font-weight:600;
+    }
+    .d-btn:active { transform:scale(0.97); }
+    .d-btn.sel { border-color:var(--ink); color:var(--ink); background:var(--white); }
+    .d-btn.sel-v { border-color:var(--vermillion); color:var(--vermillion); background:var(--vermillion-pale); }
+    .d-btn.w2 { grid-column:span 2; }
+
+    .pb { width:100%; display:none; margin-top:6px; }
+    .pb-inp {
+        background:transparent; border:none; border-bottom:2px solid var(--vermillion);
+        font-family:'Shippori Mincho',serif; font-size:1.3rem; color:var(--vermillion);
+        text-align:center; padding:10px 0; width:100%; outline:none; font-weight:700;
+    }
+    .pb-inp::placeholder { color:rgba(212,43,43,0.2); font-weight:400; }
+
+    /* CTA */
+    .cta {
+        margin-top:24px; padding:16px 52px;
+        background:var(--ink); color:white; border:none;
+        font-size:0.6rem; letter-spacing:5px; text-transform:uppercase;
+        cursor:pointer; font-family:'Noto Sans',sans-serif; font-weight:700;
+        transition:all 0.2s;
+    }
+    .cta:active { transform:scale(0.97); opacity:0.9; }
+    .cta.red { background:var(--vermillion); }
+    .cta2 {
+        margin-top:14px; padding:12px 30px; background:transparent;
+        border:1.5px solid var(--indigo-pale); color:var(--indigo);
+        font-size:0.55rem; letter-spacing:3px; text-transform:uppercase;
+        cursor:pointer; font-family:'Noto Sans',sans-serif; font-weight:600;
+    }
+
+    /* ═══════════════ SANTUARIO ═══════════════ */
+    #screen-santuario { padding: 0 0 90px 0; }
+
+    .sant-top {
+        width:100%; padding:24px 24px 16px; display:flex; flex-direction:column; align-items:center;
+        background:linear-gradient(to bottom, var(--washi), var(--washi-warm));
+        position:relative;
+    }
+    .sant-top::after {
+        content:''; position:absolute; bottom:0; left:10%; right:10%;
+        height:1px; background:linear-gradient(to right, transparent, var(--indigo-pale), transparent);
+    }
+    .sant-kanji {
+        font-family:'Shippori Mincho',serif; font-size:2.8rem; font-weight:800;
+        line-height:1; margin-top:4px; letter-spacing:4px;
+    }
+    .sant-word {
+        font-size:0.5rem; letter-spacing:6px; color:var(--indigo);
+        text-transform:uppercase; margin-top:8px; font-weight:600;
+    }
+    .sant-count {
+        font-family:'Shippori Mincho',serif; font-size:0.8rem; color:var(--indigo-light);
+        margin-top:14px;
+    }
+    .sant-search {
+        width:85%; max-width:300px; margin-top:12px; padding:10px 0;
+        border:none; border-bottom:1px solid var(--indigo-pale);
+        background:transparent; font-family:'Shippori Mincho',serif;
+        font-size:0.85rem; outline:none; color:var(--ink); text-align:center;
+    }
+    .sant-search::placeholder { color:var(--indigo-pale); }
+
+    .rooms { width:100%; padding:12px 16px; }
+
+    .room {
+        margin-bottom:4px; background:var(--white);
+        border:1px solid rgba(107,143,163,0.1);
+        overflow:hidden;
+    }
+    .room:first-child { border-radius:2px 2px 0 0; }
+    .room:last-child { border-radius:0 0 2px 2px; }
+    .room-h {
+        display:flex; align-items:center; justify-content:space-between;
+        padding:15px 16px; cursor:pointer; transition:background 0.15s;
+    }
+    .room-h:active { background:var(--indigo-ghost); }
+    .room-hl { display:flex; align-items:center; gap:12px; }
+    .room-hi svg { width:18px; height:18px; stroke:var(--ink); stroke-width:1.5; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .room-hn { font-family:'Shippori Mincho',serif; font-size:0.85rem; }
+    .room-hk { font-family:'Shippori Mincho',serif; font-size:0.6rem; color:var(--indigo-light); margin-left:4px; }
+    .room-hr { display:flex; align-items:center; gap:8px; }
+    .room-hc {
+        font-family:'Shippori Mincho',serif; font-size:0.7rem; color:var(--indigo);
+        background:var(--indigo-ghost); padding:2px 10px; border-radius:10px;
+    }
+    .room-ha {
+        display:inline-block; font-size:0.65rem; color:var(--indigo-pale);
+        transition:transform 0.3s ease;
+    }
+    .room.open .room-ha { transform:rotate(90deg); }
+
+    .room-body {
+        max-height:0; overflow:hidden;
+        transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .room.open .room-body { max-height:2000px; }
+
+    .r-item {
+        display:flex; align-items:center; justify-content:space-between;
+        padding:10px 12px 10px 40px;
+        border-top:1px solid rgba(107,143,163,0.06);
+    }
+    .r-item-l { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
+    .r-dot { width:5px; height:5px; border-radius:50%; background:var(--vermillion); flex-shrink:0; opacity:0.7; }
+    .r-name {
+        font-family:'Shippori Mincho',serif; font-size:0.8rem;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .r-qty { font-size:0.5rem; color:var(--indigo); background:var(--indigo-ghost); padding:1px 6px; border-radius:8px; flex-shrink:0; font-weight:600; }
+    .r-btns { display:flex; gap:6px; flex-shrink:0; align-items:center; }
+    /* r-btn replaced by .cb circles */
+
+    .sant-empty {
+        text-align:center; padding:60px 24px;
+    }
+    .sant-empty-k {
+        font-family:'Shippori Mincho',serif; font-size:3.5rem;
+        color:var(--indigo-pale); opacity:0.4; line-height:1;
+    }
+    .sant-empty-t {
+        font-family:'Shippori Mincho',serif; font-size:0.85rem;
+        color:var(--indigo-light); margin-top:12px; font-weight:400;
+    }
+
+    /* ═══════════════ PROCESS ═══════════════ */
+    #screen-list { padding:0; }
+    .tabs { display:flex; width:100%; border-bottom:1px solid var(--indigo-ghost); }
+    .tab {
+        flex:1; padding:15px 0; background:none; border:none;
+        font-size:0.5rem; letter-spacing:4px; text-transform:uppercase;
+        color:var(--indigo-pale); cursor:pointer; position:relative;
+        font-family:'Noto Sans',sans-serif; font-weight:600;
+        transition:color 0.2s;
+    }
+    .tab::after { content:''; position:absolute; bottom:-1px; left:50%; transform:translateX(-50%); width:0; height:2px; background:var(--vermillion); transition:width 0.3s; }
+    .tab.on { color:var(--ink); }
+    .tab.on::after { width:30%; }
+
+    .list-hdr {
+        width:100%; display:flex; justify-content:space-between; align-items:center;
+        padding:14px 20px 10px;
+    }
+    .list-t { font-family:'Shippori Mincho',serif; font-size:1rem; }
+    .list-t small { font-weight:300; color:var(--indigo); font-size:0.75rem; }
+    .sp {
+        font-size:0.5rem; letter-spacing:2px; text-transform:uppercase;
+        background:var(--white); border:1px solid var(--indigo-ghost);
+        padding:4px 12px; color:var(--indigo); cursor:pointer;
+        font-family:'Noto Sans',sans-serif; font-weight:600;
+        transition:all 0.15s;
+    }
+    .sp:active { background:var(--ink); color:white; border-color:var(--ink); }
+
+    .gh {
+        width:92%; padding:18px 0 5px; font-size:0.45rem; letter-spacing:3px;
+        text-transform:uppercase; color:var(--indigo); font-weight:700;
+        border-bottom:1px solid var(--indigo-ghost);
+        margin:0 auto 6px; display:flex; justify-content:space-between; align-items:baseline;
+    }
+    .gh-n { font-family:'Shippori Mincho',serif; font-size:0.8rem; font-weight:700; color:var(--ink-soft); }
+
+    .ic {
+        width:92%; margin:0 auto 5px; background:var(--white);
+        border:1px solid rgba(107,143,163,0.08);
+        padding:12px 14px;
+    }
+    .ic-top { display:flex; align-items:center; justify-content:space-between; }
+    .ic-l { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
+    .ic-i svg { width:15px; height:15px; stroke:var(--vermillion); stroke-width:1.8; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .ic-n { font-family:'Shippori Mincho',serif; font-size:0.88rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ic-q { font-size:0.5rem; color:var(--indigo); background:var(--indigo-ghost); padding:1px 6px; border-radius:8px; font-weight:600; flex-shrink:0; }
+    .ic-d { font-size:0.5rem; color:var(--indigo-pale); letter-spacing:1px; flex-shrink:0; }
+    .ic-d.alert { color:var(--vermillion); font-weight:700; }
+    .ic-bot { display:flex; align-items:center; justify-content:space-between; margin-top:8px; padding-top:8px; border-top:1px solid rgba(107,143,163,0.06); }
+    .ic-m { font-size:0.45rem; letter-spacing:2px; text-transform:uppercase; color:var(--indigo-pale); font-weight:600; }
+    .ic-p { font-family:'Shippori Mincho',serif; font-size:0.8rem; color:var(--indigo); }
+    .ic-p.won { color:var(--vermillion); font-weight:700; }
+    .ic-btns { display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .ib { background:none; border:none; font-size:0.85rem; color:var(--indigo-pale); cursor:pointer; padding:3px; transition:color 0.15s; }
+    .ib:active { color:var(--ink); }
+    /* Cuentas action buttons — larger tap targets */
+    .cb { 
+        background:none; border:1px solid var(--indigo-ghost); 
+        width:38px; height:38px; border-radius:50%; 
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; transition:all 0.15s; flex-shrink:0;
+    }
+    .cb svg { width:18px; height:18px; stroke:var(--indigo); stroke-width:1.8; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+    .cb:active { background:var(--indigo-ghost); transform:scale(0.93); }
+    .cb.price-edit { border-color:rgba(212,43,43,0.2); }
+    .cb.price-edit svg { stroke:var(--vermillion); }
+    .cb.price-edit:active { background:var(--vermillion-pale); }
+    .cb.del { border-color:rgba(212,43,43,0.15); }
+    .cb.del svg { stroke:var(--vermillion); }
+    .cb.del:active { background:var(--vermillion-pale); }
+    .ab {
+        padding:5px 14px; border:none; font-size:0.5rem; letter-spacing:2px;
+        text-transform:uppercase; cursor:pointer; font-family:'Noto Sans',sans-serif; font-weight:700;
+    }
+    .ab.dk { background:var(--ink); color:white; }
+    .ab.rd { background:var(--vermillion); color:white; }
+    .ab:active { transform:scale(0.96); opacity:0.9; }
+
+    .as {
+        display:flex; width:92%; margin:12px auto; background:var(--white);
+        border:1px solid rgba(107,143,163,0.08); overflow:hidden;
+    }
+    .as-h { flex:1; padding:16px; text-align:center; }
+    .as-h+.as-h { border-left:1px solid rgba(107,143,163,0.06); }
+    .as-v { font-family:'Shippori Mincho',serif; font-size:1.5rem; font-weight:700; }
+    .as-v.red { color:var(--vermillion); }
+    .as-l { font-size:0.4rem; letter-spacing:2px; text-transform:uppercase; color:var(--indigo-pale); margin-top:3px; font-weight:600; }
+
+    .mt { margin-top:60px; text-align:center; font-family:'Shippori Mincho',serif; color:var(--indigo-pale); font-size:0.85rem; }
+    .mt-k { font-size:2.5rem; opacity:0.3; margin-bottom:8px; }
+
+    /* ═══════════════ SETTINGS ═══════════════ */
+    #screen-settings { padding:0 24px; }
+    .s-hdr { width:100%; padding:20px 0 16px; display:flex; align-items:baseline; gap:10px; }
+    .s-kanji { font-family:'Shippori Mincho',serif; font-size:2rem; font-weight:800; }
+    .s-word { font-size:0.55rem; letter-spacing:4px; color:var(--indigo); text-transform:uppercase; font-weight:600; padding-bottom:4px; }
+    .s-desc { font-size:0.7rem; color:var(--indigo); line-height:1.7; margin-bottom:30px; }
+    .s-alert { color:var(--vermillion); font-weight:700; font-size:0.65rem; display:none; margin-top:8px; }
+
+    .s-section { width:100%; margin-bottom:32px; }
+    .s-section-t { font-size:0.5rem; letter-spacing:3px; color:var(--indigo-pale); text-transform:uppercase; font-weight:600; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--indigo-ghost); }
+
+    .s-stat-row { display:flex; justify-content:space-between; padding:8px 0; }
+    .s-stat-label { font-size:0.75rem; color:var(--ink-soft); }
+    .s-stat-val { font-family:'Shippori Mincho',serif; font-size:0.8rem; font-weight:700; }
+    .s-stat-val.red { color:var(--vermillion); }
+
+    /* ═══════════════ OVERLAYS ═══════════════ */
+    .ov {
+        position:fixed; inset:0; background:rgba(247,245,240,0.97);
+        z-index:2000; display:none; flex-direction:column; align-items:center;
+        padding:40px 24px; overflow-y:auto;
+    }
+    .ov-t { font-family:'Shippori Mincho',serif; font-size:1.2rem; font-weight:300; margin-bottom:28px; letter-spacing:2px; }
+
+    /* ═══════════════ NAV ═══════════════ */
+    .nav {
+        position:fixed; bottom:0; width:100%; height:64px;
+        background:var(--washi);
+        border-top:1px solid var(--indigo-ghost);
+        display:flex; justify-content:space-around; align-items:center;
+        z-index:1000; padding-bottom:env(safe-area-inset-bottom, 6px);
+    }
+    .ni {
+        background:none; border:none; display:flex; flex-direction:column;
+        align-items:center; gap:3px; cursor:pointer; position:relative; padding:6px 12px;
+    }
+    .ni svg { width:19px; height:19px; stroke:var(--indigo-pale); stroke-width:1.5; fill:none; stroke-linecap:round; stroke-linejoin:round; transition:stroke 0.2s; }
+    .ni .nt { font-size:0.4rem; letter-spacing:1.5px; color:var(--indigo-pale); transition:color 0.2s; text-transform:uppercase; font-weight:600; }
+    .ni.on svg { stroke:var(--vermillion); }
+    .ni.on .nt { color:var(--vermillion); }
+    .nd { position:absolute; top:1px; right:6px; width:5px; height:5px; background:var(--vermillion); border-radius:50%; display:none; }
+</style>
+```
+
 </head>
 <body>
-    <div class="version-tag">v16.0</div>
 
-    <div id="screen-home" class="screen active">
-        <div class="enso-circle">
-            <div style="text-align:center">
-                <div class="money-display" id="total-money">0€</div>
-                <div style="font-size:0.7rem; color:#888; letter-spacing:1px;">GANADO</div>
+```
+<!-- ═══ HOME ═══ -->
+<div id="screen-home" class="screen active">
+    <div class="home-header">
+        <div class="home-greeting jp" id="greeting">空白</div>
+        <div class="home-ver">v19</div>
+    </div>
+
+    <div class="enso-container">
+        <div class="enso">
+            <svg viewBox="0 0 200 200">
+                <path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13"
+                      stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>
+                <path d="M78 13 C81 12,84 12,88 13"
+                      stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.2"/>
+            </svg>
+            <div class="enso-center">
+                <div class="enso-num jp" id="total-money"><span class="enso-cur">€</span>0</div>
+                <div class="enso-sub">ganado</div>
             </div>
-            <div class="enso-dot"></div>
         </div>
-        
-        <div class="ui-text" style="display:flex; gap:40px; margin-top:30px; text-align:center;">
-            <div><div style="font-size:1.5rem; font-weight:bold;" id="stat-kept">0</div><div style="font-size:0.7rem; color:#888;">SANTUARIO</div></div>
-            <div><div style="font-size:1.5rem; font-weight:bold;" id="stat-pending">0</div><div style="font-size:0.7rem; color:#888;">PENDIENTE</div></div>
+        <div class="hanko-seal">空<br>白</div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-cell" onclick="go('screen-santuario',document.querySelectorAll('.ni')[2])">
+            <div class="stat-num jp" id="stat-kept">0</div>
+            <div class="stat-lbl">santuario</div>
+        </div>
+        <div class="stat-cell" onclick="go('screen-list',document.querySelectorAll('.ni')[3])">
+            <div class="stat-num jp" id="stat-pending">0</div>
+            <div class="stat-lbl">pendiente</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-num jp red" id="stat-sold">0</div>
+            <div class="stat-lbl">vendidos</div>
         </div>
     </div>
 
-    <div id="screen-add" class="screen">
-        <h2 class="ui-text">Nuevo Objeto</h2>
-        <input type="text" id="inp-name" placeholder="Nombre..." autocomplete="off">
-        <div class="qty-wrapper ui-text">
-            <button class="qty-btn" onclick="adjQty('add', -1)">-</button>
-            <span class="qty-val" id="add-qty-val">1</span>
-            <button class="qty-btn" onclick="adjQty('add', 1)">+</button>
-            <span style="font-size:0.8rem; color:#888;">unidades</span>
+    <div class="koan">
+        <div class="koan-text jp" id="koan-text"></div>
+        <div class="koan-attr" id="koan-attr"></div>
+    </div>
+</div>
+
+<!-- ═══ ADD ═══ -->
+<div id="screen-add" class="screen">
+    <div class="add-header">
+        <div class="add-kanji jp">新</div>
+        <div class="add-word">nuevo objeto</div>
+    </div>
+    <div class="fg"><div class="fg-label">nombre</div><input class="fg-input jp" type="text" id="inp-name" placeholder="¿Qué objeto es?" autocomplete="off"></div>
+    <div class="fg"><div class="fg-label">unidades</div><div class="qty-row"><button class="q-btn" onclick="adjQ('a',-1)">−</button><span class="q-val jp" id="aq">1</span><button class="q-btn" onclick="adjQ('a',1)">+</button></div></div>
+    <div class="fg"><div class="fg-label">espacio</div><div class="chips" id="add-chips"></div></div>
+    <div class="fg">
+        <div class="fg-label">decisión</div>
+        <div class="dg">
+            <button class="d-btn" onclick="sA(this,'conservar')">Conservar</button>
+            <button class="d-btn" onclick="sA(this,'regalar')">Regalar</button>
+            <button class="d-btn" onclick="sA(this,'donar')">Donar</button>
+            <button class="d-btn" onclick="sA(this,'tirar')">Tirar</button>
+            <button class="d-btn w2" onclick="sA(this,'vender')">Vender</button>
         </div>
-        <div class="spaces-scroll" id="add-space-selector" style="margin-bottom:20px;"></div>
-        <div class="grid-actions ui-text">
-            <button class="btn-opt" onclick="setAct(this, 'conservar')">Conservar</button>
-            <button class="btn-opt" onclick="setAct(this, 'regalar')">Regalar</button>
-            <button class="btn-opt" onclick="setAct(this, 'donar')">Donar</button>
-            <button class="btn-opt" onclick="setAct(this, 'tirar')">Tirar</button>
-            <button class="btn-opt" style="grid-column: span 2;" onclick="setAct(this, 'vender')">Vender</button>
-        </div>
-        <div id="price-box" style="display:none; width:100%;">
-            <input type="number" id="inp-price" placeholder="Precio TOTAL estimado (€)" inputmode="decimal">
-        </div>
-        <button class="btn-main ui-text" onclick="saveNewItem()">REGISTRAR</button>
+    </div>
+    <div class="pb" id="pb"><div class="fg-label" style="color:var(--vermillion)">precio estimado</div><input class="pb-inp jp" type="number" id="inp-price" placeholder="0€" inputmode="decimal"></div>
+    <button class="cta" onclick="saveNew()">REGISTRAR</button>
+</div>
+
+<!-- ═══ SANTUARIO ═══ -->
+<div id="screen-santuario" class="screen">
+    <div class="sant-top">
+        <div class="sant-kanji jp">聖域</div>
+        <div class="sant-word">santuario</div>
+        <div class="sant-count jp" id="sant-n">0 objetos</div>
+        <input class="sant-search jp" type="text" id="sant-q" placeholder="Buscar..." oninput="rSant()">
+    </div>
+    <div class="rooms" id="rooms"></div>
+</div>
+
+<!-- ═══ PROCESS ═══ -->
+<div id="screen-list" class="screen" style="padding:0; padding-bottom:90px;">
+    <div class="tabs">
+        <button class="tab on" onclick="sTab('process')">Proceso</button>
+        <button class="tab" onclick="sTab('sold')">Cuentas</button>
+    </div>
+    <div class="list-hdr" id="lh">
+        <div class="list-t jp">進行 <small>proceso</small></div>
+        <button class="sp" id="sb" onclick="tSort()">Fecha ↓</button>
+    </div>
+    <div id="lc" style="width:100%;display:flex;flex-direction:column;align-items:center;padding:0 0 10px;"></div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div id="screen-settings" class="screen">
+    <div class="s-hdr"><div class="s-kanji jp">控</div><div class="s-word">ajustes</div></div>
+
+    <div class="s-section">
+        <div class="s-section-t">resumen</div>
+        <div class="s-stat-row"><span class="s-stat-label">Objetos en santuario</span><span class="s-stat-val jp" id="ss-kept">0</span></div>
+        <div class="s-stat-row"><span class="s-stat-label">En proceso</span><span class="s-stat-val jp" id="ss-pend">0</span></div>
+        <div class="s-stat-row"><span class="s-stat-label">Completados</span><span class="s-stat-val jp" id="ss-done">0</span></div>
+        <div class="s-stat-row"><span class="s-stat-label">Total ganado</span><span class="s-stat-val jp red" id="ss-earn">0€</span></div>
     </div>
 
-    <div id="screen-list" class="screen" style="padding:0;">
-        <div class="tabs ui-text">
-            <button class="tab active" onclick="setTab('process')">Proceso</button>
-            <button class="tab" onclick="setTab('kept')">Santuario</button>
-            <button class="tab" onclick="setTab('sold')">Cuentas</button>
-        </div>
-
-        <div id="santuario-header" style="display:none; flex-direction:column; align-items:center; width:100%; background: #fff; padding-bottom:10px; border-bottom:1px solid #eee; margin-bottom:10px;">
-            <div style="margin:10px; font-family:'Georgia'; font-size:1rem; color:#888;">Tus Espacios</div>
-            <div class="spaces-scroll" id="filter-space-selector"></div>
-        </div>
-        
-        <input type="text" id="search-inp" placeholder="Buscar..." onkeyup="render()" style="display:none; font-size:0.9rem; margin-top:10px;">
-        <button id="sort-btn" class="sort-btn" onclick="toggleSort()">Orden: Fecha</button>
-        
-        <div id="list-content" style="width:100%; display:flex; flex-direction:column; align-items:center; padding-bottom: 90px;"></div>
+    <div class="s-section">
+        <div class="s-section-t">copia de seguridad</div>
+        <div class="s-desc">Guarda una copia de tus datos en Archivos para no perderlos.<div class="s-alert" id="backup-status">Copia recomendada</div></div>
+        <button class="cta" onclick="nExp()" style="width:100%">GUARDAR COPIA</button>
+        <input type="file" id="fi" style="display:none" accept=".json" onchange="nImp(this)">
+        <button class="cta2" onclick="document.getElementById('fi').click()" style="width:100%;margin-top:10px">CARGAR COPIA</button>
     </div>
+</div>
 
-    <div id="screen-settings" class="screen">
-        <h2 class="ui-text">Copia de Seguridad</h2>
-        <p class="ui-text" style="font-size:0.8rem; color:#888; text-align:center; margin:20px 40px;">
-            Guarda una copia en "Archivos".<br>
-            <span id="backup-status" style="color:var(--hanko-color); font-weight:bold; display:none;">¡Copia recomendada!</span>
-        </p>
-        <button class="btn-main ui-text" onclick="nativeExport()">📤 GUARDAR COPIA</button>
-        <input type="file" id="file-input" style="display:none" onchange="nativeImport(this)">
-        <button class="ui-text" style="background:none; border:none; margin-top:40px; color:black; text-decoration:underline;" onclick="document.getElementById('file-input').click()">📥 CARGAR COPIA</button>
-    </div>
-    
-    <div id="edit-overlay">
-        <h2 class="ui-text" style="margin-bottom:20px;">Editar</h2>
-        <input type="text" id="edit-name" placeholder="Nombre..." autocomplete="off">
-        <div class="qty-wrapper ui-text" style="border:none;">
-            <button class="qty-btn" onclick="adjQty('edit', -1)">-</button>
-            <span class="qty-val" id="edit-qty-val">1</span>
-            <button class="qty-btn" onclick="adjQty('edit', 1)">+</button>
-        </div>
-        <p class="ui-text" style="font-size:0.8rem; color:#888;">Cambiar Espacio</p>
-        <div class="spaces-scroll" id="edit-space-selector" style="width:95%; margin-bottom:30px;"></div>
-        <button class="btn-main ui-text" onclick="saveEdit()">GUARDAR CAMBIOS</button>
-        <button class="btn-secondary ui-text" onclick="closeEdit()">CANCELAR</button>
-    </div>
+<!-- ═══ EDIT OVERLAY ═══ -->
+<div id="ov-edit" class="ov">
+    <div class="ov-t jp">編集 Editar</div>
+    <div class="fg" style="max-width:340px"><div class="fg-label">nombre</div><input class="fg-input jp" type="text" id="ed-name" autocomplete="off"></div>
+    <div class="fg" style="max-width:340px"><div class="fg-label">unidades</div><div class="qty-row"><button class="q-btn" onclick="adjQ('e',-1)">−</button><span class="q-val jp" id="eq">1</span><button class="q-btn" onclick="adjQ('e',1)">+</button></div></div>
+    <div class="fg" style="max-width:340px"><div class="fg-label">espacio</div><div class="chips" id="ed-chips"></div></div>
+    <button class="cta" onclick="saveEd()">GUARDAR</button>
+    <button class="cta2" onclick="clEd()">CANCELAR</button>
+</div>
 
-    <nav class="nav">
-        <button class="nav-btn active" onclick="go('screen-home', this)">●</button>
-        <button class="nav-btn" onclick="go('screen-add', this)">+</button>
-        <button class="nav-btn" onclick="go('screen-list', this)">☰</button>
-        <button class="nav-btn" onclick="go('screen-settings', this)">
-            ⚙
-            <div id="settings-dot" class="alert-dot"></div>
-        </button>
-    </nav>
+<!-- ═══ SOLD OVERLAY ═══ -->
+<div id="ov-sold" class="ov" style="justify-content:center;z-index:3000;">
+    <div class="ov-t jp">売 Vendido</div>
+    <p style="font-size:0.7rem;color:var(--indigo);margin-bottom:20px;">¿Precio final de venta?</p>
+    <div class="fg" style="max-width:260px"><input class="pb-inp jp" type="number" id="sold-p" placeholder="0€" inputmode="decimal" style="font-size:2.2rem;"></div>
+    <button class="cta red" onclick="cSold()">CONFIRMAR</button>
+    <button class="cta2" onclick="xSold()">CANCELAR</button>
+</div>
 
-    <script>
-        // --- DATA & ICONS ---
-        const ICONS={all:'<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',living:'<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3"/><path d="M12 10v8"/></svg>',bedroom:'<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/><path d="M6 14h12"/></svg>',kitchen:'<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/><path d="M2 13h2"/><path d="M20 13h2"/><path d="M12 5V3"/></svg>',bath:'<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4z"/><path d="M7 14V9a2 2 0 0 1 2-2h1"/><path d="M10 5v4"/><path d="M10 14v-2"/></svg>',study:'<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M6 16v5"/><path d="M18 16v5"/><path d="M14 14V9a2 2 0 0 0-2-2H8"/><path d="M16 6l-2 3"/></svg>',garden:'<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 0 0-5-5 4 4 0 0 1-3-3 4 4 0 0 1 8 0 4 4 0 0 1 8 0 4 4 0 0 1-3 3 5 5 0 0 0-5 5z"/><path d="M8 21h8"/></svg>',pantry:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16"/><path d="M4 16h16"/><path d="M8 10V6"/><path d="M12 16v-6"/><path d="M16 16v-6"/></svg>',garage:'<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/><path d="M2 20h20"/></svg>',terrace:'<svg viewBox="0 0 24 24"><path d="M4 16h16"/><path d="M4 20h16"/><path d="M6 16v4"/><path d="M10 16v4"/><path d="M14 16v4"/><path d="M18 16v4"/><path d="M8 12h8"/><path d="M12 12v4"/><path d="M12 8v-2"/></svg>',basement:'<svg viewBox="0 0 24 24"><path d="M3 5h4v4h4v4h4v4h4"/><path d="M3 5v14h16"/></svg>',dining:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M12 10V6"/><path d="M9 6h6"/><path d="M12 18v4"/><path d="M8 22h8"/></svg>',entrance:'<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h1"/><path d="M5 20h14"/></svg>'};
-        const SPACES=[{id:'all',icon:ICONS.all,label:'Todo',kanji:'全'},{id:'living',icon:ICONS.living,label:'Sala de\nEstar',kanji:'居間'},{id:'bedroom',icon:ICONS.bedroom,label:'Dormitorio',kanji:'寝室'},{id:'kitchen',icon:ICONS.kitchen,label:'Cocina',kanji:'台所'},{id:'bath',icon:ICONS.bath,label:'Baño',kanji:'浴室'},{id:'study',icon:ICONS.study,label:'Estudio',kanji:'書斎'},{id:'garden',icon:ICONS.garden,label:'Jardín',kanji:'庭園'},{id:'pantry',icon:ICONS.pantry,label:'Despensa',kanji:'貯蔵'},{id:'garage',icon:ICONS.garage,label:'Garaje',kanji:'車庫'},{id:'terrace',icon:ICONS.terrace,label:'Terraza',kanji:'テラス'},{id:'basement',icon:ICONS.basement,label:'Sótano',kanji:'地下室'},{id:'dining',icon:ICONS.dining,label:'Comedor',kanji:'食堂'},{id:'entrance',icon:ICONS.entrance,label:'Entrada',kanji:'玄関'}];
+<!-- ═══ CONFIRM OVERLAY ═══ -->
+<div id="ov-confirm" class="ov" style="justify-content:center;z-index:3500;">
+    <div class="ov-t jp" id="confirm-title">確認</div>
+    <p style="font-size:0.8rem;color:var(--indigo);margin-bottom:24px;text-align:center;" id="confirm-msg"></p>
+    <button class="cta" id="confirm-yes" style="min-width:200px;">CONFIRMAR</button>
+    <button class="cta2" onclick="xConfirm()" style="min-width:200px;">CANCELAR</button>
+</div>
 
-        let db=[], curAct=null, curTab='process', curSpaceAdd='living', curSpaceFilter='all', editId=null, curSpaceEdit='living', addQty=1, editQty=1;
-        let lastBackup = 0, changesSinceBackup = 0;
-        let sortMode = 'date'; 
+<!-- ═══ NAV ═══ -->
+<nav class="nav">
+    <button class="ni on" onclick="go('screen-home',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg><span class="nt">inicio</span>
+    </button>
+    <button class="ni" onclick="go('screen-add',this)">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="nt">nuevo</span>
+    </button>
+    <button class="ni" onclick="go('screen-santuario',this)">
+        <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg><span class="nt">santuario</span>
+    </button>
+    <button class="ni" onclick="go('screen-list',this)">
+        <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg><span class="nt">proceso</span>
+    </button>
+    <button class="ni" onclick="go('screen-settings',this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="nt">ajustes</span>
+        <div class="nd" id="sdot"></div>
+    </button>
+</nav>
 
-        function init() {
-            try {
-                const raw=localStorage.getItem('kuhakuDB');
-                if(raw) db=JSON.parse(raw);
-                const meta=localStorage.getItem('kuhakuMeta');
-                if(meta) { const m=JSON.parse(meta); lastBackup=m.lastBackup; changesSinceBackup=m.changes; }
-            } catch(e) { db=[]; }
-            renderSelectors(); checkBackupStatus(); updateHome();
-        }
+<script>
+const I={
+    all:'<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
+    living:'<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 013-3h10a3 3 0 013 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 011-1h10a1 1 0 011 1v3"/></svg>',
+    bedroom:'<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/></svg>',
+    kitchen:'<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/><path d="M12 5V3"/></svg>',
+    bath:'<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 01-4 4H8a4 4 0 01-4-4v-4z"/><path d="M7 14V9a2 2 0 012-2h1"/></svg>',
+    study:'<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M6 16v5M18 16v5"/><path d="M14 14V9a2 2 0 00-2-2H8"/></svg>',
+    garden:'<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 00-5-5 4 4 0 01-3-3 4 4 0 018 0 4 4 0 018 0 4 4 0 01-3 3 5 5 0 00-5 5z"/><path d="M8 21h8"/></svg>',
+    pantry:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16M4 16h16"/></svg>',
+    garage:'<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16M4 14h16M4 18h16"/></svg>',
+    terrace:'<svg viewBox="0 0 24 24"><path d="M4 16h16M4 20h16"/><path d="M6 16v4M10 16v4M14 16v4M18 16v4"/><path d="M12 8v8"/></svg>',
+    basement:'<svg viewBox="0 0 24 24"><path d="M3 5h4v4h4v4h4v4h4"/><path d="M3 5v14h16"/></svg>',
+    dining:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M12 10V6M9 6h6"/><path d="M12 18v4M8 22h8"/></svg>',
+    entrance:'<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h1"/><path d="M5 20h14"/></svg>'
+};
+const SP=[
+    {id:'living',icon:I.living,label:'Sala',kj:'居間'},
+    {id:'bedroom',icon:I.bedroom,label:'Dormitorio',kj:'寝室'},
+    {id:'kitchen',icon:I.kitchen,label:'Cocina',kj:'台所'},
+    {id:'bath',icon:I.bath,label:'Baño',kj:'浴室'},
+    {id:'study',icon:I.study,label:'Estudio',kj:'書斎'},
+    {id:'garden',icon:I.garden,label:'Jardín',kj:'庭園'},
+    {id:'pantry',icon:I.pantry,label:'Despensa',kj:'貯蔵'},
+    {id:'garage',icon:I.garage,label:'Garaje',kj:'車庫'},
+    {id:'terrace',icon:I.terrace,label:'Terraza',kj:'テラス'},
+    {id:'basement',icon:I.basement,label:'Sótano',kj:'地下室'},
+    {id:'dining',icon:I.dining,label:'Comedor',kj:'食堂'},
+    {id:'entrance',icon:I.entrance,label:'Entrada',kj:'玄関'}
+];
 
-        function save() {
-            localStorage.setItem('kuhakuDB', JSON.stringify(db));
-            changesSinceBackup++;
-            localStorage.setItem('kuhakuMeta', JSON.stringify({lastBackup, changes:changesSinceBackup}));
-            checkBackupStatus(); updateHome();
-        }
+const KOANS=[
+    {t:'Poseer menos no es perder, es encontrar espacio para lo esencial.',a:''},
+    {t:'El vacío no es ausencia. Es posibilidad.',a:''},
+    {t:'Lo que sueltas con gratitud vuelve como libertad.',a:''},
+    {t:'Cada objeto que liberas es un paso hacia la claridad.',a:''},
+    {t:'El espacio vacío es el más valioso de la casa.',a:''},
+    {t:'Simplificar es el arte de saber qué merece quedarse.',a:''},
+    {t:'No se trata de tener poco, sino de tener lo justo.',a:''},
+];
 
-        function checkBackupStatus() {
-            const now = Date.now();
-            const daysSince = (now - lastBackup) / (1000 * 60 * 60 * 24);
-            const needsBackup = (changesSinceBackup > 5) || (daysSince > 7 && changesSinceBackup > 0);
-            document.getElementById('settings-dot').style.display = needsBackup ? 'block' : 'none';
-            document.getElementById('backup-status').style.display = needsBackup ? 'block' : 'none';
-        }
+let db=[],cAct=null,cTab='process',cSA='living',eId=null,cSE='living';
+let aQ=1,eQ=1,lB=0,cSB=0,sM='date',oR=new Set(),sId=null;
 
-        function renderSelectors() {
-            const createCard=(s,selectedId,cb)=>{const b=document.createElement('div');b.className=`space-card ${s.id===selectedId?'selected':''}`;b.innerHTML=`${s.icon}<div class="card-text">${s.label}</div><div class="card-kanji">${s.kanji}</div>`;b.onclick=()=>cb(s.id);return b;};
-            const ac=document.getElementById('add-space-selector');ac.innerHTML='';SPACES.slice(1).forEach(s=>ac.appendChild(createCard(s,curSpaceAdd,(id)=>{curSpaceAdd=id;renderSelectors();})));
-            const fc=document.getElementById('filter-space-selector');fc.innerHTML='';SPACES.forEach(s=>fc.appendChild(createCard(s,curSpaceFilter,(id)=>{curSpaceFilter=id;renderSelectors();render();})));
-            const ec=document.getElementById('edit-space-selector');ec.innerHTML='';SPACES.slice(1).forEach(s=>ec.appendChild(createCard(s,curSpaceEdit,(id)=>{curSpaceEdit=id;renderSelectors();})));
-        }
+function init(){
+    try{const r=localStorage.getItem('kuhakuDB');if(r)db=JSON.parse(r);const m=localStorage.getItem('kuhakuMeta');if(m){const o=JSON.parse(m);lB=o.lastBackup;cSB=o.changes;}}catch(e){db=[];}
+    rChips();chkBk();uHome();
+    // Set koan
+    const k=KOANS[Math.floor(Math.random()*KOANS.length)];
+    document.getElementById('koan-text').innerText='「 '+k.t+' 」';
+    // Greeting based on time
+    const h=new Date().getHours();
+    const g=h<12?'おはよう Buenos días':h<19?'こんにちは Buenas tardes':'こんばんは Buenas noches';
+    document.getElementById('greeting').innerText=g;
+}
+function save(){
+    localStorage.setItem('kuhakuDB',JSON.stringify(db));cSB++;
+    localStorage.setItem('kuhakuMeta',JSON.stringify({lastBackup:lB,changes:cSB}));
+    chkBk();uHome();
+}
+function chkBk(){
+    const d=(Date.now()-lB)/(864e5);
+    const n=(cSB>5)||(d>7&&cSB>0);
+    document.getElementById('sdot').style.display=n?'block':'none';
+    document.getElementById('backup-status').style.display=n?'block':'none';
+}
+function rChips(){
+    const mk=(c,sel,cb)=>{c.innerHTML='';SP.forEach(s=>{const e=document.createElement('div');e.className='chip'+(s.id===sel?' sel':'');e.innerHTML=`${s.icon}<div class="chip-lbl">${s.label}</div><div class="chip-kj">${s.kj}</div>`;e.onclick=()=>cb(s.id);c.appendChild(e);});};
+    mk(document.getElementById('add-chips'),cSA,id=>{cSA=id;rChips();});
+    mk(document.getElementById('ed-chips'),cSE,id=>{cSE=id;rChips();});
+}
+function go(id,btn){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
+    if(btn)btn.classList.add('on');
+    if(id==='screen-list')rList();
+    if(id==='screen-santuario')rSant();
+}
 
-        function go(id,btn){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');if(id==='screen-list')render();}
-        function setAct(btn,act){document.querySelectorAll('.btn-opt').forEach(b=>b.classList.remove('selected','sell'));btn.classList.add('selected');if(act==='vender'){btn.classList.add('sell');document.getElementById('price-box').style.display='block';}else{document.getElementById('price-box').style.display='none';}curAct=act;}
-        function adjQty(m,d){if(m==='add'){addQty+=d;if(addQty<1)addQty=1;document.getElementById('add-qty-val').innerText=addQty;}else{editQty+=d;if(editQty<1)editQty=1;document.getElementById('edit-qty-val').innerText=editQty;}}
+// ADD
+function sA(btn,act){
+    document.querySelectorAll('.d-btn').forEach(b=>b.classList.remove('sel','sel-v'));
+    if(act==='vender'){btn.classList.add('sel-v');document.getElementById('pb').style.display='block';}
+    else{btn.classList.add('sel');document.getElementById('pb').style.display='none';}
+    cAct=act;
+}
+function adjQ(m,d){
+    if(m==='a'){aQ=Math.max(1,aQ+d);document.getElementById('aq').innerText=aQ;}
+    else{eQ=Math.max(1,eQ+d);document.getElementById('eq').innerText=eQ;}
+}
+function saveNew(){
+    const n=document.getElementById('inp-name').value.trim();
+    if(!n||!cAct)return alert("Faltan datos");
+    db.push({id:Date.now(),name:n,qty:aQ,act:cAct,space:cSA,price:document.getElementById('inp-price').value||0,final:0,st:(cAct==='conservar')?'kept':'active',date:new Date().toLocaleDateString(),ts:Date.now()});
+    save();
+    document.getElementById('inp-name').value='';document.getElementById('inp-price').value='';
+    aQ=1;document.getElementById('aq').innerText='1';
+    document.querySelectorAll('.d-btn').forEach(b=>b.classList.remove('sel','sel-v'));
+    cAct=null;document.getElementById('pb').style.display='none';
+    if(db[db.length-1].st==='kept')go('screen-santuario',document.querySelectorAll('.ni')[2]);
+    else go('screen-list',document.querySelectorAll('.ni')[3]);
+}
 
-        function saveNewItem(){const name=document.getElementById('inp-name').value;if(!name||!curAct)return alert("Faltan datos");db.push({id:Date.now(),name:name,qty:addQty,act:curAct,space:curSpaceAdd,price:document.getElementById('inp-price').value||0,final:0,st:(curAct==='conservar')?'kept':'active',date:new Date().toLocaleDateString(),ts:Date.now()});save();document.getElementById('inp-name').value='';document.getElementById('inp-price').value='';addQty=1;document.getElementById('add-qty-val').innerText='1';setAct(document.querySelector('.btn-opt'),null);go('screen-list',document.querySelectorAll('.nav-btn')[2]);}
+// SANTUARIO
+function rSant(){
+    const c=document.getElementById('rooms');c.innerHTML='';
+    const q=(document.getElementById('sant-q').value||'').toLowerCase();
+    let k=db.filter(i=>i.st==='kept');
+    if(q)k=k.filter(i=>i.name.toLowerCase().includes(q));
+    document.getElementById('sant-n').innerText=k.length+' objeto'+(k.length!==1?'s':'');
+    if(!k.length){c.innerHTML='<div class="sant-empty"><div class="sant-empty-k">空</div><div class="sant-empty-t">Tu santuario está vacío</div></div>';return;}
+    const g={};k.forEach(i=>{const s=i.space||'living';if(!g[s])g[s]=[];g[s].push(i);});
+    SP.forEach(s=>{
+        if(!g[s.id])return;
+        const items=g[s.id],rm=document.createElement('div');
+        rm.className='room'+(oR.has(s.id)?' open':'');
+        const hd=document.createElement('div');hd.className='room-h';
+        hd.innerHTML=`<div class="room-hl"><div class="room-hi">${s.icon}</div><span class="room-hn">${s.label}</span><span class="room-hk">${s.kj}</span></div><div class="room-hr"><span class="room-hc">${items.length}</span><span class="room-ha">›</span></div>`;
+        hd.onclick=()=>{rm.classList.toggle('open');if(rm.classList.contains('open'))oR.add(s.id);else oR.delete(s.id);};
+        const bd=document.createElement('div');bd.className='room-body';
+        items.forEach(item=>{
+            const r=document.createElement('div');r.className='r-item';
+            const qty=(item.qty>1)?`<span class="r-qty">×${item.qty}</span>`:'';
+            const svgEdit='<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>';
+            const svgOut='<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>';
+            const svgDel='<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+            r.innerHTML=`<div class="r-item-l"><div class="r-dot"></div><span class="r-name">${item.name}</span>${qty}</div><div class="r-btns"><button class="cb" onclick="opEd(${item.id})">${svgEdit}</button><button class="cb" onclick="fromKeep(${item.id})">${svgOut}</button><button class="cb del" onclick="xDel(${item.id})">${svgDel}</button></div>`;
+            bd.appendChild(r);
+        });
+        rm.appendChild(hd);rm.appendChild(bd);c.appendChild(rm);
+    });
+}
 
-        function setTab(t){curTab=t;document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['process','kept','sold'][i]===t));
-            const s=document.getElementById('search-inp'), h=document.getElementById('santuario-header'), sb=document.getElementById('sort-btn');
-            if(t==='kept'){s.style.display='block';h.style.display='flex';sb.style.display='none';}
-            else if(t==='process'){s.style.display='none';h.style.display='none';sb.style.display='block';}
-            else{s.style.display='none';h.style.display='none';sb.style.display='none';}
-            render();
-        }
-
-        function toggleSort() {
-            sortMode = (sortMode === 'date') ? 'price' : 'date';
-            document.getElementById('sort-btn').innerText = (sortMode === 'date') ? 'Orden: Fecha' : 'Orden: Precio';
-            render();
-        }
-
-        function render() {
-            const list=document.getElementById('list-content');list.innerHTML='';const query=document.getElementById('search-inp').value.toLowerCase();
-            
-            // Lógica de Renderizado Diferente por Tab
-            if(curTab === 'process') {
-                const groups = ['vender', 'donar', 'regalar', 'tirar'];
-                let hasItems = false;
-
-                groups.forEach(group => {
-                    // Filtrar items de este grupo
-                    let groupItems = db.filter(i => i.st === 'active' && i.act === group);
-                    
-                    // Ordenar
-                    if(sortMode === 'date') groupItems.sort((a,b) => (b.ts||0) - (a.ts||0));
-                    else if(sortMode === 'price') groupItems.sort((a,b) => parseFloat(b.price||0) - parseFloat(a.price||0));
-
-                    if(groupItems.length > 0) {
-                        hasItems = true;
-                        // Renderizar Cabecera de Grupo
-                        const header = document.createElement('div');
-                        header.className = 'group-header';
-                        header.innerText = group + ` (${groupItems.length})`;
-                        list.appendChild(header);
-
-                        // Renderizar Cards del Grupo
-                        groupItems.forEach(item => list.appendChild(createCardElement(item)));
-                    }
-                });
-
-                if(!hasItems) list.innerHTML='<div style="margin-top:20px;color:#ccc;">Todo limpio</div>';
-
-            } else {
-                // Lógica Estándar (Sin grupos de acción) para Santuario y Cuentas
-                let data = [];
-                if(curTab==='kept') { 
-                    data=db.filter(i=>i.st==='kept'); 
-                    if(curSpaceFilter!=='all') data=data.filter(i=>(i.space||'living')===curSpaceFilter); 
-                    if(query) data=data.filter(i=>i.name.toLowerCase().includes(query)); 
-                }
-                else if(curTab==='sold') {
-                    const ps=db.filter(i=>i.st==='active'&&i.act==='vender'), es=db.filter(i=>i.st==='done'&&i.act==='vender');
-                    const te=es.reduce((a,i)=>a+parseFloat(i.final||0),0), tp=ps.reduce((a,i)=>a+parseFloat(i.price||0),0);
-                    list.innerHTML=`<div style="display:flex;justify-content:space-around;width:90%;margin-bottom:20px;text-align:center;background:#fff;padding:15px;border-radius:8px;border:1px solid #eee;"><div><div style="font-size:1.8rem;font-weight:bold;color:var(--hanko-color);">${te}€</div><div style="font-size:0.7rem;color:#888;">GANADO (REAL)</div></div><div style="border-left:1px solid #eee;"></div><div><div style="font-size:1.8rem;font-weight:bold;color:#555;">${tp}€</div><div style="font-size:0.7rem;color:#888;">EN VENTA (EST)</div></div></div>`;
-                    data=db.filter(i=>i.st==='done');
-                    // En cuentas siempre orden fecha descendente
-                    data.sort((a,b) => (b.ts||0) - (a.ts||0));
-                }
-
-                if(data.length===0 && curTab!=='sold'){list.innerHTML='<div style="margin-top:20px;color:#ccc;">Vacío</div>'; return;}
-                data.forEach(item => list.appendChild(createCardElement(item)));
+// PROCESS/CUENTAS
+const GROUP_LABELS={vender:'Vender',donar:'Donar',regalar:'Regalar',tirar:'Tirar'};
+const GROUP_KJ={vender:'売',donar:'寄',regalar:'贈',tirar:'捨'};
+function sTab(t){
+    cTab=t;document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['process','sold'][i]===t));
+    const h=document.getElementById('lh');
+    if(t==='process'){
+        const total=db.filter(i=>i.st==='active').length;
+        h.querySelector('.list-t').innerHTML=`進行 <small>proceso · ${total}</small>`;
+        document.getElementById('sb').style.display='block';
+    } else {
+        const total=db.filter(i=>i.st==='done').length;
+        h.querySelector('.list-t').innerHTML=`帳簿 <small>cuentas · ${total}</small>`;
+        document.getElementById('sb').style.display='none';
+    }
+    rList();
+}
+function tSort(){sM=(sM==='date')?'price':'date';document.getElementById('sb').innerText=(sM==='date')?'Fecha ↓':'Precio ↓';rList();}
+function rList(){
+    const l=document.getElementById('lc');l.innerHTML='';
+    // Update header count live
+    if(cTab==='process'){
+        const total=db.filter(i=>i.st==='active').length;
+        document.getElementById('lh').querySelector('.list-t').innerHTML=`進行 <small>proceso · ${total}</small>`;
+    }
+    if(cTab==='process'){
+        const gs=['vender','donar','regalar','tirar'];let has=false;
+        gs.forEach(g=>{
+            let it=db.filter(i=>i.st==='active'&&i.act===g);
+            if(sM==='date')it.sort((a,b)=>(b.ts||0)-(a.ts||0));
+            else it.sort((a,b)=>parseFloat(b.price||0)-parseFloat(a.price||0));
+            if(it.length){
+                has=true;
+                const h=document.createElement('div');h.className='gh';
+                h.innerHTML=`<span>${GROUP_KJ[g]} ${GROUP_LABELS[g]}</span><span class="gh-n">${it.length}</span>`;
+                l.appendChild(h);
+                it.forEach(i=>l.appendChild(mkC(i)));
             }
-        }
+        });
+        if(!has)l.innerHTML='<div class="mt"><div class="mt-k">空</div>Todo limpio</div>';
+    } else {
+        const ps=db.filter(i=>i.st==='active'&&i.act==='vender'),es=db.filter(i=>i.st==='done'&&i.act==='vender');
+        const te=es.reduce((a,i)=>a+parseFloat(i.final||0),0),tp=ps.reduce((a,i)=>a+parseFloat(i.price||0),0);
+        const s=document.createElement('div');s.className='as';
+        s.innerHTML=`<div class="as-h"><div class="as-v red jp">${te}€</div><div class="as-l">ganado</div></div><div class="as-h"><div class="as-v jp">${tp}€</div><div class="as-l">en venta</div></div>`;
+        l.appendChild(s);
+        const total=db.filter(i=>i.st==='done').length;
+        document.getElementById('lh').querySelector('.list-t').innerHTML=`帳簿 <small>cuentas · ${total}</small>`;
+        let d=db.filter(i=>i.st==='done');d.sort((a,b)=>(b.ts||0)-(a.ts||0));d.forEach(i=>l.appendChild(mkC(i)));
+    }
+}
+function mkC(item){
+    const e=document.createElement('div');e.className='ic';
+    const sp=SP.find(s=>s.id===(item.space||'living')),si=sp?sp.icon:I.living;
+    const q=(item.qty>1)?`<span class="ic-q">×${item.qty}</span>`:'';
+    const dy=Math.floor((Date.now()-(item.ts||Date.now()))/864e5);
+    const dt=(dy===0)?'Hoy':`${dy}d`;
+    const ac=(cTab==='process'&&dy>30)?'alert':'';
+    let m='';
+    if(cTab==='process'&&item.act==='vender') m=`<div class="ic-p">Meta: ${item.price}€</div>`;
+    else if(cTab==='sold'&&item.act==='vender') m=`<div class="ic-p won">+${item.final}€</div>`;
+    else if(cTab==='sold') m=`<div class="ic-m">${GROUP_LABELS[item.act]||item.act} ✓</div>`;
+    else m=`<div class="ic-m">${GROUP_LABELS[item.act]||item.act}</div>`;
+    let b='';const eb=`<button class="ib" onclick="opEd(${item.id})">✎</button>`;
+    if(cTab==='process'){
+        if(item.act==='vender')b=eb+`<button class="ab rd" onclick="oSold(${item.id})">Vendido</button>`;
+        else b=eb+`<button class="ab dk" onclick="xDone(${item.id})">Listo</button>`;
+    }else{
+        // Cuentas: SVG icon buttons
+        const svgPrice='<svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>';
+        const svgKeep='<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>';
+        const svgBack='<svg viewBox="0 0 24 24"><path d="M3 12h12"/><path d="M3 12l5-5"/><path d="M3 12l5 5"/><path d="M21 5v14"/></svg>';
+        const svgDel='<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        let extraBtns='';
+        if(item.act==='vender') extraBtns=`<button class="cb price-edit" onclick="editPrice(${item.id})">${svgPrice}</button>`;
+        b=extraBtns+`<button class="cb" onclick="toKeep(${item.id})">${svgKeep}</button><button class="cb" onclick="xRest(${item.id})">${svgBack}</button><button class="cb del" onclick="xDel(${item.id})">${svgDel}</button>`;
+    }
+    e.innerHTML=`<div class="ic-top"><div class="ic-l"><div class="ic-i">${si}</div><span class="ic-n">${item.name}</span>${q}</div><div class="ic-d ${ac}">${dt}</div></div><div class="ic-bot">${m}<div class="ic-btns">${b}</div></div>`;
+    return e;
+}
 
-        function createCardElement(item) {
-            const el=document.createElement('div');el.className='card ui-text';
-            const sObj=SPACES.find(s=>s.id===(item.space||'living')), sIcon=sObj?sObj.icon:ICONS.living;
-            const qty=(item.qty>1)?`<span class="qty-badge">x${item.qty}</span>`:'';
-            
-            const days = Math.floor((Date.now() - (item.ts || Date.now())) / (1000 * 60 * 60 * 24));
-            const daysText = (days === 0) ? 'Hoy' : `${days}d`;
-            const alertClass = (curTab==='process' && days > 30) ? 'alert' : '';
+// EDIT
+function opEd(id){eId=id;const i=db.find(x=>x.id===id);document.getElementById('ed-name').value=i.name;eQ=i.qty||1;document.getElementById('eq').innerText=eQ;cSE=i.space||'living';rChips();document.getElementById('ov-edit').style.display='flex';}
+function saveEd(){if(!eId)return;const i=db.find(x=>x.id===eId),n=document.getElementById('ed-name').value.trim();if(n){i.name=n;i.space=cSE;i.qty=eQ;save();rList();rSant();clEd();}}
+function clEd(){document.getElementById('ov-edit').style.display='none';eId=null;}
 
-            let topHtml = `<div class="card-top"><div style="font-size:1.1rem;display:flex;align-items:center;"><span class="space-tag-icon">${sIcon}</span>${item.name}${qty}</div><div class="date-badge ${alertClass}">${daysText}</div></div>`;
-            let btmHtml = `<div style="font-size:0.7rem;color:#888;">${item.act.toUpperCase()}</div>`;
+// ACTIONS
+function oSold(id){sId=id;document.getElementById('sold-p').value='';document.getElementById('ov-sold').style.display='flex';setTimeout(()=>document.getElementById('sold-p').focus(),100);}
+function cSold(){const p=document.getElementById('sold-p').value;if(p!=null&&p!==''){const i=db.find(x=>x.id===sId);if(i){i.final=p;i.st='done';save();rList();}}xSold();}
+function xSold(){document.getElementById('ov-sold').style.display='none';sId=null;}
+function xDone(id){const i=db.find(x=>x.id===id);i.st='done';save();rList();}
+function editPrice(id){
+    sId=id;
+    const i=db.find(x=>x.id===id);
+    document.getElementById('sold-p').value=i.final||'';
+    document.getElementById('ov-sold').style.display='flex';
+    setTimeout(()=>document.getElementById('sold-p').focus(),100);
+}
 
-            // En proceso, si es venta, mostrar precio estimado
-            if(curTab === 'process' && item.act === 'vender') {
-                btmHtml = `<div style="display:flex; align-items:center; margin-top:5px;"><span style="font-size:0.8rem; color:#555;">Meta: ${item.price}€</span></div>`;
-            } else if(curTab === 'sold' && item.act === 'vender') {
-                btmHtml = `<div style="font-size:0.9rem;color:var(--hanko-color);font-weight:bold; margin-top:5px;">+${item.final}€</div>`;
-            }
+// Custom confirm modal
+let confirmCb=null;
+function askConfirm(msg,cb){
+    confirmCb=cb;
+    document.getElementById('confirm-msg').innerText=msg;
+    document.getElementById('confirm-yes').onclick=()=>{
+        const fn=confirmCb;
+        confirmCb=null;
+        document.getElementById('ov-confirm').style.display='none';
+        if(fn)fn();
+    };
+    document.getElementById('ov-confirm').style.display='flex';
+}
+function xConfirm(){document.getElementById('ov-confirm').style.display='none';confirmCb=null;}
 
-            let btns='', ed=`<button onclick="openEdit(${item.id})" style="color:#666;font-size:1.2rem;margin-right:10px;">✎</button>`;
-            if(curTab==='process'){if(item.act==='vender')btns=ed+`<button onclick="sold(${item.id})" style="background:var(--hanko-color);color:white;border-radius:20px;font-size:0.8rem;padding:5px 15px;">Vendido</button>`;else btns=ed+`<button onclick="done(${item.id})" style="background:black;color:white;border-radius:20px;font-size:0.8rem;padding:5px 15px;">Listo</button>`;}
-            else{btns=ed+`<button onclick="restore(${item.id})">↺</button><button onclick="del(${item.id})" style="color:red">✕</button>`;}
+function toKeep(id){
+    askConfirm('¿Mover al santuario?',()=>{
+        const i=db.find(x=>x.id===id);
+        i.st='kept';i.act='conservar';i.final=0;
+        save();rList();rSant();
+    });
+}
+function fromKeep(id){
+    askConfirm('¿Sacar del santuario y mover a proceso?',()=>{
+        const i=db.find(x=>x.id===id);
+        i.st='active';i.act='vender';
+        save();rList();rSant();
+    });
+}
+function xRest(id){
+    askConfirm('¿Devolver al proceso?',()=>{
+        const i=db.find(x=>x.id===id);
+        i.st='active';i.final=0;
+        save();rList();
+    });
+}
+function xDel(id){
+    askConfirm('¿Eliminar definitivamente?',()=>{
+        db=db.filter(x=>x.id!==id);save();rList();rSant();
+    });
+}
 
-            el.innerHTML= topHtml + btmHtml + `<div class="card-bottom"><div style="flex:1"></div><div style="display:flex;align-items:center;">${btns}</div></div>`;
-            return el;
-        }
+// HOME
+function uHome(){
+    const earned=db.filter(i=>i.st==='done'&&i.act==='vender').reduce((a,i)=>a+parseFloat(i.final||0),0);
+    const fs=db.filter(i=>i.st==='active'&&i.act==='vender').reduce((a,i)=>a+parseFloat(i.price||0),0);
+    document.getElementById('total-money').innerHTML=`<span class="enso-cur">€</span>${earned}`;
+    document.getElementById('stat-kept').innerText=db.filter(i=>i.st==='kept').length;
+    document.getElementById('stat-pending').innerText=db.filter(i=>i.st==='active').length;
+    document.getElementById('stat-sold').innerText=db.filter(i=>i.st==='done').length;
+    // Settings stats
+    document.getElementById('ss-kept').innerText=db.filter(i=>i.st==='kept').length;
+    document.getElementById('ss-pend').innerText=db.filter(i=>i.st==='active').length;
+    document.getElementById('ss-done').innerText=db.filter(i=>i.st==='done').length;
+    document.getElementById('ss-earn').innerText=earned+'€';
+}
 
-        function openEdit(id){editId=id;const i=db.find(x=>x.id===id);document.getElementById('edit-name').value=i.name;editQty=i.qty||1;document.getElementById('edit-qty-val').innerText=editQty;curSpaceEdit=i.space||'living';renderSelectors();document.getElementById('edit-overlay').style.display='flex';}
-        function saveEdit(){if(!editId)return;const i=db.find(x=>x.id===editId);const n=document.getElementById('edit-name').value;if(n){i.name=n;i.space=curSpaceEdit;i.qty=editQty;save();render();closeEdit();}}
-        function closeEdit(){document.getElementById('edit-overlay').style.display='none';editId=null;}
-        function sold(id){const p=prompt("Precio final TOTAL:");if(p){const i=db.find(x=>x.id===id);i.final=p;i.st='done';save();render();}}
-        function done(id){const i=db.find(x=>x.id===id);i.st='done';save();render();}
-        function restore(id){if(confirm("¿Devolver?")){const i=db.find(x=>x.id===id);i.st='active';save();render();}}
-        function del(id){if(confirm("¿Eliminar?")){db=db.filter(x=>x.id!==id);save();render();}}
+// BACKUP
+async function nExp(){
+    const s=JSON.stringify(db,null,2),f=new File([s],"kuhaku.json",{type:"application/json"});
+    if(navigator.share){try{await navigator.share({files:[f],title:'Kūhaku'});lB=Date.now();cSB=0;localStorage.setItem('kuhakuMeta',JSON.stringify({lastBackup:lB,changes:0}));chkBk();}catch(e){dl(s);}}else{dl(s);}
+}
+function dl(s){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:"application/json"}));a.download="kuhaku.json";document.body.appendChild(a);a.click();a.remove();}
+function nImp(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{db=JSON.parse(e.target.result);save();alert("Cargado");}catch(x){alert("Error");}};r.readAsText(f);}
 
-        function updateHome(){
-            const e=db.filter(i=>i.st==='done').reduce((a,i)=>a+parseFloat(i.final||0),0);document.getElementById('total-money').innerText=e+'€';
-            document.getElementById('stat-kept').innerText=db.filter(i=>i.st==='kept').length;document.getElementById('stat-pending').innerText=db.filter(i=>i.st==='active').length;
-        }
+init();
+</script>
+```
 
-        async function nativeExport(){const s=JSON.stringify(db,null,2);const f=new File([s],"kuhaku.json",{type:"application/json"});if(navigator.share){try{await navigator.share({files:[f],title:'Kuhaku Backup'});lastBackup=Date.now();changesSinceBackup=0;localStorage.setItem('kuhakuMeta',JSON.stringify({lastBackup,changes:0}));checkBackupStatus();}catch(e){dl(s);}}else{dl(s);}}
-        function dl(s){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:"application/json"}));a.download="kuhaku.json";document.body.appendChild(a);a.click();a.remove();}
-        function nativeImport(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{db=JSON.parse(e.target.result);save();alert("Cargado");}catch(x){alert("Error");}};r.readAsText(f);}
-
-        init();
-    </script>
 </body>
 </html>
