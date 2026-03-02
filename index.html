@@ -15,38 +15,26 @@
             --washi-warm: #F0EDE5;
             --ink: #0a0a0a;
             --ink-soft: #1a1a1a;
-            --ink-faint: #2a2a2a;
             --vermillion: #C83232;
-            --vermillion-deep: #A51C1C;
             --vermillion-pale: rgba(200,50,50,0.06);
             --indigo: #6B8FA3;
             --indigo-light: #8FB4C9;
             --indigo-pale: #A8C8D8;
             --indigo-ghost: rgba(107,143,163,0.12);
             --white: #FFFFFF;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
             --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
-            --shadow-lg: 0 4px 20px rgba(0,0,0,0.08);
             --radius: 4px;
             --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html { font-size: 18px; }
-
-        body {
+        html, body {
+            height: 100%;
             background: var(--washi);
             color: var(--ink);
             font-family: 'Noto Sans', sans-serif;
-            height: 100vh;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            overflow: hidden; /* Evita rebote elástico global */
         }
 
         body::before {
@@ -61,224 +49,124 @@
 
         .jp { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; }
 
-        /* ANIMATIONS */
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes brushStroke { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
-
-        /* SCREENS */
+        /* SCREENS - CORRECCIÓN DE SCROLL */
         .screen {
-            flex: 1;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 80px; /* Deja espacio para la nav */
             display: none;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 110px;
-            position: relative;
-            z-index: 1;
-            scroll-behavior: smooth;
+            overflow-y: auto; /* Permite scroll interno */
             -webkit-overflow-scrolling: touch;
-            overflow-y: auto;
+            padding-bottom: 40px; /* Padding extra para no chocar con la nav */
+            z-index: 1;
         }
         .screen.active { display: flex; animation: screenIn 0.3s ease; }
-        .screen::-webkit-scrollbar { display: none; }
+        
+        @keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* HOME */
+        /* HEADER & ENSO */
         #screen-home { padding: 0 28px; }
         .home-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 24px 0 0; }
-        .home-greeting { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo); letter-spacing: 0.5px; }
-        .home-ver { font-size: 0.6rem; color: var(--indigo-pale); letter-spacing: 1.5px; font-weight: 600; }
-
-        .enso-container { display: flex; flex-direction: column; align-items: center; margin: 40px 0 0; position: relative; }
-        .enso { width: 250px; height: 250px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .home-greeting { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo); }
+        
+        .enso-container { display: flex; flex-direction: column; align-items: center; margin: 30px 0; position: relative; }
+        .enso { width: 220px; height: 220px; position: relative; display: flex; align-items: center; justify-content: center; }
         .enso svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-        .enso svg path { stroke-dasharray: 600; animation: brushStroke 2s ease-out forwards; }
-        .enso-center { text-align: center; z-index: 1; }
-        .enso-num { font-family: 'Shippori Mincho', serif; font-size: 4rem; font-weight: 800; line-height: 1; letter-spacing: -3px; }
-        .enso-cur { font-size: 2.2rem; font-weight: 400; }
-        .enso-sub { font-size: 0.6rem; letter-spacing: 6px; color: var(--indigo); text-transform: uppercase; margin-top: 10px; font-weight: 600; }
+        .enso svg path { stroke-dasharray: 600; animation: brushStroke 2s ease-out forwards; stroke: var(--ink); stroke-width: 5; fill: none; }
+        @keyframes brushStroke { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+        
+        .enso-num { font-family: 'Shippori Mincho', serif; font-size: 3.5rem; font-weight: 800; line-height: 1; }
+        .enso-sub { font-size: 0.6rem; letter-spacing: 4px; color: var(--indigo); text-transform: uppercase; margin-top: 5px; font-weight: 700; }
 
-        .hanko-seal {
-            position: absolute; bottom: -6px; right: -6px; width: 52px; height: 52px;
-            border: 2px solid var(--vermillion); border-radius: 6px; transform: rotate(-6deg);
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Shippori Mincho', serif; font-size: 1rem; color: var(--vermillion);
-            font-weight: 800; background: var(--washi); box-shadow: 0 0 0 1px rgba(200,50,50,0.08);
-            line-height: 1.1; opacity: 0.85;
-        }
+        /* STATS */
+        .stats-row { display: flex; width: 100%; border-top: 1px solid var(--indigo-ghost); border-bottom: 1px solid var(--indigo-ghost); }
+        .stat-cell { flex: 1; text-align: center; padding: 15px 5px; cursor: pointer; }
+        .stat-num { font-family: 'Shippori Mincho', serif; font-size: 1.5rem; font-weight: 700; }
+        .stat-lbl { font-size: 0.5rem; letter-spacing: 2px; color: var(--indigo); text-transform: uppercase; }
 
-        .stats-row { display: flex; gap: 0; width: 100%; margin-top: 40px; border-top: 1px solid var(--indigo-ghost); border-bottom: 1px solid var(--indigo-ghost); }
-        .stat-cell { flex: 1; text-align: center; padding: 24px 8px; cursor: pointer; transition: background var(--transition); position: relative; }
-        .stat-cell:active { background: var(--indigo-ghost); }
-        .stat-cell + .stat-cell { border-left: 1px solid var(--indigo-ghost); }
-        .stat-num { font-family: 'Shippori Mincho', serif; font-size: 1.8rem; font-weight: 700; line-height: 1; }
-        .stat-num.red { color: var(--vermillion); }
-        .stat-lbl { font-size: 0.55rem; letter-spacing: 3px; color: var(--indigo); text-transform: uppercase; margin-top: 8px; font-weight: 600; }
-
-        .koan { margin-top: auto; padding: 40px 20px 20px; text-align: center; }
-        .koan-text { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo-light); font-style: italic; line-height: 1.7; }
-
-        /* ADD SCREEN */
+        /* FORMULARIO */
         #screen-add { padding: 0 28px; }
-        .section-header { width: 100%; padding: 24px 0 20px; display: flex; align-items: baseline; gap: 12px; }
-        .section-kanji { font-family: 'Shippori Mincho', serif; font-size: 2.4rem; font-weight: 800; line-height: 1; }
-        .section-word { font-size: 0.65rem; letter-spacing: 4px; color: var(--indigo); text-transform: uppercase; font-weight: 600; padding-bottom: 4px; }
-
-        .fg { width: 100%; margin-bottom: 24px; }
-        .fg-label { font-size: 0.6rem; letter-spacing: 3px; color: var(--indigo); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+        .fg { width: 100%; margin-bottom: 20px; }
+        .fg-label { font-size: 0.6rem; letter-spacing: 2px; color: var(--indigo); text-transform: uppercase; margin-bottom: 5px; font-weight: 700; }
         .fg-input {
             background: transparent; border: none; border-bottom: 2px solid var(--indigo-pale);
-            font-family: 'Shippori Mincho', serif; font-size: 1.3rem; color: var(--ink);
-            padding: 14px 0; width: 100%; outline: none; transition: border-color 0.3s;
+            font-family: 'Shippori Mincho', serif; font-size: 1.2rem; color: var(--ink);
+            padding: 10px 0; width: 100%; outline: none;
         }
-        .fg-input:focus { border-color: var(--ink); }
+        
+        .qty-row { display: flex; align-items: center; gap: 15px; }
+        .q-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--indigo-pale); background: transparent; font-size: 1.2rem; color: var(--indigo); }
+        .q-val { font-family: 'Shippori Mincho', serif; font-size: 1.8rem; font-weight: 700; width: 40px; text-align: center; }
 
-        .qty-row { display: flex; align-items: center; gap: 20px; }
-        .q-btn {
-            width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--indigo-pale);
-            background: transparent; font-size: 1.4rem; color: var(--indigo); display: flex;
-            align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s;
-        }
-        .q-btn:active { background: var(--ink); color: white; border-color: var(--ink); }
-        .q-val { font-family: 'Shippori Mincho', serif; font-size: 2rem; font-weight: 700; width: 50px; text-align: center; }
-
-        .chips { display: flex; gap: 10px; overflow-x: auto; width: 100%; padding: 6px 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-        .chips::-webkit-scrollbar { display: none; }
+        .chips { display: flex; gap: 10px; overflow-x: auto; width: 100%; padding: 5px 0; -webkit-overflow-scrolling: touch; }
         .chip {
-            min-width: 76px; height: 96px; background: var(--white); border: 1.5px solid var(--indigo-ghost);
+            min-width: 70px; height: 85px; background: var(--white); border: 1.5px solid var(--indigo-ghost);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 8px; padding: 8px 6px; cursor: pointer; transition: all var(--transition);
-            flex-shrink: 0; border-radius: var(--radius);
+            padding: 5px; border-radius: var(--radius); flex-shrink: 0;
         }
-        .chip svg { width: 26px; height: 26px; stroke: var(--indigo); stroke-width: 1.5; fill: none; transition: all var(--transition); }
-        .chip-lbl { font-size: 0.6rem; color: var(--indigo); text-align: center; font-weight: 600; }
-        .chip-kj { font-family: 'Shippori Mincho', serif; font-size: 0.55rem; color: var(--indigo-pale); }
-        .chip.sel { border-color: var(--ink); background: var(--ink); box-shadow: var(--shadow-md); }
-        .chip.sel svg { stroke: #fff; }
-        .chip.sel .chip-lbl { color: #fff; }
-        .chip.sel .chip-kj { color: rgba(255,255,255,0.3); }
+        .chip.sel { background: var(--ink); color: white; border-color: var(--ink); }
+        .chip svg { width: 22px; height: 22px; stroke: currentColor; fill: none; margin-bottom: 5px; }
+        .chip-lbl { font-size: 0.55rem; text-align: center; font-weight: 600; }
 
         .dg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
         .d-btn {
-            padding: 18px 8px; background: var(--white); border: 1.5px solid var(--indigo-ghost);
-            cursor: pointer; text-align: center; font-size: 0.7rem; letter-spacing: 2px;
-            color: var(--indigo); text-transform: uppercase; font-family: 'Noto Sans', sans-serif;
-            transition: all var(--transition); font-weight: 700; border-radius: var(--radius);
+            padding: 15px 5px; background: var(--white); border: 1.5px solid var(--indigo-ghost);
+            font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; border-radius: var(--radius);
         }
         .d-btn.sel { border-color: var(--ink); color: var(--ink); }
         .d-btn.sel-v { border-color: var(--vermillion); color: var(--vermillion); background: var(--vermillion-pale); }
         .d-btn.w2 { grid-column: span 2; }
 
-        .pb { width: 100%; display: none; margin-top: 10px; }
+        .pb { width: 100%; display: none; margin-top: 10px; text-align: center; }
         .pb-inp {
             background: transparent; border: none; border-bottom: 2px solid var(--vermillion);
-            font-family: 'Shippori Mincho', serif; font-size: 1.6rem; color: var(--vermillion);
-            text-align: center; padding: 14px 0; width: 100%; outline: none; font-weight: 700;
+            font-family: 'Shippori Mincho', serif; font-size: 1.5rem; color: var(--vermillion);
+            text-align: center; padding: 10px 0; width: 100%; outline: none; font-weight: 700;
         }
 
         .cta {
-            margin-top: 32px; padding: 20px 52px; background: var(--ink); color: white;
-            border: none; font-size: 0.7rem; letter-spacing: 5px; text-transform: uppercase;
-            cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 700;
-            transition: all 0.15s; border-radius: var(--radius); width: 100%;
-        }
-        .cta:active { transform: scale(0.97); opacity: 0.9; }
-        .cta.red { background: var(--vermillion); }
-        .cta2 {
-            margin-top: 16px; padding: 16px 30px; background: transparent; border: 1.5px solid var(--indigo-pale);
-            color: var(--indigo); font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase;
-            cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 600;
-            border-radius: var(--radius); width: 100%;
+            margin: 25px 0; padding: 18px; background: var(--ink); color: white;
+            border: none; font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase;
+            font-weight: 700; border-radius: var(--radius); width: 100%; cursor: pointer;
         }
 
-        /* SANTUARIO */
-        .sant-top {
-            width: 100%; padding: 32px 28px 24px; display: flex; flex-direction: column;
-            align-items: center; background: linear-gradient(to bottom, var(--washi), var(--washi-warm));
-            position: relative;
-        }
-        .sant-kanji { font-family: 'Shippori Mincho', serif; font-size: 3.2rem; font-weight: 800; line-height: 1; margin-top: 8px; letter-spacing: 4px; }
-        .sant-word { font-size: 0.65rem; letter-spacing: 6px; color: var(--indigo); text-transform: uppercase; margin-top: 10px; font-weight: 600; }
-        .sant-count { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo-light); margin-top: 18px; }
-        .sant-search {
-            width: 85%; max-width: 340px; margin-top: 20px; padding: 14px 0; border: none;
-            border-bottom: 2px solid var(--indigo-pale); background: transparent;
-            font-family: 'Shippori Mincho', serif; font-size: 1.05rem; outline: none;
-            color: var(--ink); text-align: center;
-        }
+        /* LISTAS */
+        .ic { width: 92%; margin: 0 auto 10px; background: var(--white); border: 1px solid rgba(107,143,163,0.08); padding: 15px; border-radius: var(--radius); }
+        .ic-top { display: flex; justify-content: space-between; align-items: center; }
+        .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1rem; font-weight: 600; }
+        .ic-p { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; font-weight: 700; color: var(--indigo); }
+        .ic-p.won { color: var(--vermillion); }
+        .ic-bot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--indigo-ghost); }
 
-        .rooms { width: 100%; padding: 16px 20px; }
-        .room { margin-bottom: 6px; background: var(--white); border: 1px solid rgba(107,143,163,0.08); overflow: hidden; }
-        .room-h { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px; cursor: pointer; }
-        .room-hl { display: flex; align-items: center; gap: 14px; }
-        .room-hi svg { width: 22px; height: 22px; stroke: var(--ink); stroke-width: 1.5; fill: none; }
-        .room-hn { font-family: 'Shippori Mincho', serif; font-size: 1.05rem; }
-        .room-ha { font-size: 0.8rem; color: var(--indigo-pale); transition: transform 0.3s ease; }
-        .room.open .room-ha { transform: rotate(90deg); }
-        .room-body { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); }
-        .room.open .room-body { max-height: 2000px; }
+        .cb { background: none; border: 1.5px solid var(--indigo-ghost); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .cb svg { width: 18px; height: 18px; stroke: var(--indigo); fill: none; }
 
-        .r-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 16px 48px; border-top: 1px solid rgba(107,143,163,0.06); gap: 12px; }
-        .r-name { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
-        .r-btns { display: flex; gap: 8px; align-items: center; }
-
-        /* LIST / CUENTAS */
-        .tabs { display: flex; width: 100%; border-bottom: 1px solid var(--indigo-ghost); }
-        .tab {
-            flex: 1; padding: 20px 0; background: none; border: none; font-size: 0.6rem;
-            letter-spacing: 4px; text-transform: uppercase; color: var(--indigo-pale);
-            cursor: pointer; position: relative; font-family: 'Noto Sans', sans-serif;
-            font-weight: 700; transition: color 0.2s;
-        }
-        .tab.on { color: var(--ink); }
-        .tab.on::after { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 30%; height: 2px; background: var(--vermillion); }
-
-        .ic { width: 92%; margin: 0 auto 8px; background: var(--white); border: 1px solid rgba(107,143,163,0.08); padding: 18px 20px; border-radius: var(--radius); }
-        .ic-top { display: flex; align-items: center; justify-content: space-between; }
-        .ic-l { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-        .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-        .ic-p { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo); font-weight: 600; }
-        .ic-p.won { color: var(--vermillion); font-weight: 800; }
-        .ic-bot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(107,143,163,0.06); }
-
-        .cb {
-            background: none; border: 1.5px solid var(--indigo-ghost); width: 44px; height: 44px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.15s;
-        }
-        .cb svg { width: 22px; height: 22px; stroke: var(--indigo); stroke-width: 1.8; fill: none; }
-        .cb:active { background: var(--indigo-ghost); transform: scale(0.93); }
-
-        /* OVERLAYS */
+        /* MODALS */
         .ov {
-            position: fixed; inset: 0; background: rgba(247,245,240,0.97);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            position: fixed; inset: 0; background: rgba(247,245,240,0.98);
             z-index: 2000; display: none; flex-direction: column; align-items: center;
-            padding: 60px 28px; overflow-y: auto;
+            justify-content: center; padding: 30px;
         }
-        .ov.visible { display: flex; animation: fadeIn 0.25s ease-out; }
-        .ov-t { font-family: 'Shippori Mincho', serif; font-size: 1.6rem; margin-bottom: 36px; letter-spacing: 2px; }
+        .ov.visible { display: flex; }
 
-        .toast {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
-            background: var(--ink); color: white; padding: 14px 32px; border-radius: 30px;
-            font-size: 0.85rem; font-family: 'Noto Sans', sans-serif; z-index: 5000;
-            opacity: 0; transition: all 0.3s ease; pointer-events: none;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* NAV */
+        /* NAV - FIJADA ABAJO */
         .nav {
             position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--washi);
             border-top: 1px solid var(--indigo-ghost); display: flex; justify-content: space-around;
-            align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 16px);
+            align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
         }
-        .ni { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; padding: 8px 16px; }
-        .ni svg { width: 24px; height: 24px; stroke: var(--indigo-pale); stroke-width: 1.5; fill: none; transition: stroke 0.2s; }
-        .ni.on svg { stroke: var(--vermillion); stroke-width: 2; }
-        .nt { font-size: 0.55rem; letter-spacing: 1.5px; color: var(--indigo-pale); text-transform: uppercase; font-weight: 700; }
-        .ni.on .nt { color: var(--vermillion); }
-        .nd { position: absolute; top: 12px; right: 25%; width: 6px; height: 6px; background: var(--vermillion); border-radius: 50%; display: none; }
+        .ni { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.4; }
+        .ni.on { opacity: 1; }
+        .ni svg { width: 22px; height: 22px; stroke: var(--ink); fill: none; }
+        .nt { font-size: 0.5rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: var(--ink); color: white; padding: 12px 25px; border-radius: 20px;
+            font-size: 0.8rem; z-index: 5000; opacity: 0; transition: 0.3s;
+        }
+        .toast.show { opacity: 1; }
     </style>
 </head>
 <body>
@@ -290,76 +178,65 @@
     </div>
     <div class="enso-container">
         <div class="enso">
-            <svg viewBox="0 0 200 200">
-                <path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13"
-                      stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>
-            </svg>
+            <svg viewBox="0 0 200 200"><path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13"/></svg>
             <div class="enso-center">
-                <div class="enso-num jp" id="total-money"><span class="enso-cur">€</span>0</div>
-                <div class="enso-sub">ganado</div>
+                <div class="enso-num jp" id="total-money">0</div>
+                <div class="enso-sub">ganado €</div>
             </div>
         </div>
-        <div class="hanko-seal">空<br>白</div>
     </div>
     <div class="stats-row">
         <div class="stat-cell" onclick="go('screen-santuario', navButtons[2])">
             <div class="stat-num jp" id="stat-kept">0</div>
-            <div class="stat-lbl">santuario</div>
+            <div class="stat-lbl">Santuario</div>
         </div>
         <div class="stat-cell" onclick="go('screen-list', navButtons[3])">
             <div class="stat-num jp" id="stat-pending">0</div>
-            <div class="stat-lbl">pendiente</div>
+            <div class="stat-lbl">Pendiente</div>
         </div>
         <div class="stat-cell">
-            <div class="stat-num jp red" id="stat-sold">0</div>
-            <div class="stat-lbl">vendidos</div>
+            <div class="stat-num jp" id="stat-sold" style="color:var(--vermillion)">0</div>
+            <div class="stat-lbl">Vendidos</div>
         </div>
-    </div>
-    <div class="koan">
-        <div class="koan-text jp" id="koan-text">「 El espacio vacío es el más valioso de la casa. 」</div>
     </div>
 </div>
 
 <div id="screen-add" class="screen">
-    <div class="section-header">
-        <div class="section-kanji jp">新</div>
-        <div class="section-word">nuevo objeto</div>
-    </div>
-    <div class="fg">
-        <div class="fg-label">nombre</div>
-        <input class="fg-input jp" type="text" id="inp-name" placeholder="¿Qué objeto es?" autocomplete="off">
-    </div>
-    <div class="fg">
-        <div class="fg-label">unidades</div>
-        <div class="qty-row">
-            <button class="q-btn" onclick="adjustQty('add', -1)">−</button>
-            <span class="q-val jp" id="add-qty">1</span>
-            <button class="q-btn" onclick="adjustQty('add', 1)">+</button>
+    <div style="width:100%; padding-top: 20px;">
+        <div class="fg">
+            <div class="fg-label">Nombre del objeto</div>
+            <input class="fg-input jp" type="text" id="inp-name" placeholder="Ej: Jarrón antiguo" autocomplete="off">
         </div>
+        <div class="fg">
+            <div class="fg-label">Cantidad</div>
+            <div class="qty-row">
+                <button class="q-btn" onclick="adjustQty(-1)">−</button>
+                <span class="q-val jp" id="add-qty">1</span>
+                <button class="q-btn" onclick="adjustQty(1)">+</button>
+            </div>
+        </div>
+        <div class="fg">
+            <div class="fg-label">Espacio</div>
+            <div class="chips" id="add-chips"></div>
+        </div>
+        <div class="fg">
+            <div class="fg-label">¿Qué vas a hacer?</div>
+            <div class="dg" id="decision-grid"></div>
+        </div>
+        <div class="pb" id="price-box">
+            <div class="fg-label" style="color:var(--vermillion)">Precio esperado (€)</div>
+            <input class="pb-inp jp" type="text" id="inp-price" placeholder="0" inputmode="decimal" pattern="[0-9]*">
+        </div>
+        <button class="cta" onclick="saveNewItem()">REGISTRAR OBJETO</button>
     </div>
-    <div class="fg">
-        <div class="fg-label">espacio</div>
-        <div class="chips" id="add-chips"></div>
-    </div>
-    <div class="fg">
-        <div class="fg-label">decisión</div>
-        <div class="dg" id="decision-grid"></div>
-    </div>
-    <div class="pb" id="price-box">
-        <div class="fg-label" style="color:var(--vermillion)">precio estimado</div>
-        <input class="pb-inp jp" type="text" id="inp-price" placeholder="0€" inputmode="decimal" pattern="[0-9]*">
-    </div>
-    <button class="cta" onclick="saveNewItem()">REGISTRAR</button>
 </div>
 
 <div id="screen-santuario" class="screen">
     <div class="sant-top">
         <div class="sant-kanji jp">聖域</div>
-        <div class="sant-word">santuario</div>
-        <div class="sant-count jp" id="sant-n">0 objetos</div>
-        <input class="sant-search jp" type="text" id="sant-q" placeholder="Buscar..." oninput="renderSantuario()">
+        <input class="sant-search jp" type="text" id="sant-q" placeholder="Buscar en santuario..." oninput="renderSantuario()">
     </div>
-    <div class="rooms" id="rooms"></div>
+    <div class="rooms" id="rooms" style="width:100%;"></div>
 </div>
 
 <div id="screen-list" class="screen">
@@ -371,395 +248,181 @@
 </div>
 
 <div id="screen-settings" class="screen">
-    <div class="section-header">
-        <div class="section-kanji jp">控</div>
-        <div class="section-word">ajustes</div>
+    <div style="padding-top:40px; width:100%; padding-left:28px; padding-right:28px;">
+        <button class="cta" onclick="exportData()">GUARDAR COPIA (JSON)</button>
+        <button class="cta2" onclick="document.getElementById('file-input').click()" style="width:100%; padding:15px; border:1px solid var(--indigo); border-radius:4px; background:none; color:var(--indigo); font-weight:700;">CARGAR COPIA</button>
+        <input type="file" id="file-input" style="display:none" accept=".json" onchange="importData(this)">
+        <button class="cta" style="background:var(--vermillion); margin-top:50px;" onclick="confirmAction('¿Borrar TODO?', resetAll)">RESETEAR APP</button>
     </div>
-    <button class="cta" onclick="exportData()">GUARDAR COPIA</button>
-    <input type="file" id="file-input" style="display:none" accept=".json" onchange="importData(this)">
-    <button class="cta2" onclick="document.getElementById('file-input').click()">CARGAR COPIA</button>
-    <button class="cta red" style="margin-top:40px" onclick="confirmAction('¿Borrar TODOS los datos?', resetAll)">BORRAR TODO</button>
 </div>
 
-<div id="ov-edit" class="ov">
-    <div class="ov-t jp">編集 Editar</div>
-    <div class="fg" style="max-width:380px; width:100%;">
-        <div class="fg-label">nombre</div>
-        <input class="fg-input jp" type="text" id="ed-name">
-    </div>
-    <button class="cta" onclick="saveEdit()">GUARDAR</button>
-    <button class="cta2" onclick="closeOverlay('ov-edit')">CANCELAR</button>
+<div id="ov-sold" class="ov">
+    <div class="fg-label">Precio final de venta</div>
+    <input class="pb-inp jp" type="text" id="sold-price" placeholder="0" inputmode="decimal" style="font-size:3rem;">
+    <button class="cta" onclick="confirmSold()">CONFIRMAR VENTA</button>
+    <button class="cta" style="background:none; color:var(--indigo);" onclick="closeOverlay('ov-sold')">CANCELAR</button>
 </div>
 
-<div id="ov-sold" class="ov" style="justify-content:center;">
-    <div class="ov-t jp">売 Vendido</div>
-    <input class="pb-inp jp" type="text" id="sold-price" placeholder="0€" inputmode="decimal" pattern="[0-9]*" style="font-size:3rem; margin-bottom:20px;">
-    <button class="cta red" onclick="confirmSold()">CONFIRMAR</button>
-    <button class="cta2" onclick="closeOverlay('ov-sold')">CANCELAR</button>
-</div>
-
-<div id="ov-confirm" class="ov" style="justify-content:center;">
-    <p id="confirm-msg" style="text-align:center; margin-bottom:30px; font-weight:600;"></p>
-    <button class="cta" id="confirm-yes">CONFIRMAR</button>
-    <button class="cta2" onclick="closeOverlay('ov-confirm')">CANCELAR</button>
+<div id="ov-confirm" class="ov">
+    <p id="confirm-msg" style="margin-bottom:20px; font-weight:700;"></p>
+    <button class="cta" id="confirm-yes">SÍ, ESTOY SEGURO</button>
+    <button class="cta" style="background:none; color:var(--indigo);" onclick="closeOverlay('ov-confirm')">CANCELAR</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <nav class="nav">
-    <button class="ni on" onclick="go('screen-home', this)">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>
-        <span class="nt">inicio</span>
-    </button>
-    <button class="ni" onclick="go('screen-add', this)">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span class="nt">nuevo</span>
-    </button>
-    <button class="ni" onclick="go('screen-santuario', this)">
-        <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
-        <span class="nt">santuario</span>
-    </button>
-    <button class="ni" onclick="go('screen-list', this)">
-        <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>
-        <span class="nt">proceso</span>
-    </button>
-    <button class="ni" onclick="go('screen-settings', this)">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83"/></svg>
-        <span class="nt">ajustes</span>
-        <div class="nd" id="settings-dot"></div>
-    </button>
+    <button class="ni on" onclick="go('screen-home', this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg><span class="nt">Inicio</span></button>
+    <button class="ni" onclick="go('screen-add', this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="nt">Nuevo</span></button>
+    <button class="ni" onclick="go('screen-santuario', this)"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg><span class="nt">Zen</span></button>
+    <button class="ni" onclick="go('screen-list', this)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="nt">Lista</span></button>
+    <button class="ni" onclick="go('screen-settings', this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2"/></svg><span class="nt">Config</span></button>
 </nav>
 
 <script>
-/* ═══════════════════════════════════════════
-   空白 Kūhaku — Logic Core
-   ═══════════════════════════════════════════ */
-
-const ICONS = {
-    living:   '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 013-3h10a3 3 0 013 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 011-1h10a1 1 0 011 1v3"/></svg>',
-    bedroom:  '<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/></svg>',
-    kitchen:  '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/></svg>',
-    bath:     '<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 01-4 4H8a4 4 0 01-4-4v-4z"/><path d="M7 14V9a2 2 0 012-2h1"/></svg>',
-    study:    '<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M14 14V9a2 2 0 00-2-2H8"/></svg>',
-    garden:   '<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 00-5-5 4 4 0 01-3-3 4 4 0 018 0 4 4 0 018 0 4 4 0 01-3 3 5 5 0 00-5 5z"/></svg>',
-    edit:     '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
-    logout:   '<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
-    close:    '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
-};
+let db = JSON.parse(localStorage.getItem('kuhakuDB') || '[]');
+let state = { currentAction: null, currentTab: 'process', addSpace: 'living', addQty: 1, soldId: null, openRooms: new Set() };
+const navButtons = document.querySelectorAll('.ni');
 
 const SPACES = [
-    { id: 'living', icon: ICONS.living, label: 'Sala', kj: '居間' },
-    { id: 'bedroom', icon: ICONS.bedroom, label: 'Dormitorio', kj: '寝室' },
-    { id: 'kitchen', icon: ICONS.kitchen, label: 'Cocina', kj: '台所' },
-    { id: 'bath', icon: ICONS.bath, label: 'Baño', kj: '浴室' },
-    { id: 'study', icon: ICONS.study, label: 'Estudio', kj: '書斎' },
-    { id: 'garden', icon: ICONS.garden, label: 'Jardín', kj: '庭園' }
+    { id: 'living', icon: '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 013-3h10a3 3 0 013 3v5"/></svg>', label: 'Sala' },
+    { id: 'bedroom', icon: '<svg viewBox="0 0 24 24"><path d="M2 18h20M4 18v-7a2 2 0 012-2h12a2 2 0 012 2v7"/></svg>', label: 'Cama' },
+    { id: 'kitchen', icon: '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/></svg>', label: 'Cocina' },
+    { id: 'bath', icon: '<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 01-4 4H8a4 4 0 01-4-4v-4z"/></svg>', label: 'Baño' }
 ];
 
 const DECISIONS = [
-    { id: 'conservar', label: 'Conservar' },
+    { id: 'conservar', label: 'Santuario' },
     { id: 'regalar', label: 'Regalar' },
     { id: 'donar', label: 'Donar' },
     { id: 'tirar', label: 'Tirar' },
     { id: 'vender', label: 'Vender', wide: true }
 ];
 
-let db = [];
-let state = {
-    currentAction: null,
-    currentTab: 'process',
-    addSpace: 'living',
-    addQty: 1,
-    editId: null,
-    soldId: null,
-    openRooms: new Set()
-};
+function saveData() { localStorage.setItem('kuhakuDB', JSON.stringify(db)); updateHome(); }
 
-const navButtons = document.querySelectorAll('.ni');
-
-// --- DATABASE & STORAGE ---
-function loadData() {
-    const raw = localStorage.getItem('kuhakuDB');
-    if (raw) db = JSON.parse(raw);
-}
-
-function saveData() {
-    localStorage.setItem('kuhakuDB', JSON.stringify(db));
-    updateHome();
-}
-
-// --- NAVIGATION ---
-function go(screenId, btn) {
+function go(id, btn) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    document.getElementById(id).classList.add('active');
     navButtons.forEach(b => b.classList.remove('on'));
-    if (btn) btn.classList.add('on');
-    if (screenId === 'screen-list') renderList();
-    if (screenId === 'screen-santuario') renderSantuario();
+    btn.classList.add('on');
+    // Reiniciar scroll al cambiar pantalla
+    document.getElementById(id).scrollTop = 0;
+    if (id === 'screen-list') renderList();
+    if (id === 'screen-santuario') renderSantuario();
 }
 
-function showToast(msg) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2000);
+function adjustQty(delta) { 
+    state.addQty = Math.max(1, state.addQty + delta); 
+    document.getElementById('add-qty').textContent = state.addQty; 
 }
 
-// --- ADD ITEM LOGIC ---
 function renderAddForm() {
     const chips = document.getElementById('add-chips');
-    chips.innerHTML = '';
-    SPACES.forEach(s => {
-        const chip = document.createElement('div');
-        chip.className = `chip ${s.id === state.addSpace ? 'sel' : ''}`;
-        chip.innerHTML = `${s.icon}<div class="chip-lbl">${s.label}</div>`;
-        chip.onclick = () => {
-            state.addSpace = s.id;
-            renderAddForm();
-        };
-        chips.appendChild(chip);
-    });
+    chips.innerHTML = SPACES.map(s => `
+        <div class="chip ${s.id === state.addSpace ? 'sel' : ''}" onclick="state.addSpace='${s.id}'; renderAddForm();">
+            ${s.icon}<div class="chip-lbl">${s.label}</div>
+        </div>
+    `).join('');
 
     const grid = document.getElementById('decision-grid');
-    grid.innerHTML = '';
-    DECISIONS.forEach(d => {
-        const btn = document.createElement('button');
-        btn.className = `d-btn ${d.wide ? 'w2' : ''} ${state.currentAction === d.id ? (d.id === 'vender' ? 'sel-v' : 'sel') : ''}`;
-        btn.textContent = d.label;
-        btn.onclick = () => {
-            state.currentAction = d.id;
-            document.getElementById('price-box').style.display = d.id === 'vender' ? 'block' : 'none';
-            renderAddForm();
-        };
-        grid.appendChild(btn);
-    });
-}
-
-function adjustQty(mode, delta) {
-    state.addQty = Math.max(1, state.addQty + delta);
-    document.getElementById('add-qty').textContent = state.addQty;
+    grid.innerHTML = DECISIONS.map(d => `
+        <button class="d-btn ${d.wide ? 'w2' : ''} ${state.currentAction === d.id ? (d.id === 'vender' ? 'sel-v' : 'sel') : ''}" 
+                onclick="state.currentAction='${d.id}'; document.getElementById('price-box').style.display = '${d.id === 'vender' ? 'block' : 'none'}'; renderAddForm();">
+            ${d.label}
+        </button>
+    `).join('');
 }
 
 function saveNewItem() {
-    const name = document.getElementById('inp-name').value.trim();
-    if (!name || !state.currentAction) return showToast('Falta nombre o decisión');
-
-    const priceVal = parseFloat(document.getElementById('inp-price').value) || 0;
-
+    const name = document.getElementById('inp-name').value;
+    if (!name || !state.currentAction) { showToast('Nombre y decisión obligatorios'); return; }
     const item = {
-        id: Date.now(),
-        name,
-        qty: state.addQty,
-        act: state.currentAction,
-        space: state.addSpace,
-        price: priceVal,
-        final: 0,
-        st: state.currentAction === 'conservar' ? 'kept' : 'active',
-        ts: Date.now()
+        id: Date.now(), name, qty: state.addQty, act: state.currentAction,
+        space: state.addSpace, price: parseFloat(document.getElementById('inp-price').value) || 0,
+        final: 0, st: state.currentAction === 'conservar' ? 'kept' : 'active'
     };
-
-    db.push(item);
-    saveData();
-    showToast('Registrado ✓');
-    
-    // Reset
+    db.push(item); saveData();
+    showToast('¡Guardado!');
+    // Limpiar campos
     document.getElementById('inp-name').value = '';
     document.getElementById('inp-price').value = '';
-    state.addQty = 1;
-    document.getElementById('add-qty').textContent = '1';
-    state.currentAction = null;
-    renderAddForm();
+    state.addQty = 1; document.getElementById('add-qty').textContent = '1';
+    state.currentAction = null; renderAddForm();
     go('screen-home', navButtons[0]);
 }
 
-// --- SANTUARIO ---
 function renderSantuario() {
-    const container = document.getElementById('rooms');
-    container.innerHTML = '';
-    const query = document.getElementById('sant-q').value.toLowerCase();
-    
-    let kept = db.filter(i => i.st === 'kept');
-    if (query) kept = kept.filter(i => i.name.toLowerCase().includes(query));
-    
-    document.getElementById('sant-n').textContent = `${kept.length} objetos`;
-
-    SPACES.forEach(space => {
-        const items = kept.filter(i => i.space === space.id);
-        if (items.length === 0) return;
-
-        const room = document.createElement('div');
-        room.className = `room ${state.openRooms.has(space.id) ? 'open' : ''}`;
-        room.innerHTML = `
-            <div class="room-h" onclick="toggleRoom('${space.id}')">
-                <div class="room-hl">${space.icon} <span class="room-hn">${space.label}</span></div>
-                <div class="room-ha">›</div>
+    const items = db.filter(i => i.st === 'kept');
+    document.getElementById('rooms').innerHTML = items.map(i => `
+        <div class="ic">
+            <div class="ic-top"><span class="ic-n">${i.name}</span> <span class="ic-p">Zen</span></div>
+            <div class="ic-bot">
+                <button class="cb" onclick="moveItem(${i.id}, 'active')"><svg viewBox="0 0 24 24"><path d="M17 8l4 4-4 4M3 12h18"/></svg></button>
+                <button class="cb" onclick="deleteItem(${i.id})">×</button>
             </div>
-            <div class="room-body">
-                ${items.map(i => `
-                    <div class="r-item">
-                        <span class="r-name">${i.name}</span>
-                        <div class="r-btns">
-                            <button class="cb" onclick="moveItem('${i.id}', 'active')">${ICONS.logout}</button>
-                            <button class="cb" onclick="deleteItem(${i.id})">${ICONS.close}</button>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        container.appendChild(room);
-    });
+        </div>
+    `).join('');
 }
 
-function toggleRoom(id) {
-    if (state.openRooms.has(id)) state.openRooms.delete(id);
-    else state.openRooms.add(id);
-    renderSantuario();
-}
-
-// --- LISTS & TABS ---
-function switchTab(tab) {
-    state.currentTab = tab;
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.textContent.toLowerCase().includes(tab === 'process' ? 'proceso' : 'cuentas')));
-    renderList();
-}
+function switchTab(t) { state.currentTab = t; renderList(); }
 
 function renderList() {
-    const container = document.getElementById('list-content');
-    container.innerHTML = '';
-
-    if (state.currentTab === 'process') {
-        const active = db.filter(i => i.st === 'active');
-        active.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'ic';
-            card.innerHTML = `
-                <div class="ic-top">
-                    <div class="ic-l"><span class="ic-n">${item.name}</span></div>
-                    <div class="ic-p">${item.act === 'vender' ? item.price + '€' : item.act}</div>
-                </div>
-                <div class="ic-bot">
-                    <button class="cb" onclick="openEdit(${item.id})">${ICONS.edit}</button>
-                    ${item.act === 'vender' ? 
-                        `<button class="cta red" style="margin:0; width:auto; padding:10px 20px;" onclick="openSold(${item.id})">Vendido</button>` : 
-                        `<button class="cta" style="margin:0; width:auto; padding:10px 20px;" onclick="moveItem(${item.id}, 'done')">Listo</button>`
-                    }
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    } else {
-        const done = db.filter(i => i.st === 'done');
-        done.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'ic';
-            card.innerHTML = `
-                <div class="ic-top">
-                    <div class="ic-l"><span class="ic-n">${item.name}</span></div>
-                    <div class="ic-p won">${item.act === 'vender' ? '+' + item.final + '€' : '✓'}</div>
-                </div>
-                <div class="ic-bot">
-                    <button class="cb" onclick="moveItem(${item.id}, 'kept')">Santuario</button>
-                    <button class="cb" onclick="deleteItem(${item.id})">${ICONS.close}</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
+    const list = db.filter(i => i.st === (state.currentTab === 'process' ? 'active' : 'done'));
+    document.getElementById('list-content').innerHTML = list.map(i => `
+        <div class="ic">
+            <div class="ic-top"><span class="ic-n">${i.name}</span> <span class="ic-p ${state.currentTab === 'sold' ? 'won' : ''}">${state.currentTab === 'process' ? i.price+'€' : '+'+i.final+'€'}</span></div>
+            <div class="ic-bot">
+                ${state.currentTab === 'process' ? 
+                    `<button class="cta" style="margin:0; padding:8px 15px;" onclick="${i.act==='vender' ? 'openSold('+i.id+')' : 'moveItem('+i.id+',\'done\')'}">${i.act==='vender' ? 'Vendido' : 'Hecho'}</button>` : 
+                    `<button class="cb" onclick="moveItem(${i.id}, 'kept')">Zen</button>`
+                }
+                <button class="cb" onclick="deleteItem(${i.id})">×</button>
+            </div>
+        </div>
+    `).join('');
 }
 
-// --- ACTIONS ---
-function moveItem(id, status) {
-    const item = db.find(i => i.id == id);
-    if (item) {
-        item.st = status;
-        saveData();
-        renderList();
-        renderSantuario();
-        showToast('Actualizado');
-    }
+function moveItem(id, st) { 
+    const i = db.find(x => x.id == id); 
+    if(i) { i.st = st; saveData(); renderList(); renderSantuario(); } 
 }
 
-function deleteItem(id) {
-    confirmAction('¿Eliminar para siempre?', () => {
-        db = db.filter(i => i.id != id);
-        saveData();
-        renderList();
-        renderSantuario();
-    });
+function deleteItem(id) { 
+    confirmAction('¿Eliminar este objeto?', () => { db = db.filter(x => x.id != id); saveData(); renderList(); renderSantuario(); }); 
 }
 
-function openSold(id) {
-    state.soldId = id;
-    document.getElementById('ov-sold').style.display = 'flex';
-    document.getElementById('ov-sold').classList.add('visible');
-}
-
+function openSold(id) { state.soldId = id; document.getElementById('ov-sold').classList.add('visible'); }
 function confirmSold() {
-    const finalPrice = parseFloat(document.getElementById('sold-price').value) || 0;
-    const item = db.find(i => i.id == state.soldId);
-    if (item) {
-        item.final = finalPrice;
-        item.st = 'done';
-        saveData();
-        closeOverlay('ov-sold');
-        renderList();
-        showToast('¡Vendido! 🎉');
-    }
+    const p = parseFloat(document.getElementById('sold-price').value) || 0;
+    const i = db.find(x => x.id == state.soldId);
+    if(i) { i.final = p; i.st = 'done'; saveData(); closeOverlay('ov-sold'); renderList(); }
 }
 
-function openEdit(id) {
-    state.editId = id;
-    const item = db.find(i => i.id == id);
-    document.getElementById('ed-name').value = item.name;
-    document.getElementById('ov-edit').style.display = 'flex';
-    document.getElementById('ov-edit').classList.add('visible');
-}
-
-function saveEdit() {
-    const item = db.find(i => i.id == state.editId);
-    item.name = document.getElementById('ed-name').value;
-    saveData();
-    closeOverlay('ov-edit');
-    renderList();
-}
-
-function closeOverlay(id) {
-    document.getElementById(id).classList.remove('visible');
-    setTimeout(() => document.getElementById(id).style.display = 'none', 300);
-}
-
-function confirmAction(msg, cb) {
-    document.getElementById('confirm-msg').textContent = msg;
-    document.getElementById('ov-confirm').style.display = 'flex';
+function closeOverlay(id) { document.getElementById(id).classList.remove('visible'); }
+function confirmAction(m, cb) {
+    document.getElementById('confirm-msg').textContent = m;
     document.getElementById('ov-confirm').classList.add('visible');
-    document.getElementById('confirm-yes').onclick = () => {
-        cb();
-        closeOverlay('ov-confirm');
-    };
+    document.getElementById('confirm-yes').onclick = () => { cb(); closeOverlay('ov-confirm'); };
 }
 
-function resetAll() {
-    db = [];
-    saveData();
-    go('screen-home', navButtons[0]);
-}
-
+function resetAll() { db = []; saveData(); location.reload(); }
 function updateHome() {
-    const total = db.filter(i => i.st === 'done').reduce((acc, i) => acc + (parseFloat(i.final) || 0), 0);
-    document.getElementById('total-money').innerHTML = `<span class="enso-cur">€</span>${total}`;
+    const earned = db.filter(i => i.st === 'done').reduce((acc, x) => acc + x.final, 0);
+    document.getElementById('total-money').textContent = earned;
     document.getElementById('stat-kept').textContent = db.filter(i => i.st === 'kept').length;
     document.getElementById('stat-pending').textContent = db.filter(i => i.st === 'active').length;
     document.getElementById('stat-sold').textContent = db.filter(i => i.st === 'done').length;
 }
 
-// --- INITIALIZE ---
-loadData();
+function showToast(m) { 
+    const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); 
+    setTimeout(() => t.classList.remove('show'), 2000); 
+}
+
+// Init
 renderAddForm();
 updateHome();
-
-const hour = new Date().getHours();
-document.getElementById('greeting').textContent = hour < 12 ? 'おはよう Buenos días' : hour < 19 ? 'こんにちは Buenas tardes' : 'こんばんは Buenas noches';
-
 </script>
 </body>
 </html>
