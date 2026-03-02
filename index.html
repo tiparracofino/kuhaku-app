@@ -15,28 +15,39 @@
             --washi-warm: #F0EDE5;
             --ink: #0a0a0a;
             --ink-soft: #1a1a1a;
+            --ink-faint: #2a2a2a;
             --vermillion: #C83232;
+            --vermillion-deep: #A51C1C;
             --vermillion-pale: rgba(200,50,50,0.06);
             --indigo: #6B8FA3;
             --indigo-light: #8FB4C9;
             --indigo-pale: #A8C8D8;
             --indigo-ghost: rgba(107,143,163,0.12);
             --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
             --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
-            --radius: 4px;
+            --shadow-lg: 0 4px 20px rgba(0,0,0,0.08);
+            --radius: 3px;
             --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html, body {
-            height: 100%;
+        body {
             background: var(--washi);
             color: var(--ink);
             font-family: 'Noto Sans', sans-serif;
-            overflow: hidden; /* Evita rebote elástico global */
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
+        /* Washi texture overlay */
         body::before {
             content: '';
             position: fixed;
@@ -49,380 +60,1745 @@
 
         .jp { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; }
 
-        /* SCREENS - CORRECCIÓN DE SCROLL */
+        /* ═══════════════ UTILITIES ═══════════════ */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes brushStroke {
+            from { stroke-dashoffset: 600; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* ═══════════════ SCREENS ═══════════════ */
         .screen {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 80px; /* Deja espacio para la nav */
+            flex: 1;
             display: none;
             flex-direction: column;
             align-items: center;
-            overflow-y: auto; /* Permite scroll interno */
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 40px; /* Padding extra para no chocar con la nav */
+            overflow-y: auto;
+            position: relative;
             z-index: 1;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            /* Scroll fix: Clear bottom nav + safe area */
+            padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
         }
+        
+        #screen-home, #screen-add, #screen-settings {
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        #screen-santuario, #screen-list {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
         .screen.active { display: flex; animation: screenIn 0.3s ease; }
-        
-        @keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
+        .screen::-webkit-scrollbar { display: none; }
 
-        /* HEADER & ENSO */
-        #screen-home { padding: 0 28px; }
-        .home-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 24px 0 0; }
-        .home-greeting { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo); }
-        
-        .enso-container { display: flex; flex-direction: column; align-items: center; margin: 30px 0; position: relative; }
-        .enso { width: 220px; height: 220px; position: relative; display: flex; align-items: center; justify-content: center; }
-        .enso svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-        .enso svg path { stroke-dasharray: 600; animation: brushStroke 2s ease-out forwards; stroke: var(--ink); stroke-width: 5; fill: none; }
-        @keyframes brushStroke { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
-        
-        .enso-num { font-family: 'Shippori Mincho', serif; font-size: 3.5rem; font-weight: 800; line-height: 1; }
-        .enso-sub { font-size: 0.6rem; letter-spacing: 4px; color: var(--indigo); text-transform: uppercase; margin-top: 5px; font-weight: 700; }
+        /* ═══════════════ HOME ═══════════════ */
+        .home-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 0;
+        }
+        .home-greeting {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.88rem;
+            color: var(--indigo);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        .home-ver {
+            font-size: 0.55rem;
+            color: var(--indigo-pale);
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
 
-        /* STATS */
-        .stats-row { display: flex; width: 100%; border-top: 1px solid var(--indigo-ghost); border-bottom: 1px solid var(--indigo-ghost); }
-        .stat-cell { flex: 1; text-align: center; padding: 15px 5px; cursor: pointer; }
-        .stat-num { font-family: 'Shippori Mincho', serif; font-size: 1.5rem; font-weight: 700; }
-        .stat-lbl { font-size: 0.5rem; letter-spacing: 2px; color: var(--indigo); text-transform: uppercase; }
+        /* Ensō circle */
+        .enso-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 28px 0 0;
+            position: relative;
+        }
+        .enso {
+            width: 220px;
+            height: 220px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .enso svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .enso svg path {
+            stroke-dasharray: 600;
+            animation: brushStroke 2s ease-out forwards;
+        }
+        .enso-center { text-align: center; z-index: 1; }
+        .enso-num {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -3px;
+        }
+        .enso-cur { font-size: 2rem; font-weight: 400; }
+        .enso-sub {
+            font-size: 0.55rem;
+            letter-spacing: 6px;
+            color: var(--indigo);
+            text-transform: uppercase;
+            margin-top: 8px;
+            font-weight: 600;
+        }
 
-        /* FORMULARIO */
-        #screen-add { padding: 0 28px; }
+        /* Hanko seal */
+        .hanko-seal {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            width: 44px;
+            height: 44px;
+            border: 2px solid var(--vermillion);
+            border-radius: 4px;
+            transform: rotate(-6deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.95rem;
+            color: var(--vermillion);
+            font-weight: 800;
+            background: var(--washi);
+            box-shadow: 0 0 0 1px rgba(200,50,50,0.08);
+            line-height: 1;
+            opacity: 0.85;
+        }
+
+        /* Stats row */
+        .stats-row {
+            display: flex;
+            gap: 0;
+            width: 100%;
+            margin-top: 32px;
+            border-top: 1px solid var(--indigo-ghost);
+            border-bottom: 1px solid var(--indigo-ghost);
+        }
+        .stat-cell {
+            flex: 1;
+            text-align: center;
+            padding: 18px 8px;
+            cursor: pointer;
+            transition: background var(--transition);
+            position: relative;
+        }
+        .stat-cell:active { background: var(--indigo-ghost); }
+        .stat-cell + .stat-cell { border-left: 1px solid var(--indigo-ghost); }
+        .stat-num {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .stat-num.red { color: var(--vermillion); }
+        .stat-lbl {
+            font-size: 0.5rem;
+            letter-spacing: 3px;
+            color: var(--indigo);
+            text-transform: uppercase;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        /* Koan */
+        .koan {
+            margin-top: auto;
+            padding: 30px 20px 10px;
+            text-align: center;
+        }
+        .koan-text {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.9rem;
+            color: var(--indigo-light);
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════ ADD SCREEN ═══════════════ */
+        .section-header {
+            width: 100%;
+            padding: 20px 0 16px;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .section-kanji {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .section-word {
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            color: var(--indigo);
+            text-transform: uppercase;
+            font-weight: 600;
+            padding-bottom: 4px;
+        }
+
+        /* Form groups */
         .fg { width: 100%; margin-bottom: 20px; }
-        .fg-label { font-size: 0.6rem; letter-spacing: 2px; color: var(--indigo); text-transform: uppercase; margin-bottom: 5px; font-weight: 700; }
+        .fg-label {
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            color: var(--indigo);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
         .fg-input {
-            background: transparent; border: none; border-bottom: 2px solid var(--indigo-pale);
-            font-family: 'Shippori Mincho', serif; font-size: 1.2rem; color: var(--ink);
-            padding: 10px 0; width: 100%; outline: none;
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid var(--indigo-pale);
+            font-family: 'Shippori Mincho', serif;
+            font-size: 1.25rem;
+            color: var(--ink);
+            padding: 10px 0;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.3s;
         }
-        
-        .qty-row { display: flex; align-items: center; gap: 15px; }
-        .q-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--indigo-pale); background: transparent; font-size: 1.2rem; color: var(--indigo); }
-        .q-val { font-family: 'Shippori Mincho', serif; font-size: 1.8rem; font-weight: 700; width: 40px; text-align: center; }
+        .fg-input:focus { border-color: var(--ink); }
+        .fg-input::placeholder { color: var(--indigo-pale); }
 
-        .chips { display: flex; gap: 10px; overflow-x: auto; width: 100%; padding: 5px 0; -webkit-overflow-scrolling: touch; }
+        /* Quantity controls */
+        .qty-row { display: flex; align-items: center; gap: 16px; }
+        .q-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1.5px solid var(--indigo-pale);
+            background: transparent;
+            font-size: 1.3rem;
+            color: var(--indigo);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .q-btn:active { background: var(--ink); color: white; border-color: var(--ink); }
+        .q-val {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            width: 50px;
+            text-align: center;
+        }
+
+        /* Space chips */
+        .chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            width: 100%;
+            padding: 4px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .chips::-webkit-scrollbar { display: none; }
         .chip {
-            min-width: 70px; height: 85px; background: var(--white); border: 1.5px solid var(--indigo-ghost);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 5px; border-radius: var(--radius); flex-shrink: 0;
+            min-width: 72px;
+            height: 90px;
+            background: var(--white);
+            border: 1.5px solid var(--indigo-ghost);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 6px 4px;
+            cursor: pointer;
+            transition: all var(--transition);
+            flex-shrink: 0;
+            border-radius: var(--radius);
         }
-        .chip.sel { background: var(--ink); color: white; border-color: var(--ink); }
-        .chip svg { width: 22px; height: 22px; stroke: currentColor; fill: none; margin-bottom: 5px; }
-        .chip-lbl { font-size: 0.55rem; text-align: center; font-weight: 600; }
+        .chip svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--indigo);
+            stroke-width: 1.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all var(--transition);
+        }
+        .chip-lbl { font-size: 0.55rem; color: var(--indigo); text-align: center; line-height: 1.15; transition: all var(--transition); }
+        .chip-kj { font-family: 'Shippori Mincho', serif; font-size: 0.55rem; color: var(--indigo-pale); transition: all var(--transition); }
+        .chip.sel {
+            border-color: var(--ink);
+            background: var(--ink);
+            box-shadow: var(--shadow-md);
+        }
+        .chip.sel svg { stroke: #fff; }
+        .chip.sel .chip-lbl { color: #fff; }
+        .chip.sel .chip-kj { color: rgba(255,255,255,0.3); }
 
-        .dg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+        /* Decision buttons */
+        .dg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
         .d-btn {
-            padding: 15px 5px; background: var(--white); border: 1.5px solid var(--indigo-ghost);
-            font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; border-radius: var(--radius);
+            padding: 16px 8px;
+            background: var(--white);
+            border: 1.5px solid var(--indigo-ghost);
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--indigo);
+            text-transform: uppercase;
+            font-family: 'Noto Sans', sans-serif;
+            transition: all var(--transition);
+            font-weight: 600;
+            border-radius: var(--radius);
         }
+        .d-btn:active { transform: scale(0.97); }
         .d-btn.sel { border-color: var(--ink); color: var(--ink); }
         .d-btn.sel-v { border-color: var(--vermillion); color: var(--vermillion); background: var(--vermillion-pale); }
         .d-btn.w2 { grid-column: span 2; }
 
-        .pb { width: 100%; display: none; margin-top: 10px; text-align: center; }
+        .pb { width: 100%; display: none; margin-top: 6px; }
         .pb-inp {
-            background: transparent; border: none; border-bottom: 2px solid var(--vermillion);
-            font-family: 'Shippori Mincho', serif; font-size: 1.5rem; color: var(--vermillion);
-            text-align: center; padding: 10px 0; width: 100%; outline: none; font-weight: 700;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--vermillion);
+            font-family: 'Shippori Mincho', serif;
+            font-size: 1.5rem;
+            color: var(--vermillion);
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+            outline: none;
+            font-weight: 700;
         }
+        .pb-inp::placeholder { color: rgba(200,50,50,0.2); font-weight: 400; }
 
+        /* CTA Buttons */
         .cta {
-            margin: 25px 0; padding: 18px; background: var(--ink); color: white;
-            border: none; font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase;
-            font-weight: 700; border-radius: var(--radius); width: 100%; cursor: pointer;
+            margin-top: 24px;
+            padding: 18px 52px;
+            background: var(--ink);
+            color: white;
+            border: none;
+            font-size: 0.65rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Noto Sans', sans-serif;
+            font-weight: 700;
+            transition: all 0.15s;
+            border-radius: var(--radius);
+        }
+        .cta:active { transform: scale(0.97); opacity: 0.9; }
+        .cta.red { background: var(--vermillion); }
+
+        .cta2 {
+            margin-top: 14px;
+            padding: 14px 30px;
+            background: transparent;
+            border: 1.5px solid var(--indigo-pale);
+            color: var(--indigo);
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Noto Sans', sans-serif;
+            font-weight: 600;
+            border-radius: var(--radius);
         }
 
-        /* LISTAS */
-        .ic { width: 92%; margin: 0 auto 10px; background: var(--white); border: 1px solid rgba(107,143,163,0.08); padding: 15px; border-radius: var(--radius); }
-        .ic-top { display: flex; justify-content: space-between; align-items: center; }
-        .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1rem; font-weight: 600; }
-        .ic-p { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; font-weight: 700; color: var(--indigo); }
-        .ic-p.won { color: var(--vermillion); }
-        .ic-bot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--indigo-ghost); }
+        /* ═══════════════ SANTUARIO ═══════════════ */
+        .sant-top {
+            width: 100%;
+            padding: 24px 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(to bottom, var(--washi), var(--washi-warm));
+            position: relative;
+        }
+        .sant-top::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--indigo-pale), transparent);
+        }
+        .sant-kanji {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-top: 4px;
+            letter-spacing: 4px;
+        }
+        .sant-word {
+            font-size: 0.55rem;
+            letter-spacing: 6px;
+            color: var(--indigo);
+            text-transform: uppercase;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+        .sant-count {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.9rem;
+            color: var(--indigo-light);
+            margin-top: 14px;
+        }
+        .sant-search {
+            width: 85%;
+            max-width: 300px;
+            margin-top: 12px;
+            padding: 10px 0;
+            border: none;
+            border-bottom: 1px solid var(--indigo-pale);
+            background: transparent;
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.95rem;
+            outline: none;
+            color: var(--ink);
+            text-align: center;
+        }
+        .sant-search::placeholder { color: var(--indigo-pale); }
 
-        .cb { background: none; border: 1.5px solid var(--indigo-ghost); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .cb svg { width: 18px; height: 18px; stroke: var(--indigo); fill: none; }
+        .rooms { width: 100%; padding: 12px 16px; }
 
-        /* MODALS */
+        .room {
+            margin-bottom: 4px;
+            background: var(--white);
+            border: 1px solid rgba(107,143,163,0.08);
+            overflow: hidden;
+            transition: box-shadow var(--transition);
+        }
+        .room:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+        .room:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+        .room.open { box-shadow: var(--shadow-sm); }
+
+        .room-h {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .room-h:active { background: var(--indigo-ghost); }
+        .room-hl { display: flex; align-items: center; gap: 12px; }
+        .room-hi svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--ink);
+            stroke-width: 1.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .room-hn { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; }
+        .room-hk { font-family: 'Shippori Mincho', serif; font-size: 0.7rem; color: var(--indigo-light); margin-left: 4px; }
+        .room-hr { display: flex; align-items: center; gap: 8px; }
+        .room-hc {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.8rem;
+            color: var(--indigo);
+            background: var(--indigo-ghost);
+            padding: 3px 12px;
+            border-radius: 12px;
+        }
+        .room-ha {
+            display: inline-block;
+            font-size: 0.65rem;
+            color: var(--indigo-pale);
+            transition: transform 0.3s ease;
+        }
+        .room.open .room-ha { transform: rotate(90deg); }
+
+        .room-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+        .room.open .room-body { max-height: 2000px; }
+
+        .r-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 12px 12px 40px;
+            border-top: 1px solid rgba(107,143,163,0.06);
+            gap: 8px;
+        }
+        .r-item-l { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+        .r-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--vermillion); flex-shrink: 0; opacity: 0.6; }
+        .r-name {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .r-qty {
+            font-size: 0.55rem;
+            color: var(--indigo);
+            background: var(--indigo-ghost);
+            padding: 2px 6px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+        .r-btns { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+
+        .sant-empty { text-align: center; padding: 60px 24px; }
+        .sant-empty-k {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 3.5rem;
+            color: var(--indigo-pale);
+            opacity: 0.35;
+            line-height: 1;
+        }
+        .sant-empty-t {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.85rem;
+            color: var(--indigo-light);
+            margin-top: 12px;
+        }
+
+        /* ═══════════════ PROCESS / CUENTAS ═══════════════ */
+        .tabs { display: flex; width: 100%; border-bottom: 1px solid var(--indigo-ghost); }
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            background: none;
+            border: none;
+            font-size: 0.55rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--indigo-pale);
+            cursor: pointer;
+            position: relative;
+            font-family: 'Noto Sans', sans-serif;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--vermillion);
+            transition: width 0.3s;
+        }
+        .tab.on { color: var(--ink); }
+        .tab.on::after { width: 30%; }
+
+        .list-hdr {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px 12px;
+        }
+        .list-t { font-family: 'Shippori Mincho', serif; font-size: 1.1rem; }
+        .list-t small { font-weight: 300; color: var(--indigo); font-size: 0.85rem; }
+        .sp {
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: var(--white);
+            border: 1px solid var(--indigo-ghost);
+            padding: 6px 14px;
+            color: var(--indigo);
+            cursor: pointer;
+            font-family: 'Noto Sans', sans-serif;
+            font-weight: 600;
+            transition: all 0.15s;
+            border-radius: var(--radius);
+        }
+        .sp:active { background: var(--ink); color: white; border-color: var(--ink); }
+
+        .gh {
+            width: 92%;
+            padding: 18px 0 5px;
+            font-size: 0.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--indigo);
+            font-weight: 700;
+            border-bottom: 1px solid var(--indigo-ghost);
+            margin: 0 auto 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .gh-n { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; font-weight: 700; color: var(--ink-soft); }
+
+        /* Item cards */
+        .ic {
+            width: 92%;
+            margin: 0 auto 6px;
+            background: var(--white);
+            border: 1px solid rgba(107,143,163,0.08);
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            transition: box-shadow var(--transition);
+        }
+        .ic:active { box-shadow: var(--shadow-sm); }
+        .ic-top { display: flex; align-items: center; justify-content: space-between; }
+        .ic-l { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+        .ic-i svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--vermillion);
+            stroke-width: 1.8;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ic-q { font-size: 0.55rem; color: var(--indigo); background: var(--indigo-ghost); padding: 1px 6px; border-radius: 8px; font-weight: 600; flex-shrink: 0; }
+        .ic-d { font-size: 0.55rem; color: var(--indigo-pale); letter-spacing: 1px; flex-shrink: 0; }
+        .ic-d.alert { color: var(--vermillion); font-weight: 700; }
+        .ic-bot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(107,143,163,0.06);
+        }
+        .ic-m { font-size: 0.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(--indigo-pale); font-weight: 600; }
+        .ic-p { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; color: var(--indigo); }
+        .ic-p.won { color: var(--vermillion); font-weight: 700; }
+        .ic-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+        .ib {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: var(--indigo-pale);
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.15s;
+        }
+        .ib:active { color: var(--ink); }
+
+        /* Circle action buttons */
+        .cb {
+            background: none;
+            border: 1px solid var(--indigo-ghost);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .cb svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--indigo);
+            stroke-width: 1.8;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .cb:active { background: var(--indigo-ghost); transform: scale(0.93); }
+        .cb.price-edit { border-color: rgba(200,50,50,0.2); }
+        .cb.price-edit svg { stroke: var(--vermillion); }
+        .cb.price-edit:active { background: var(--vermillion-pale); }
+        .cb.del { border-color: rgba(200,50,50,0.15); }
+        .cb.del svg { stroke: var(--vermillion); }
+        .cb.del:active { background: var(--vermillion-pale); }
+
+        .ab {
+            padding: 6px 16px;
+            border: none;
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Noto Sans', sans-serif;
+            font-weight: 700;
+            border-radius: var(--radius);
+            transition: all 0.15s;
+        }
+        .ab.dk { background: var(--ink); color: white; }
+        .ab.rd { background: var(--vermillion); color: white; }
+        .ab:active { transform: scale(0.96); opacity: 0.9; }
+
+        /* Summary strip */
+        .as {
+            display: flex;
+            width: 92%;
+            margin: 14px auto;
+            background: var(--white);
+            border: 1px solid rgba(107,143,163,0.08);
+            overflow: hidden;
+            border-radius: var(--radius);
+        }
+        .as-h { flex: 1; padding: 18px; text-align: center; }
+        .as-h + .as-h { border-left: 1px solid rgba(107,143,163,0.06); }
+        .as-v { font-family: 'Shippori Mincho', serif; font-size: 1.7rem; font-weight: 700; }
+        .as-v.red { color: var(--vermillion); }
+        .as-l { font-size: 0.48rem; letter-spacing: 2px; text-transform: uppercase; color: var(--indigo-pale); margin-top: 3px; font-weight: 600; }
+
+        .mt { margin-top: 60px; text-align: center; font-family: 'Shippori Mincho', serif; color: var(--indigo-pale); font-size: 0.95rem; }
+        .mt-k { font-size: 2.8rem; opacity: 0.3; margin-bottom: 8px; }
+
+        /* ═══════════════ SETTINGS ═══════════════ */
+        .s-desc { font-size: 0.8rem; color: var(--indigo); line-height: 1.7; margin-bottom: 30px; }
+        .s-alert { color: var(--vermillion); font-weight: 700; font-size: 0.75rem; display: none; margin-top: 8px; }
+
+        .s-section { width: 100%; margin-bottom: 36px; }
+        .s-section-t {
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            color: var(--indigo-pale);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 14px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--indigo-ghost);
+        }
+
+        .s-stat-row { display: flex; justify-content: space-between; padding: 10px 0; }
+        .s-stat-label { font-size: 0.85rem; color: var(--ink-soft); }
+        .s-stat-val { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; font-weight: 700; }
+        .s-stat-val.red { color: var(--vermillion); }
+
+        /* ═══════════════ OVERLAYS ═══════════════ */
         .ov {
-            position: fixed; inset: 0; background: rgba(247,245,240,0.98);
-            z-index: 2000; display: none; flex-direction: column; align-items: center;
-            justify-content: center; padding: 30px;
+            position: fixed;
+            inset: 0;
+            background: rgba(247,245,240,0.97);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 24px;
+            overflow-y: auto;
         }
-        .ov.visible { display: flex; }
-
-        /* NAV - FIJADA ABAJO */
-        .nav {
-            position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--washi);
-            border-top: 1px solid var(--indigo-ghost); display: flex; justify-content: space-around;
-            align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
+        .ov.visible { display: flex; animation: fadeIn 0.25s ease-out; }
+        .ov-t {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 1.4rem;
+            font-weight: 300;
+            margin-bottom: 28px;
+            letter-spacing: 2px;
         }
-        .ni { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.4; }
-        .ni.on { opacity: 1; }
-        .ni svg { width: 22px; height: 22px; stroke: var(--ink); fill: none; }
-        .nt { font-size: 0.5rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
 
+        /* Toast notification */
         .toast {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: var(--ink); color: white; padding: 12px 25px; border-radius: 20px;
-            font-size: 0.8rem; z-index: 5000; opacity: 0; transition: 0.3s;
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--ink);
+            color: white;
+            padding: 12px 26px;
+            border-radius: 24px;
+            font-size: 0.8rem;
+            font-family: 'Noto Sans', sans-serif;
+            z-index: 5000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
         }
-        .toast.show { opacity: 1; }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ═══════════════ NAV ═══════════════ */
+        .nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 72px; /* Increased height for better touch area */
+            background: var(--washi);
+            border-top: 1px solid var(--indigo-ghost);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom, 8px);
+        }
+        .ni {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            position: relative;
+            padding: 8px 16px;
+        }
+        .ni svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--indigo-pale);
+            stroke-width: 1.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke var(--transition);
+        }
+        .ni .nt {
+            font-size: 0.45rem;
+            letter-spacing: 1.5px;
+            color: var(--indigo-pale);
+            transition: color var(--transition);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .ni.on svg { stroke: var(--vermillion); }
+        .ni.on .nt { color: var(--vermillion); }
+        .nd {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+            width: 6px;
+            height: 6px;
+            background: var(--vermillion);
+            border-radius: 50%;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
+<!-- ═══ HOME ═══ -->
 <div id="screen-home" class="screen active">
     <div class="home-header">
         <div class="home-greeting jp" id="greeting">空白</div>
-        <div class="home-ver">v20 Plus</div>
+        <div class="home-ver">v20</div>
     </div>
     <div class="enso-container">
         <div class="enso">
-            <svg viewBox="0 0 200 200"><path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13"/></svg>
+            <svg viewBox="0 0 200 200">
+                <path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13"
+                      stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>
+                <path d="M78 13 C81 12,84 12,88 13"
+                      stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.2"/>
+            </svg>
             <div class="enso-center">
-                <div class="enso-num jp" id="total-money">0</div>
-                <div class="enso-sub">ganado €</div>
+                <div class="enso-num jp" id="total-money"><span class="enso-cur">€</span>0</div>
+                <div class="enso-sub">ganado</div>
             </div>
         </div>
+        <div class="hanko-seal">空<br>白</div>
     </div>
     <div class="stats-row">
         <div class="stat-cell" onclick="go('screen-santuario', navButtons[2])">
             <div class="stat-num jp" id="stat-kept">0</div>
-            <div class="stat-lbl">Santuario</div>
+            <div class="stat-lbl">santuario</div>
         </div>
         <div class="stat-cell" onclick="go('screen-list', navButtons[3])">
             <div class="stat-num jp" id="stat-pending">0</div>
-            <div class="stat-lbl">Pendiente</div>
+            <div class="stat-lbl">pendiente</div>
         </div>
         <div class="stat-cell">
-            <div class="stat-num jp" id="stat-sold" style="color:var(--vermillion)">0</div>
-            <div class="stat-lbl">Vendidos</div>
+            <div class="stat-num jp red" id="stat-sold">0</div>
+            <div class="stat-lbl">vendidos</div>
         </div>
+    </div>
+    <div class="koan">
+        <div class="koan-text jp" id="koan-text"></div>
     </div>
 </div>
 
+<!-- ═══ ADD ═══ -->
 <div id="screen-add" class="screen">
-    <div style="width:100%; padding-top: 20px;">
-        <div class="fg">
-            <div class="fg-label">Nombre del objeto</div>
-            <input class="fg-input jp" type="text" id="inp-name" placeholder="Ej: Jarrón antiguo" autocomplete="off">
-        </div>
-        <div class="fg">
-            <div class="fg-label">Cantidad</div>
-            <div class="qty-row">
-                <button class="q-btn" onclick="adjustQty(-1)">−</button>
-                <span class="q-val jp" id="add-qty">1</span>
-                <button class="q-btn" onclick="adjustQty(1)">+</button>
-            </div>
-        </div>
-        <div class="fg">
-            <div class="fg-label">Espacio</div>
-            <div class="chips" id="add-chips"></div>
-        </div>
-        <div class="fg">
-            <div class="fg-label">¿Qué vas a hacer?</div>
-            <div class="dg" id="decision-grid"></div>
-        </div>
-        <div class="pb" id="price-box">
-            <div class="fg-label" style="color:var(--vermillion)">Precio esperado (€)</div>
-            <input class="pb-inp jp" type="text" id="inp-price" placeholder="0" inputmode="decimal" pattern="[0-9]*">
-        </div>
-        <button class="cta" onclick="saveNewItem()">REGISTRAR OBJETO</button>
+    <div class="section-header">
+        <div class="section-kanji jp">新</div>
+        <div class="section-word">nuevo objeto</div>
     </div>
+    <div class="fg">
+        <div class="fg-label">nombre</div>
+        <input class="fg-input jp" type="text" id="inp-name" placeholder="¿Qué objeto es?" autocomplete="off">
+    </div>
+    <div class="fg">
+        <div class="fg-label">unidades</div>
+        <div class="qty-row">
+            <button class="q-btn" onclick="adjustQty('add', -1)">−</button>
+            <span class="q-val jp" id="add-qty">1</span>
+            <button class="q-btn" onclick="adjustQty('add', 1)">+</button>
+        </div>
+    </div>
+    <div class="fg">
+        <div class="fg-label">espacio</div>
+        <div class="chips" id="add-chips"></div>
+    </div>
+    <div class="fg">
+        <div class="fg-label">decisión</div>
+        <div class="dg" id="decision-grid"></div>
+    </div>
+    <div class="pb" id="price-box">
+        <div class="fg-label" style="color:var(--vermillion)">precio estimado</div>
+        <input class="pb-inp jp" type="number" id="inp-price" placeholder="0€" inputmode="decimal">
+    </div>
+    <button class="cta" onclick="saveNewItem()">REGISTRAR</button>
 </div>
 
+<!-- ═══ SANTUARIO ═══ -->
 <div id="screen-santuario" class="screen">
     <div class="sant-top">
         <div class="sant-kanji jp">聖域</div>
-        <input class="sant-search jp" type="text" id="sant-q" placeholder="Buscar en santuario..." oninput="renderSantuario()">
+        <div class="sant-word">santuario</div>
+        <div class="sant-count jp" id="sant-n">0 objetos</div>
+        <input class="sant-search jp" type="text" id="sant-q" placeholder="Buscar..." oninput="renderSantuario()">
     </div>
-    <div class="rooms" id="rooms" style="width:100%;"></div>
+    <div class="rooms" id="rooms"></div>
 </div>
 
+<!-- ═══ PROCESS ═══ -->
 <div id="screen-list" class="screen">
     <div class="tabs">
         <button class="tab on" onclick="switchTab('process')">Proceso</button>
         <button class="tab" onclick="switchTab('sold')">Cuentas</button>
     </div>
-    <div id="list-content" style="width:100%; padding-top:20px;"></div>
+    <div class="list-hdr" id="list-header">
+        <div class="list-t jp">進行 <small>proceso</small></div>
+        <button class="sp" id="sort-btn" onclick="toggleSort()">Fecha ↓</button>
+    </div>
+    <div id="list-content" style="width:100%;display:flex;flex-direction:column;align-items:center;padding:0 0 10px;"></div>
 </div>
 
+<!-- ═══ SETTINGS ═══ -->
 <div id="screen-settings" class="screen">
-    <div style="padding-top:40px; width:100%; padding-left:28px; padding-right:28px;">
-        <button class="cta" onclick="exportData()">GUARDAR COPIA (JSON)</button>
-        <button class="cta2" onclick="document.getElementById('file-input').click()" style="width:100%; padding:15px; border:1px solid var(--indigo); border-radius:4px; background:none; color:var(--indigo); font-weight:700;">CARGAR COPIA</button>
+    <div class="section-header">
+        <div class="section-kanji jp">控</div>
+        <div class="section-word">ajustes</div>
+    </div>
+
+    <div class="s-section">
+        <div class="s-section-t">resumen</div>
+        <div class="s-stat-row"><span class="s-stat-label">Objetos en santuario</span><span class="s-stat-val jp" id="ss-kept">0</span></div>
+        <div class="s-stat-row"><span class="s-stat-label">En proceso</span><span class="s-stat-val jp" id="ss-pend">0</span></div>
+        <div class="s-stat-row"><span class="s-stat-label">Completados</span><span class="s-stat-val jp" id="ss-done">0</span></div>
+        <div class="s-stat-row"><span class="s-stat-label">Total ganado</span><span class="s-stat-val jp red" id="ss-earn">0€</span></div>
+    </div>
+
+    <div class="s-section">
+        <div class="s-section-t">datos</div>
+        <div class="s-desc">
+            Guarda una copia de tus datos para no perderlos.
+            <div class="s-alert" id="backup-status">Copia recomendada</div>
+        </div>
+        <button class="cta" onclick="exportData()" style="width:100%">GUARDAR COPIA</button>
         <input type="file" id="file-input" style="display:none" accept=".json" onchange="importData(this)">
-        <button class="cta" style="background:var(--vermillion); margin-top:50px;" onclick="confirmAction('¿Borrar TODO?', resetAll)">RESETEAR APP</button>
+        <button class="cta2" onclick="document.getElementById('file-input').click()" style="width:100%;margin-top:10px">CARGAR COPIA</button>
+    </div>
+
+    <div class="s-section">
+        <div class="s-section-t">zona de peligro</div>
+        <button class="cta red" onclick="confirmAction('¿Borrar TODOS los datos? Esta acción es irreversible.', resetAll)" style="width:100%">BORRAR TODO</button>
     </div>
 </div>
 
-<div id="ov-sold" class="ov">
-    <div class="fg-label">Precio final de venta</div>
-    <input class="pb-inp jp" type="text" id="sold-price" placeholder="0" inputmode="decimal" style="font-size:3rem;">
-    <button class="cta" onclick="confirmSold()">CONFIRMAR VENTA</button>
-    <button class="cta" style="background:none; color:var(--indigo);" onclick="closeOverlay('ov-sold')">CANCELAR</button>
+<!-- ═══ EDIT OVERLAY ═══ -->
+<div id="ov-edit" class="ov">
+    <div class="ov-t jp">編集 Editar</div>
+    <div class="fg" style="max-width:340px">
+        <div class="fg-label">nombre</div>
+        <input class="fg-input jp" type="text" id="ed-name" autocomplete="off">
+    </div>
+    <div class="fg" style="max-width:340px">
+        <div class="fg-label">unidades</div>
+        <div class="qty-row">
+            <button class="q-btn" onclick="adjustQty('edit', -1)">−</button>
+            <span class="q-val jp" id="edit-qty">1</span>
+            <button class="q-btn" onclick="adjustQty('edit', 1)">+</button>
+        </div>
+    </div>
+    <div class="fg" style="max-width:340px">
+        <div class="fg-label">espacio</div>
+        <div class="chips" id="ed-chips"></div>
+    </div>
+    <button class="cta" onclick="saveEdit()">GUARDAR</button>
+    <button class="cta2" onclick="closeOverlay('ov-edit')">CANCELAR</button>
 </div>
 
-<div id="ov-confirm" class="ov">
-    <p id="confirm-msg" style="margin-bottom:20px; font-weight:700;"></p>
-    <button class="cta" id="confirm-yes">SÍ, ESTOY SEGURO</button>
-    <button class="cta" style="background:none; color:var(--indigo);" onclick="closeOverlay('ov-confirm')">CANCELAR</button>
+<!-- ═══ SOLD OVERLAY ═══ -->
+<div id="ov-sold" class="ov" style="justify-content:center;z-index:3000;">
+    <div class="ov-t jp">売 Vendido</div>
+    <p style="font-size:0.8rem;color:var(--indigo);margin-bottom:20px;">¿Precio final de venta?</p>
+    <div class="fg" style="max-width:260px">
+        <input class="pb-inp jp" type="number" id="sold-price" placeholder="0€" inputmode="decimal" style="font-size:2.4rem;">
+    </div>
+    <button class="cta red" onclick="confirmSold()">CONFIRMAR</button>
+    <button class="cta2" onclick="closeOverlay('ov-sold')">CANCELAR</button>
 </div>
 
+<!-- ═══ CONFIRM OVERLAY ═══ -->
+<div id="ov-confirm" class="ov" style="justify-content:center;z-index:3500;">
+    <div class="ov-t jp" id="confirm-title">確認</div>
+    <p style="font-size:0.9rem;color:var(--indigo);margin-bottom:24px;text-align:center;" id="confirm-msg"></p>
+    <button class="cta" id="confirm-yes" style="min-width:200px;">CONFIRMAR</button>
+    <button class="cta2" onclick="closeOverlay('ov-confirm')" style="min-width:200px;">CANCELAR</button>
+</div>
+
+<!-- ═══ TOAST ═══ -->
 <div class="toast" id="toast"></div>
 
+<!-- ═══ NAV ═══ -->
 <nav class="nav">
-    <button class="ni on" onclick="go('screen-home', this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg><span class="nt">Inicio</span></button>
-    <button class="ni" onclick="go('screen-add', this)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="nt">Nuevo</span></button>
-    <button class="ni" onclick="go('screen-santuario', this)"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg><span class="nt">Zen</span></button>
-    <button class="ni" onclick="go('screen-list', this)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="nt">Lista</span></button>
-    <button class="ni" onclick="go('screen-settings', this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2"/></svg><span class="nt">Config</span></button>
+    <button class="ni on" onclick="go('screen-home', this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>
+        <span class="nt">inicio</span>
+    </button>
+    <button class="ni" onclick="go('screen-add', this)">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="nt">nuevo</span>
+    </button>
+    <button class="ni" onclick="go('screen-santuario', this)">
+        <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        <span class="nt">santuario</span>
+    </button>
+    <button class="ni" onclick="go('screen-list', this)">
+        <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>
+        <span class="nt">proceso</span>
+    </button>
+    <button class="ni" onclick="go('screen-settings', this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        <span class="nt">ajustes</span>
+        <div class="nd" id="settings-dot"></div>
+    </button>
 </nav>
 
 <script>
-let db = JSON.parse(localStorage.getItem('kuhakuDB') || '[]');
-let state = { currentAction: null, currentTab: 'process', addSpace: 'living', addQty: 1, soldId: null, openRooms: new Set() };
-const navButtons = document.querySelectorAll('.ni');
+/* ═══════════════════════════════════════════
+   空白 Kūhaku — Decluttering App v21
+   Adjusted sizing for modern large displays
+   Fixed scroll area to prevent overlapping
+   ═══════════════════════════════════════════ */
 
+// ─── ICONS ───
+const ICONS = {
+    living:   '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 013-3h10a3 3 0 013 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 011-1h10a1 1 0 011 1v3"/></svg>',
+    bedroom:  '<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/></svg>',
+    kitchen:  '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/><path d="M12 5V3"/></svg>',
+    bath:     '<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 01-4 4H8a4 4 0 01-4-4v-4z"/><path d="M7 14V9a2 2 0 012-2h1"/></svg>',
+    study:    '<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M6 16v5M18 16v5"/><path d="M14 14V9a2 2 0 00-2-2H8"/></svg>',
+    garden:   '<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 00-5-5 4 4 0 01-3-3 4 4 0 018 0 4 4 0 018 0 4 4 0 01-3 3 5 5 0 00-5 5z"/><path d="M8 21h8"/></svg>',
+    pantry:   '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16M4 16h16"/></svg>',
+    garage:   '<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16M4 14h16M4 18h16"/></svg>',
+    terrace:  '<svg viewBox="0 0 24 24"><path d="M4 16h16M4 20h16"/><path d="M6 16v4M10 16v4M14 16v4M18 16v4"/><path d="M12 8v8"/></svg>',
+    basement: '<svg viewBox="0 0 24 24"><path d="M3 5h4v4h4v4h4v4h4"/><path d="M3 5v14h16"/></svg>',
+    dining:   '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M12 10V6M9 6h6"/><path d="M12 18v4M8 22h8"/></svg>',
+    entrance: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h1"/><path d="M5 20h14"/></svg>',
+    edit:     '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
+    logout:   '<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+    close:    '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    price:    '<svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
+    temple:   '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
+    back:     '<svg viewBox="0 0 24 24"><path d="M3 12h12"/><path d="M3 12l5-5"/><path d="M3 12l5 5"/><path d="M21 5v14"/></svg>',
+};
+
+// ─── SPACES ───
 const SPACES = [
-    { id: 'living', icon: '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 013-3h10a3 3 0 013 3v5"/></svg>', label: 'Sala' },
-    { id: 'bedroom', icon: '<svg viewBox="0 0 24 24"><path d="M2 18h20M4 18v-7a2 2 0 012-2h12a2 2 0 012 2v7"/></svg>', label: 'Cama' },
-    { id: 'kitchen', icon: '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/></svg>', label: 'Cocina' },
-    { id: 'bath', icon: '<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 01-4 4H8a4 4 0 01-4-4v-4z"/></svg>', label: 'Baño' }
+    { id: 'living',   icon: ICONS.living,   label: 'Sala',       kj: '居間' },
+    { id: 'bedroom',  icon: ICONS.bedroom,  label: 'Dormitorio', kj: '寝室' },
+    { id: 'kitchen',  icon: ICONS.kitchen,  label: 'Cocina',     kj: '台所' },
+    { id: 'bath',     icon: ICONS.bath,     label: 'Baño',       kj: '浴室' },
+    { id: 'study',    icon: ICONS.study,    label: 'Estudio',    kj: '書斎' },
+    { id: 'garden',   icon: ICONS.garden,   label: 'Jardín',     kj: '庭園' },
+    { id: 'pantry',   icon: ICONS.pantry,   label: 'Despensa',   kj: '貯蔵' },
+    { id: 'garage',   icon: ICONS.garage,   label: 'Garaje',     kj: '車庫' },
+    { id: 'terrace',  icon: ICONS.terrace,  label: 'Terraza',    kj: 'テラス' },
+    { id: 'basement', icon: ICONS.basement, label: 'Sótano',     kj: '地下室' },
+    { id: 'dining',   icon: ICONS.dining,   label: 'Comedor',    kj: '食堂' },
+    { id: 'entrance', icon: ICONS.entrance, label: 'Entrada',    kj: '玄関' },
 ];
 
 const DECISIONS = [
-    { id: 'conservar', label: 'Santuario' },
-    { id: 'regalar', label: 'Regalar' },
-    { id: 'donar', label: 'Donar' },
-    { id: 'tirar', label: 'Tirar' },
-    { id: 'vender', label: 'Vender', wide: true }
+    { id: 'conservar', label: 'Conservar' },
+    { id: 'regalar',   label: 'Regalar' },
+    { id: 'donar',     label: 'Donar' },
+    { id: 'tirar',     label: 'Tirar' },
+    { id: 'vender',    label: 'Vender', wide: true },
 ];
 
-function saveData() { localStorage.setItem('kuhakuDB', JSON.stringify(db)); updateHome(); }
+const GROUP_LABELS = { vender: 'Vender', donar: 'Donar', regalar: 'Regalar', tirar: 'Tirar' };
+const GROUP_KJ = { vender: '売', donar: '寄', regalar: '贈', tirar: '捨' };
 
-function go(id, btn) {
+const KOANS = [
+    'Poseer menos no es perder, es encontrar espacio para lo esencial.',
+    'El vacío no es ausencia. Es posibilidad.',
+    'Lo que sueltas con gratitud vuelve como libertad.',
+    'Cada objeto que liberas es un paso hacia la claridad.',
+    'El espacio vacío es el más valioso de la casa.',
+    'Simplificar es el arte de saber qué merece quedarse.',
+    'No se trata de tener poco, sino de tener lo justo.',
+];
+
+// ─── STATE ───
+let db = [];
+let state = {
+    currentAction: null,
+    currentTab: 'process',
+    addSpace: 'living',
+    editSpace: 'living',
+    editId: null,
+    soldId: null,
+    addQty: 1,
+    editQty: 1,
+    lastBackup: 0,
+    changesSinceBackup: 0,
+    sortMode: 'date',
+    openRooms: new Set(),
+    confirmCallback: null,
+};
+
+// Cache nav buttons
+const navButtons = document.querySelectorAll('.ni');
+
+// ─── PERSISTENCE ───
+function loadData() {
+    try {
+        const raw = localStorage.getItem('kuhakuDB');
+        if (raw) db = JSON.parse(raw);
+        const meta = localStorage.getItem('kuhakuMeta');
+        if (meta) {
+            const parsed = JSON.parse(meta);
+            state.lastBackup = parsed.lastBackup || 0;
+            state.changesSinceBackup = parsed.changes || 0;
+        }
+    } catch {
+        db = [];
+    }
+}
+
+function saveData() {
+    localStorage.setItem('kuhakuDB', JSON.stringify(db));
+    state.changesSinceBackup++;
+    localStorage.setItem('kuhakuMeta', JSON.stringify({
+        lastBackup: state.lastBackup,
+        changes: state.changesSinceBackup,
+    }));
+    checkBackupStatus();
+    updateHome();
+}
+
+function findItem(id) {
+    return db.find(item => item.id === id);
+}
+
+// ─── TOAST ───
+let toastTimer = null;
+function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ─── BACKUP ───
+function checkBackupStatus() {
+    const daysSince = (Date.now() - state.lastBackup) / 864e5;
+    const needsBackup = (state.changesSinceBackup > 5) || (daysSince > 7 && state.changesSinceBackup > 0);
+    document.getElementById('settings-dot').style.display = needsBackup ? 'block' : 'none';
+    document.getElementById('backup-status').style.display = needsBackup ? 'block' : 'none';
+}
+
+// ─── NAVIGATION ───
+function go(screenId, btn) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    document.getElementById(screenId).classList.add('active');
     navButtons.forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-    // Reiniciar scroll al cambiar pantalla
-    document.getElementById(id).scrollTop = 0;
-    if (id === 'screen-list') renderList();
-    if (id === 'screen-santuario') renderSantuario();
+    if (btn) btn.classList.add('on');
+    if (screenId === 'screen-list') renderList();
+    if (screenId === 'screen-santuario') renderSantuario();
 }
 
-function adjustQty(delta) { 
-    state.addQty = Math.max(1, state.addQty + delta); 
-    document.getElementById('add-qty').textContent = state.addQty; 
+// ─── CHIPS RENDERER ───
+function renderChips(containerId, selectedId, onSelect) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    SPACES.forEach(space => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (space.id === selectedId ? ' sel' : '');
+        chip.innerHTML = `${space.icon}<div class="chip-lbl">${space.label}</div><div class="chip-kj">${space.kj}</div>`;
+        chip.onclick = () => onSelect(space.id);
+        container.appendChild(chip);
+    });
 }
 
-function renderAddForm() {
-    const chips = document.getElementById('add-chips');
-    chips.innerHTML = SPACES.map(s => `
-        <div class="chip ${s.id === state.addSpace ? 'sel' : ''}" onclick="state.addSpace='${s.id}'; renderAddForm();">
-            ${s.icon}<div class="chip-lbl">${s.label}</div>
-        </div>
-    `).join('');
+function refreshAllChips() {
+    renderChips('add-chips', state.addSpace, id => { state.addSpace = id; refreshAllChips(); });
+    renderChips('ed-chips', state.editSpace, id => { state.editSpace = id; refreshAllChips(); });
+}
 
+// ─── DECISION GRID ───
+function renderDecisionGrid() {
     const grid = document.getElementById('decision-grid');
-    grid.innerHTML = DECISIONS.map(d => `
-        <button class="d-btn ${d.wide ? 'w2' : ''} ${state.currentAction === d.id ? (d.id === 'vender' ? 'sel-v' : 'sel') : ''}" 
-                onclick="state.currentAction='${d.id}'; document.getElementById('price-box').style.display = '${d.id === 'vender' ? 'block' : 'none'}'; renderAddForm();">
-            ${d.label}
-        </button>
-    `).join('');
+    grid.innerHTML = '';
+    DECISIONS.forEach(dec => {
+        const btn = document.createElement('button');
+        btn.className = 'd-btn' + (dec.wide ? ' w2' : '');
+        btn.textContent = dec.label;
+        btn.onclick = () => selectDecision(btn, dec.id);
+        grid.appendChild(btn);
+    });
 }
 
+function selectDecision(btn, action) {
+    document.querySelectorAll('.d-btn').forEach(b => b.classList.remove('sel', 'sel-v'));
+    if (action === 'vender') {
+        btn.classList.add('sel-v');
+        document.getElementById('price-box').style.display = 'block';
+    } else {
+        btn.classList.add('sel');
+        document.getElementById('price-box').style.display = 'none';
+    }
+    state.currentAction = action;
+}
+
+// ─── QUANTITY ───
+function adjustQty(mode, delta) {
+    if (mode === 'add') {
+        state.addQty = Math.max(1, state.addQty + delta);
+        document.getElementById('add-qty').textContent = state.addQty;
+    } else {
+        state.editQty = Math.max(1, state.editQty + delta);
+        document.getElementById('edit-qty').textContent = state.editQty;
+    }
+}
+
+// ─── ADD NEW ITEM ───
 function saveNewItem() {
-    const name = document.getElementById('inp-name').value;
-    if (!name || !state.currentAction) { showToast('Nombre y decisión obligatorios'); return; }
+    const name = document.getElementById('inp-name').value.trim();
+    if (!name || !state.currentAction) {
+        showToast('Completa nombre y decisión');
+        return;
+    }
+
     const item = {
-        id: Date.now(), name, qty: state.addQty, act: state.currentAction,
-        space: state.addSpace, price: parseFloat(document.getElementById('inp-price').value) || 0,
-        final: 0, st: state.currentAction === 'conservar' ? 'kept' : 'active'
+        id: Date.now(),
+        name,
+        qty: state.addQty,
+        act: state.currentAction,
+        space: state.addSpace,
+        price: document.getElementById('inp-price').value || 0,
+        final: 0,
+        st: state.currentAction === 'conservar' ? 'kept' : 'active',
+        date: new Date().toLocaleDateString(),
+        ts: Date.now(),
     };
-    db.push(item); saveData();
-    showToast('¡Guardado!');
-    // Limpiar campos
+    db.push(item);
+    saveData();
+    showToast('Registrado ✓');
+
+    // Reset form
     document.getElementById('inp-name').value = '';
     document.getElementById('inp-price').value = '';
-    state.addQty = 1; document.getElementById('add-qty').textContent = '1';
-    state.currentAction = null; renderAddForm();
-    go('screen-home', navButtons[0]);
+    state.addQty = 1;
+    document.getElementById('add-qty').textContent = '1';
+    document.querySelectorAll('.d-btn').forEach(b => b.classList.remove('sel', 'sel-v'));
+    state.currentAction = null;
+    document.getElementById('price-box').style.display = 'none';
+
+    // Navigate
+    if (item.st === 'kept') {
+        go('screen-santuario', navButtons[2]);
+    } else {
+        go('screen-list', navButtons[3]);
+    }
 }
 
+// ─── SANTUARIO ───
 function renderSantuario() {
-    const items = db.filter(i => i.st === 'kept');
-    document.getElementById('rooms').innerHTML = items.map(i => `
-        <div class="ic">
-            <div class="ic-top"><span class="ic-n">${i.name}</span> <span class="ic-p">Zen</span></div>
-            <div class="ic-bot">
-                <button class="cb" onclick="moveItem(${i.id}, 'active')"><svg viewBox="0 0 24 24"><path d="M17 8l4 4-4 4M3 12h18"/></svg></button>
-                <button class="cb" onclick="deleteItem(${i.id})">×</button>
+    const container = document.getElementById('rooms');
+    container.innerHTML = '';
+    const query = (document.getElementById('sant-q').value || '').toLowerCase();
+    let kept = db.filter(i => i.st === 'kept');
+    if (query) kept = kept.filter(i => i.name.toLowerCase().includes(query));
+
+    document.getElementById('sant-n').textContent = kept.length + ' objeto' + (kept.length !== 1 ? 's' : '');
+
+    if (!kept.length) {
+        container.innerHTML = '<div class="sant-empty"><div class="sant-empty-k">空</div><div class="sant-empty-t">Tu santuario está vacío</div></div>';
+        return;
+    }
+
+    // Group by space
+    const grouped = {};
+    kept.forEach(item => {
+        const s = item.space || 'living';
+        if (!grouped[s]) grouped[s] = [];
+        grouped[s].push(item);
+    });
+
+    SPACES.forEach(space => {
+        const items = grouped[space.id];
+        if (!items) return;
+
+        const room = document.createElement('div');
+        room.className = 'room' + (state.openRooms.has(space.id) ? ' open' : '');
+
+        const header = document.createElement('div');
+        header.className = 'room-h';
+        header.innerHTML = `
+            <div class="room-hl">
+                <div class="room-hi">${space.icon}</div>
+                <span class="room-hn">${space.label}</span>
+                <span class="room-hk">${space.kj}</span>
             </div>
-        </div>
-    `).join('');
+            <div class="room-hr">
+                <span class="room-hc">${items.length}</span>
+                <span class="room-ha">›</span>
+            </div>`;
+        header.onclick = () => {
+            room.classList.toggle('open');
+            if (room.classList.contains('open')) state.openRooms.add(space.id);
+            else state.openRooms.delete(space.id);
+        };
+
+        const body = document.createElement('div');
+        body.className = 'room-body';
+
+        items.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'r-item';
+            const qtyBadge = item.qty > 1 ? `<span class="r-qty">×${item.qty}</span>` : '';
+            row.innerHTML = `
+                <div class="r-item-l">
+                    <div class="r-dot"></div>
+                    <span class="r-name">${item.name}</span>
+                    ${qtyBadge}
+                </div>
+                <div class="r-btns">
+                    <button class="cb" onclick="openEdit(${item.id})">${ICONS.edit}</button>
+                    <button class="cb" onclick="moveFromKeep(${item.id})">${ICONS.logout}</button>
+                    <button class="cb del" onclick="deleteItem(${item.id})">${ICONS.close}</button>
+                </div>`;
+            body.appendChild(row);
+        });
+
+        room.appendChild(header);
+        room.appendChild(body);
+        container.appendChild(room);
+    });
 }
 
-function switchTab(t) { state.currentTab = t; renderList(); }
+// ─── PROCESS / CUENTAS LIST ───
+function switchTab(tab) {
+    state.currentTab = tab;
+    document.querySelectorAll('.tab').forEach((btn, i) => {
+        btn.classList.toggle('on', ['process', 'sold'][i] === tab);
+    });
+    document.getElementById('sort-btn').style.display = tab === 'process' ? 'block' : 'none';
+    renderList();
+}
+
+function toggleSort() {
+    state.sortMode = state.sortMode === 'date' ? 'price' : 'date';
+    document.getElementById('sort-btn').textContent = state.sortMode === 'date' ? 'Fecha ↓' : 'Precio ↓';
+    renderList();
+}
 
 function renderList() {
-    const list = db.filter(i => i.st === (state.currentTab === 'process' ? 'active' : 'done'));
-    document.getElementById('list-content').innerHTML = list.map(i => `
-        <div class="ic">
-            <div class="ic-top"><span class="ic-n">${i.name}</span> <span class="ic-p ${state.currentTab === 'sold' ? 'won' : ''}">${state.currentTab === 'process' ? i.price+'€' : '+'+i.final+'€'}</span></div>
-            <div class="ic-bot">
-                ${state.currentTab === 'process' ? 
-                    `<button class="cta" style="margin:0; padding:8px 15px;" onclick="${i.act==='vender' ? 'openSold('+i.id+')' : 'moveItem('+i.id+',\'done\')'}">${i.act==='vender' ? 'Vendido' : 'Hecho'}</button>` : 
-                    `<button class="cb" onclick="moveItem(${i.id}, 'kept')">Zen</button>`
-                }
-                <button class="cb" onclick="deleteItem(${i.id})">×</button>
+    const container = document.getElementById('list-content');
+    container.innerHTML = '';
+    const headerEl = document.getElementById('list-header').querySelector('.list-t');
+
+    if (state.currentTab === 'process') {
+        const active = db.filter(i => i.st === 'active');
+        headerEl.innerHTML = `進行 <small>proceso · ${active.length}</small>`;
+
+        const groups = ['vender', 'donar', 'regalar', 'tirar'];
+        let hasItems = false;
+
+        groups.forEach(group => {
+            let items = active.filter(i => i.act === group);
+            if (!items.length) return;
+            hasItems = true;
+
+            // Sort
+            if (state.sortMode === 'date') items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+            else items.sort((a, b) => parseFloat(b.price || 0) - parseFloat(a.price || 0));
+
+            const gh = document.createElement('div');
+            gh.className = 'gh';
+            gh.innerHTML = `<span>${GROUP_KJ[group]} ${GROUP_LABELS[group]}</span><span class="gh-n">${items.length}</span>`;
+            container.appendChild(gh);
+
+            items.forEach(item => container.appendChild(createItemCard(item)));
+        });
+
+        if (!hasItems) {
+            container.innerHTML = '<div class="mt"><div class="mt-k">空</div>Todo limpio</div>';
+        }
+    } else {
+        // Cuentas tab
+        const pending = db.filter(i => i.st === 'active' && i.act === 'vender');
+        const done = db.filter(i => i.st === 'done');
+        const totalEarned = done.filter(i => i.act === 'vender').reduce((sum, i) => sum + parseFloat(i.final || 0), 0);
+        const totalPending = pending.reduce((sum, i) => sum + parseFloat(i.price || 0), 0);
+
+        headerEl.innerHTML = `帳簿 <small>cuentas · ${done.length}</small>`;
+
+        const summary = document.createElement('div');
+        summary.className = 'as';
+        summary.innerHTML = `
+            <div class="as-h"><div class="as-v red jp">${totalEarned}€</div><div class="as-l">ganado</div></div>
+            <div class="as-h"><div class="as-v jp">${totalPending}€</div><div class="as-l">en venta</div></div>`;
+        container.appendChild(summary);
+
+        const sorted = [...done].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        sorted.forEach(item => container.appendChild(createItemCard(item)));
+    }
+}
+
+function createItemCard(item) {
+    const card = document.createElement('div');
+    card.className = 'ic';
+
+    const space = SPACES.find(s => s.id === (item.space || 'living'));
+    const spaceIcon = space ? space.icon : ICONS.living;
+    const qtyBadge = item.qty > 1 ? `<span class="ic-q">×${item.qty}</span>` : '';
+    const daysAgo = Math.floor((Date.now() - (item.ts || Date.now())) / 864e5);
+    const dateText = daysAgo === 0 ? 'Hoy' : `${daysAgo}d`;
+    const isAlert = state.currentTab === 'process' && daysAgo > 30;
+
+    // Meta line
+    let meta = '';
+    if (state.currentTab === 'process' && item.act === 'vender') {
+        meta = `<div class="ic-p">Meta: ${item.price}€</div>`;
+    } else if (state.currentTab === 'sold' && item.act === 'vender') {
+        meta = `<div class="ic-p won">+${item.final}€</div>`;
+    } else if (state.currentTab === 'sold') {
+        meta = `<div class="ic-m">${GROUP_LABELS[item.act] || item.act} ✓</div>`;
+    } else {
+        meta = `<div class="ic-m">${GROUP_LABELS[item.act] || item.act}</div>`;
+    }
+
+    // Action buttons
+    let buttons = '';
+    if (state.currentTab === 'process') {
+        const editBtn = `<button class="ib" onclick="openEdit(${item.id})">✎</button>`;
+        if (item.act === 'vender') {
+            buttons = editBtn + `<button class="ab rd" onclick="openSoldOverlay(${item.id})">Vendido</button>`;
+        } else {
+            buttons = editBtn + `<button class="ab dk" onclick="markDone(${item.id})">Listo</button>`;
+        }
+    } else {
+        let extraBtns = '';
+        if (item.act === 'vender') {
+            extraBtns = `<button class="cb price-edit" onclick="editFinalPrice(${item.id})">${ICONS.price}</button>`;
+        }
+        buttons = `${extraBtns}<button class="cb" onclick="moveToKeep(${item.id})">${ICONS.temple}</button><button class="cb" onclick="restoreToProcess(${item.id})">${ICONS.back}</button><button class="cb del" onclick="deleteItem(${item.id})">${ICONS.close}</button>`;
+    }
+
+    card.innerHTML = `
+        <div class="ic-top">
+            <div class="ic-l">
+                <div class="ic-i">${spaceIcon}</div>
+                <span class="ic-n">${item.name}</span>
+                ${qtyBadge}
             </div>
+            <div class="ic-d${isAlert ? ' alert' : ''}">${dateText}</div>
         </div>
-    `).join('');
+        <div class="ic-bot">
+            ${meta}
+            <div class="ic-btns">${buttons}</div>
+        </div>`;
+    return card;
 }
 
-function moveItem(id, st) { 
-    const i = db.find(x => x.id == id); 
-    if(i) { i.st = st; saveData(); renderList(); renderSantuario(); } 
+// ─── EDIT OVERLAY ───
+function openEdit(id) {
+    state.editId = id;
+    const item = findItem(id);
+    if (!item) return;
+    document.getElementById('ed-name').value = item.name;
+    state.editQty = item.qty || 1;
+    document.getElementById('edit-qty').textContent = state.editQty;
+    state.editSpace = item.space || 'living';
+    refreshAllChips();
+    openOverlay('ov-edit');
 }
 
-function deleteItem(id) { 
-    confirmAction('¿Eliminar este objeto?', () => { db = db.filter(x => x.id != id); saveData(); renderList(); renderSantuario(); }); 
+function saveEdit() {
+    if (!state.editId) return;
+    const item = findItem(state.editId);
+    const name = document.getElementById('ed-name').value.trim();
+    if (!name || !item) return;
+    item.name = name;
+    item.space = state.editSpace;
+    item.qty = state.editQty;
+    saveData();
+    renderList();
+    renderSantuario();
+    closeOverlay('ov-edit');
+    showToast('Guardado ✓');
 }
 
-function openSold(id) { state.soldId = id; document.getElementById('ov-sold').classList.add('visible'); }
+// ─── OVERLAYS ───
+function openOverlay(id) {
+    const el = document.getElementById(id);
+    el.style.display = 'flex';
+    el.classList.add('visible');
+}
+
+function closeOverlay(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('visible');
+    setTimeout(() => { el.style.display = 'none'; }, 50);
+    state.editId = null;
+    state.soldId = null;
+    state.confirmCallback = null;
+}
+
+// ─── SOLD FLOW ───
+function openSoldOverlay(id) {
+    state.soldId = id;
+    document.getElementById('sold-price').value = '';
+    openOverlay('ov-sold');
+    setTimeout(() => document.getElementById('sold-price').focus(), 150);
+}
+
 function confirmSold() {
-    const p = parseFloat(document.getElementById('sold-price').value) || 0;
-    const i = db.find(x => x.id == state.soldId);
-    if(i) { i.final = p; i.st = 'done'; saveData(); closeOverlay('ov-sold'); renderList(); }
+    const price = document.getElementById('sold-price').value;
+    if (price === '' || price === null) return;
+    const item = findItem(state.soldId);
+    if (item) {
+        item.final = price;
+        item.st = 'done';
+        saveData();
+        renderList();
+        showToast(`Vendido por ${price}€`);
+    }
+    closeOverlay('ov-sold');
 }
 
-function closeOverlay(id) { document.getElementById(id).classList.remove('visible'); }
-function confirmAction(m, cb) {
-    document.getElementById('confirm-msg').textContent = m;
-    document.getElementById('ov-confirm').classList.add('visible');
-    document.getElementById('confirm-yes').onclick = () => { cb(); closeOverlay('ov-confirm'); };
+function editFinalPrice(id) {
+    state.soldId = id;
+    const item = findItem(id);
+    document.getElementById('sold-price').value = item ? item.final || '' : '';
+    openOverlay('ov-sold');
+    setTimeout(() => document.getElementById('sold-price').focus(), 150);
 }
 
-function resetAll() { db = []; saveData(); location.reload(); }
+// ─── CONFIRM MODAL ───
+function confirmAction(msg, callback) {
+    state.confirmCallback = callback;
+    document.getElementById('confirm-msg').textContent = msg;
+    document.getElementById('confirm-yes').onclick = () => {
+        const fn = state.confirmCallback;
+        closeOverlay('ov-confirm');
+        if (fn) fn();
+    };
+    openOverlay('ov-confirm');
+}
+
+// ─── ITEM ACTIONS ───
+function markDone(id) {
+    const item = findItem(id);
+    if (item) {
+        item.st = 'done';
+        saveData();
+        renderList();
+        showToast('Completado ✓');
+    }
+}
+
+function moveToKeep(id) {
+    confirmAction('¿Mover al santuario?', () => {
+        const item = findItem(id);
+        if (item) {
+            item.st = 'kept';
+            item.act = 'conservar';
+            item.final = 0;
+            saveData();
+            renderList();
+            renderSantuario();
+            showToast('Movido al santuario');
+        }
+    });
+}
+
+function moveFromKeep(id) {
+    confirmAction('¿Sacar del santuario y mover a proceso?', () => {
+        const item = findItem(id);
+        if (item) {
+            item.st = 'active';
+            item.act = 'vender';
+            saveData();
+            renderList();
+            renderSantuario();
+            showToast('Movido a proceso');
+        }
+    });
+}
+
+function restoreToProcess(id) {
+    confirmAction('¿Devolver al proceso?', () => {
+        const item = findItem(id);
+        if (item) {
+            item.st = 'active';
+            item.final = 0;
+            saveData();
+            renderList();
+            showToast('Devuelto a proceso');
+        }
+    });
+}
+
+function deleteItem(id) {
+    confirmAction('¿Eliminar definitivamente?', () => {
+        db = db.filter(item => item.id !== id);
+        saveData();
+        renderList();
+        renderSantuario();
+        showToast('Eliminado');
+    });
+}
+
+function resetAll() {
+    db = [];
+    saveData();
+    renderList();
+    renderSantuario();
+    showToast('Datos borrados');
+}
+
+// ─── HOME ───
 function updateHome() {
-    const earned = db.filter(i => i.st === 'done').reduce((acc, x) => acc + x.final, 0);
-    document.getElementById('total-money').textContent = earned;
-    document.getElementById('stat-kept').textContent = db.filter(i => i.st === 'kept').length;
-    document.getElementById('stat-pending').textContent = db.filter(i => i.st === 'active').length;
-    document.getElementById('stat-sold').textContent = db.filter(i => i.st === 'done').length;
+    const earned = db.filter(i => i.st === 'done' && i.act === 'vender')
+        .reduce((sum, i) => sum + parseFloat(i.final || 0), 0);
+    const keptCount = db.filter(i => i.st === 'kept').length;
+    const activeCount = db.filter(i => i.st === 'active').length;
+    const doneCount = db.filter(i => i.st === 'done').length;
+
+    document.getElementById('total-money').innerHTML = `<span class="enso-cur">€</span>${earned}`;
+    document.getElementById('stat-kept').textContent = keptCount;
+    document.getElementById('stat-pending').textContent = activeCount;
+    document.getElementById('stat-sold').textContent = doneCount;
+
+    // Settings stats
+    document.getElementById('ss-kept').textContent = keptCount;
+    document.getElementById('ss-pend').textContent = activeCount;
+    document.getElementById('ss-done').textContent = doneCount;
+    document.getElementById('ss-earn').textContent = earned + '€';
 }
 
-function showToast(m) { 
-    const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); 
-    setTimeout(() => t.classList.remove('show'), 2000); 
+// ─── BACKUP / IMPORT ───
+async function exportData() {
+    const json = JSON.stringify(db, null, 2);
+    const file = new File([json], 'kuhaku.json', { type: 'application/json' });
+
+    if (navigator.share) {
+        try {
+            await navigator.share({ files: [file], title: 'Kūhaku' });
+            state.lastBackup = Date.now();
+            state.changesSinceBackup = 0;
+            localStorage.setItem('kuhakuMeta', JSON.stringify({
+                lastBackup: state.lastBackup,
+                changes: 0,
+            }));
+            checkBackupStatus();
+            showToast('Copia guardada ✓');
+        } catch {
+            downloadFile(json);
+        }
+    } else {
+        downloadFile(json);
+    }
 }
 
-// Init
-renderAddForm();
-updateHome();
+function downloadFile(content) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([content], { type: 'application/json' }));
+    a.download = 'kuhaku.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    showToast('Descargado ✓');
+}
+
+function importData(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            if (!Array.isArray(parsed)) throw new Error('Invalid');
+            db = parsed;
+            saveData();
+            renderSantuario();
+            renderList();
+            showToast('Datos cargados ✓');
+        } catch {
+            showToast('Error al cargar');
+        }
+    };
+    reader.readAsText(file);
+    input.value = ''; // Reset for re-import
+}
+
+// ─── INIT ───
+function init() {
+    loadData();
+    refreshAllChips();
+    renderDecisionGrid();
+    checkBackupStatus();
+    updateHome();
+
+    // Koan
+    const koan = KOANS[Math.floor(Math.random() * KOANS.length)];
+    document.getElementById('koan-text').textContent = '「 ' + koan + ' 」';
+
+    // Greeting
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'おはよう Buenos días'
+                   : hour < 19 ? 'こんにちは Buenas tardes'
+                   : 'こんばんは Buenas noches';
+    document.getElementById('greeting').textContent = greeting;
+}
+
+init();
 </script>
+
 </body>
 </html>
+
+
