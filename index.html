@@ -1,597 +1,635 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- viewport-fit=cover es crucial para el iPhone 16 Plus (Dynamic Island y barra inferior) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Etiquetas para Web App en iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kūhaku">
     <meta name="theme-color" content="#F7F5F0">
+    
+    <!-- Puedes añadir tu propio icono subiendo un archivo apple-touch-icon.png a tu GitHub -->
+    <!-- <link rel="apple-touch-icon" href="apple-touch-icon.png"> -->
+    
     <title>空白 Kūhaku</title>
+    
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400;500;700;900&family=Shippori+Mincho:wght@400;700;800&family=Noto+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400;500;700;900&family=Shippori+Mincho:wght@400;700;800&family=Noto+Sans:wght@300;400;600;700&display=swap');
+        :root {
+            --washi: #F7F5F0;
+            --washi-warm: #F0EDE5;
+            --ink: #0a0a0a;
+            --ink-soft: #1a1a1a;
+            --ink-faint: #2a2a2a;
+            --vermillion: #C83232;
+            --vermillion-deep: #A51C1C;
+            --vermillion-pale: rgba(200,50,50,0.06);
+            --indigo: #6B8FA3;
+            --indigo-light: #8FB4C9;
+            --indigo-pale: #A8C8D8;
+            --indigo-ghost: rgba(107,143,163,0.12);
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 20px rgba(0,0,0,0.08);
+            --radius: 3px;
+            --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
 
-```
-    :root {
-        --washi: #F7F5F0;
-        --washi-warm: #F0EDE5;
-        --ink: #0a0a0a;
-        --ink-soft: #1a1a1a;
-        --ink-faint: #2a2a2a;
-        --vermillion: #C83232;
-        --vermillion-deep: #A51C1C;
-        --vermillion-pale: rgba(200,50,50,0.06);
-        --indigo: #6B8FA3;
-        --indigo-light: #8FB4C9;
-        --indigo-pale: #A8C8D8;
-        --indigo-ghost: rgba(107,143,163,0.12);
-        --white: #FFFFFF;
-        --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-        --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
-        --shadow-lg: 0 4px 20px rgba(0,0,0,0.08);
-        --radius: 3px;
-        --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+            --cha-bg: #1C1915;
+            --cha-wood: #2A2520;
+            --cha-wood-light: #342E28;
+            --cha-paper: #E8E0D4;
+            --cha-paper-dim: rgba(232,224,212,0.6);
+            --cha-paper-ghost: rgba(232,224,212,0.12);
+            --cha-gold: #C4A265;
+            --cha-gold-dim: rgba(196,162,101,0.3);
+            --cha-gold-ghost: rgba(196,162,101,0.08);
+            --cha-shadow: rgba(0,0,0,0.4);
+        }
 
-        /* Chashitsu palette — dark sanctuary */
-        --cha-bg: #1C1915;
-        --cha-wood: #2A2520;
-        --cha-wood-light: #342E28;
-        --cha-paper: #E8E0D4;
-        --cha-paper-dim: rgba(232,224,212,0.6);
-        --cha-paper-ghost: rgba(232,224,212,0.12);
-        --cha-gold: #C4A265;
-        --cha-gold-dim: rgba(196,162,101,0.3);
-        --cha-gold-ghost: rgba(196,162,101,0.08);
-        --cha-shadow: rgba(0,0,0,0.4);
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--washi);
+            color: var(--ink);
+            font-family: 'Noto Sans', sans-serif;
+            height: 100vh;
+            height: -webkit-fill-available;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            /* Soporte para el notch/isla dinámica en horizontal si se rota */
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
 
-    body {
-        background: var(--washi);
-        color: var(--ink);
-        font-family: 'Noto Sans', sans-serif;
-        height: 100vh;
-        height: 100dvh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        -webkit-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-    }
+        /* Washi texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; right: 0; bottom: 0; left: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+            background: -webkit-repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.01) 2px,
+                rgba(0,0,0,0.01) 4px
+            );
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.01) 2px,
+                rgba(0,0,0,0.01) 4px
+            );
+        }
 
-    body::before {
-        content: '';
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 0;
-        opacity: 0.35;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23f)' opacity='0.035'/%3E%3C/svg%3E");
-    }
+        .jp { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; }
 
-    .jp { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; }
+        .fade-in { -webkit-animation: fadeIn 0.4s ease-out; animation: fadeIn 0.4s ease-out; }
 
-    .fade-in { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes brushStroke { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+        @-webkit-keyframes fadeIn { from { opacity: 0; -webkit-transform: translateY(6px); } to { opacity: 1; -webkit-transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    @keyframes chaFadeIn {
-        from { opacity: 0; transform: translateY(12px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes chaSlideIn {
-        from { opacity: 0; transform: translateX(-10px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes goldLine {
-        from { transform: scaleX(0); }
-        to { transform: scaleX(1); }
-    }
-    @keyframes gentleGlow {
-        0%, 100% { opacity: 0.03; }
-        50% { opacity: 0.06; }
-    }
-    @keyframes thresholdOpen {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
+        @-webkit-keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* ═══════════════ SCREENS ═══════════════ */
-    .screen {
-        flex: 1; display: none; flex-direction: column; align-items: center;
-        overflow-y: auto; position: relative; z-index: 1;
-        scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
-        padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
-    }
-    #screen-home, #screen-add, #screen-settings { padding-left: 24px; padding-right: 24px; }
-    #screen-santuario, #screen-list { padding-left: 0; padding-right: 0; }
-    .screen.active { display: flex; animation: screenIn 0.3s ease; }
-    .screen::-webkit-scrollbar { display: none; }
+        @-webkit-keyframes brushStroke { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+        @keyframes brushStroke { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
 
-    /* ═══════════════ HOME ═══════════════ */
-    .home-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 16px 0 0; }
-    .home-greeting { font-family: 'Shippori Mincho', serif; font-size: 0.88rem; color: var(--indigo); font-weight: 400; letter-spacing: 0.5px; }
-    .home-ver { font-size: 0.55rem; color: var(--indigo-pale); letter-spacing: 1.5px; font-weight: 600; }
+        @-webkit-keyframes chaFadeIn { from { opacity: 0; -webkit-transform: translateY(12px); } to { opacity: 1; -webkit-transform: translateY(0); } }
+        @keyframes chaFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-    .enso-container { display: flex; flex-direction: column; align-items: center; margin: 28px 0 0; position: relative; }
-    .enso { width: 220px; height: 220px; position: relative; display: flex; align-items: center; justify-content: center; }
-    .enso svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-    .enso svg path { stroke-dasharray: 600; animation: brushStroke 2s ease-out forwards; }
-    .enso-center { text-align: center; z-index: 1; }
-    .enso-num { font-family: 'Shippori Mincho', serif; font-size: 3.5rem; font-weight: 800; line-height: 1; letter-spacing: -3px; }
-    .enso-cur { font-size: 2rem; font-weight: 400; }
-    .enso-sub { font-size: 0.55rem; letter-spacing: 6px; color: var(--indigo); text-transform: uppercase; margin-top: 8px; font-weight: 600; }
-    .hanko-seal { position: absolute; bottom: -4px; right: -4px; width: 44px; height: 44px; border: 2px solid var(--vermillion); border-radius: 4px; transform: rotate(-6deg); display: flex; align-items: center; justify-content: center; font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--vermillion); font-weight: 800; background: var(--washi); box-shadow: 0 0 0 1px rgba(200,50,50,0.08); line-height: 1; opacity: 0.85; }
+        @-webkit-keyframes gentleGlow { 0%, 100% { opacity: 0.03; } 50% { opacity: 0.06; } }
+        @keyframes gentleGlow { 0%, 100% { opacity: 0.03; } 50% { opacity: 0.06; } }
 
-    .stats-row { display: flex; gap: 0; width: 100%; margin-top: 32px; border-top: 1px solid var(--indigo-ghost); border-bottom: 1px solid var(--indigo-ghost); }
-    .stat-cell { flex: 1; text-align: center; padding: 18px 8px; cursor: pointer; transition: background var(--transition); }
-    .stat-cell:active { background: var(--indigo-ghost); }
-    .stat-cell + .stat-cell { border-left: 1px solid var(--indigo-ghost); }
-    .stat-num { font-family: 'Shippori Mincho', serif; font-size: 1.8rem; font-weight: 700; line-height: 1; }
-    .stat-num.red { color: var(--vermillion); }
-    .stat-lbl { font-size: 0.5rem; letter-spacing: 3px; color: var(--indigo); text-transform: uppercase; margin-top: 5px; font-weight: 600; }
+        /* ═══════════════ SCREENS ═══════════════ */
+        .screen {
+            -webkit-flex: 1;
+            flex: 1;
+            display: none;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            -webkit-align-items: center;
+            align-items: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            z-index: 1;
+            scroll-behavior: smooth;
+            /* safe-area-inset-bottom protege contra la barra inferior de iOS */
+            padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+        #screen-home, #screen-add, #screen-settings { padding-left: 24px; padding-right: 24px; }
+        #screen-santuario, #screen-list { padding-left: 0; padding-right: 0; }
+        .screen.active {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-animation: screenIn 0.3s ease;
+            animation: screenIn 0.3s ease;
+        }
+        .screen::-webkit-scrollbar { display: none; }
 
-    .koan { margin-top: auto; padding: 30px 20px 10px; text-align: center; }
-    .koan-text { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; color: var(--indigo-light); font-weight: 400; font-style: italic; line-height: 1.7; }
+        /* ═══════════════ HOME ═══════════════ */
+        .home-header { width: 100%; display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; -webkit-align-items: center; align-items: center; padding: 16px 0 0; margin-top: 10px; }
+        .home-greeting { font-family: 'Shippori Mincho', serif; font-size: 0.88rem; color: var(--indigo); font-weight: 400; letter-spacing: 0.5px; }
+        .home-ver { font-size: 0.55rem; color: var(--indigo-pale); letter-spacing: 1.5px; font-weight: 600; }
 
-    /* ═══════════════ ADD ═══════════════ */
-    .section-header { width: 100%; padding: 20px 0 16px; display: flex; align-items: baseline; gap: 10px; }
-    .section-kanji { font-family: 'Shippori Mincho', serif; font-size: 2.2rem; font-weight: 800; line-height: 1; }
-    .section-word { font-size: 0.6rem; letter-spacing: 4px; color: var(--indigo); text-transform: uppercase; font-weight: 600; padding-bottom: 4px; }
+        .enso-container { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; margin: 28px 0 0; position: relative; }
+        .enso { width: 220px; height: 220px; position: relative; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
+        .enso svg { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; }
+        .enso svg path { stroke-dasharray: 600; -webkit-animation: brushStroke 2s ease-out forwards; animation: brushStroke 2s ease-out forwards; }
+        .enso-center { text-align: center; z-index: 1; }
+        .enso-num { font-family: 'Shippori Mincho', serif; font-size: 3.5rem; font-weight: 800; line-height: 1; letter-spacing: -3px; }
+        .enso-cur { font-size: 2rem; font-weight: 400; }
+        .enso-sub { font-size: 0.55rem; letter-spacing: 6px; color: var(--indigo); text-transform: uppercase; margin-top: 8px; font-weight: 600; }
+        .hanko-seal { position: absolute; bottom: -4px; right: -4px; width: 44px; height: 44px; border: 2px solid var(--vermillion); border-radius: 4px; -webkit-transform: rotate(-6deg); transform: rotate(-6deg); display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--vermillion); font-weight: 800; background: var(--washi); box-shadow: 0 0 0 1px rgba(200,50,50,0.08); line-height: 1; opacity: 0.85; }
 
-    .fg { width: 100%; margin-bottom: 20px; }
-    .fg-label { font-size: 0.55rem; letter-spacing: 3px; color: var(--indigo); text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
-    .fg-input { background: transparent; border: none; border-bottom: 1.5px solid var(--indigo-pale); font-family: 'Shippori Mincho', serif; font-size: 1.25rem; color: var(--ink); padding: 10px 0; width: 100%; outline: none; transition: border-color 0.3s; }
-    .fg-input:focus { border-color: var(--ink); }
-    .fg-input::placeholder { color: var(--indigo-pale); }
+        .stats-row { display: -webkit-flex; display: flex; width: 100%; margin-top: 32px; border-top: 1px solid var(--indigo-ghost); border-bottom: 1px solid var(--indigo-ghost); }
+        .stat-cell { -webkit-flex: 1; flex: 1; text-align: center; padding: 18px 8px; cursor: pointer; -webkit-transition: background var(--transition); transition: background var(--transition); }
+        .stat-cell:active { background: var(--indigo-ghost); }
+        .stat-cell + .stat-cell { border-left: 1px solid var(--indigo-ghost); }
+        .stat-num { font-family: 'Shippori Mincho', serif; font-size: 1.8rem; font-weight: 700; line-height: 1; }
+        .stat-num.red { color: var(--vermillion); }
+        .stat-lbl { font-size: 0.5rem; letter-spacing: 3px; color: var(--indigo); text-transform: uppercase; margin-top: 5px; font-weight: 600; }
 
-    .qty-row { display: flex; align-items: center; gap: 16px; }
-    .q-btn { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid var(--indigo-pale); background: transparent; font-size: 1.3rem; color: var(--indigo); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
-    .q-btn:active { background: var(--ink); color: white; border-color: var(--ink); }
-    .q-val { font-family: 'Shippori Mincho', serif; font-size: 2rem; font-weight: 700; width: 50px; text-align: center; }
+        .koan { margin-top: auto; padding: 30px 20px 10px; text-align: center; }
+        .koan-text { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; color: var(--indigo-light); font-weight: 400; font-style: italic; line-height: 1.7; }
 
-    .chips { display: flex; gap: 8px; overflow-x: auto; width: 100%; padding: 4px 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-    .chips::-webkit-scrollbar { display: none; }
-    .chip { min-width: 72px; height: 90px; background: var(--white); border: 1.5px solid var(--indigo-ghost); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 6px 4px; cursor: pointer; transition: all var(--transition); flex-shrink: 0; border-radius: var(--radius); }
-    .chip svg { width: 24px; height: 24px; stroke: var(--indigo); stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: all var(--transition); }
-    .chip-lbl { font-size: 0.55rem; color: var(--indigo); text-align: center; line-height: 1.15; transition: all var(--transition); }
-    .chip-kj { font-family: 'Shippori Mincho', serif; font-size: 0.55rem; color: var(--indigo-pale); transition: all var(--transition); }
-    .chip.sel { border-color: var(--ink); background: var(--ink); box-shadow: var(--shadow-md); }
-    .chip.sel svg { stroke: #fff; }
-    .chip.sel .chip-lbl { color: #fff; }
-    .chip.sel .chip-kj { color: rgba(255,255,255,0.3); }
+        /* ═══════════════ ADD ═══════════════ */
+        .section-header { width: 100%; padding: 20px 0 16px; display: -webkit-flex; display: flex; -webkit-align-items: baseline; align-items: baseline; margin-top: 10px; }
+        .section-header > * + * { margin-left: 10px; }
+        .section-kanji { font-family: 'Shippori Mincho', serif; font-size: 2.2rem; font-weight: 800; line-height: 1; }
+        .section-word { font-size: 0.6rem; letter-spacing: 4px; color: var(--indigo); text-transform: uppercase; font-weight: 600; padding-bottom: 4px; }
 
-    .dg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
-    .d-btn { padding: 16px 8px; background: var(--white); border: 1.5px solid var(--indigo-ghost); cursor: pointer; text-align: center; font-size: 0.65rem; letter-spacing: 2px; color: var(--indigo); text-transform: uppercase; font-family: 'Noto Sans', sans-serif; transition: all var(--transition); font-weight: 600; border-radius: var(--radius); }
-    .d-btn:active { transform: scale(0.97); }
-    .d-btn.sel { border-color: var(--ink); color: var(--ink); }
-    .d-btn.sel-v { border-color: var(--vermillion); color: var(--vermillion); background: var(--vermillion-pale); }
-    .d-btn.w2 { grid-column: span 2; }
+        .fg { width: 100%; margin-bottom: 20px; }
+        .fg-label { font-size: 0.55rem; letter-spacing: 3px; color: var(--indigo); text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+        .fg-input { background: transparent; border: none; border-bottom: 1.5px solid var(--indigo-pale); font-family: 'Shippori Mincho', serif; font-size: 1.25rem; color: var(--ink); padding: 10px 0; width: 100%; outline: none; -webkit-transition: border-color 0.3s; transition: border-color 0.3s; -webkit-appearance: none; appearance: none; border-radius: 0; }
+        .fg-input:focus { border-color: var(--ink); }
+        .fg-input::placeholder { color: var(--indigo-pale); }
 
-    .pb { width: 100%; display: none; margin-top: 6px; }
-    .pb-inp { background: transparent; border: none; border-bottom: 2px solid var(--vermillion); font-family: 'Shippori Mincho', serif; font-size: 1.5rem; color: var(--vermillion); text-align: center; padding: 10px 0; width: 100%; outline: none; font-weight: 700; }
-    .pb-inp::placeholder { color: rgba(200,50,50,0.2); font-weight: 400; }
+        .qty-row { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
+        .qty-row > * + * { margin-left: 16px; }
+        .q-btn { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid var(--indigo-pale); background: transparent; font-size: 1.3rem; color: var(--indigo); display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; cursor: pointer; -webkit-transition: all 0.15s; transition: all 0.15s; }
+        .q-btn:active { background: var(--ink); color: white; border-color: var(--ink); }
+        .q-val { font-family: 'Shippori Mincho', serif; font-size: 2rem; font-weight: 700; width: 50px; text-align: center; }
 
-    .cta { margin-top: 24px; padding: 18px 52px; background: var(--ink); color: white; border: none; font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 700; transition: all 0.15s; border-radius: var(--radius); }
-    .cta:active { transform: scale(0.97); opacity: 0.9; }
-    .cta.red { background: var(--vermillion); }
-    .cta2 { margin-top: 14px; padding: 14px 30px; background: transparent; border: 1.5px solid var(--indigo-pale); color: var(--indigo); font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 600; border-radius: var(--radius); }
+        .chips { display: -webkit-flex; display: flex; overflow-x: auto; width: 100%; padding: 4px 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .chips > * + * { margin-left: 8px; }
+        .chips::-webkit-scrollbar { display: none; }
+        .chip { min-width: 72px; height: 90px; background: var(--white); border: 1.5px solid var(--indigo-ghost); display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; padding: 6px 4px; cursor: pointer; -webkit-transition: all var(--transition); transition: all var(--transition); -webkit-flex-shrink: 0; flex-shrink: 0; border-radius: var(--radius); }
+        .chip > * + * { margin-top: 6px; }
+        .chip svg { width: 24px; height: 24px; stroke: var(--indigo); stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; -webkit-transition: all var(--transition); transition: all var(--transition); }
+        .chip-lbl { font-size: 0.55rem; color: var(--indigo); text-align: center; line-height: 1.15; -webkit-transition: all var(--transition); transition: all var(--transition); }
+        .chip-kj { font-family: 'Shippori Mincho', serif; font-size: 0.55rem; color: var(--indigo-pale); -webkit-transition: all var(--transition); transition: all var(--transition); }
+        .chip.sel { border-color: var(--ink); background: var(--ink); box-shadow: var(--shadow-md); }
+        .chip.sel svg { stroke: #fff; }
+        .chip.sel .chip-lbl { color: #fff; }
+        .chip.sel .chip-kj { color: rgba(255,255,255,0.3); }
 
-    /* ═══════════════════════════════════════════════
-       茶室 CHASHITSU — Santuario as dark tea room
-       ═══════════════════════════════════════════════ */
+        .dg { display: grid; grid-template-columns: 1fr 1fr; grid-gap: 6px; width: 100%; }
+        .d-btn { padding: 16px 8px; background: var(--white); border: 1.5px solid var(--indigo-ghost); cursor: pointer; text-align: center; font-size: 0.65rem; letter-spacing: 2px; color: var(--indigo); text-transform: uppercase; font-family: 'Noto Sans', sans-serif; -webkit-transition: all var(--transition); transition: all var(--transition); font-weight: 600; border-radius: var(--radius); }
+        .d-btn:active { -webkit-transform: scale(0.97); transform: scale(0.97); }
+        .d-btn.sel { border-color: var(--ink); color: var(--ink); }
+        .d-btn.sel-v { border-color: var(--vermillion); color: var(--vermillion); background: var(--vermillion-pale); }
+        .d-btn.w2 { grid-column: span 2; }
 
-    #screen-santuario {
-        background: var(--cha-bg);
-        animation: thresholdOpen 0.5s ease;
-    }
+        .pb { width: 100%; display: none; margin-top: 6px; }
+        .pb-inp { background: transparent; border: none; border-bottom: 2px solid var(--vermillion); font-family: 'Shippori Mincho', serif; font-size: 1.5rem; color: var(--vermillion); text-align: center; padding: 10px 0; width: 100%; outline: none; font-weight: 700; -webkit-appearance: none; appearance: none; border-radius: 0; }
+        .pb-inp::placeholder { color: rgba(200,50,50,0.2); font-weight: 400; }
 
-    /* Wood grain texture overlay */
-    #screen-santuario::before {
-        content: '';
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 0;
-        opacity: 0.5;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='w'%3E%3CfeTurbulence baseFrequency='0.02 0.2' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23w)' opacity='0.03'/%3E%3C/svg%3E");
-    }
+        .cta { margin-top: 24px; padding: 18px 52px; background: var(--ink); color: white; border: none; font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 700; -webkit-transition: all 0.15s; transition: all 0.15s; border-radius: var(--radius); -webkit-appearance: none; appearance: none; }
+        .cta:active { -webkit-transform: scale(0.97); transform: scale(0.97); opacity: 0.9; }
+        .cta.red { background: var(--vermillion); }
+        .cta2 { margin-top: 14px; padding: 14px 30px; background: transparent; border: 1.5px solid var(--indigo-pale); color: var(--indigo); font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 600; border-radius: var(--radius); -webkit-appearance: none; appearance: none; }
 
-    /* Warm ambient glow — like candlelight in the room */
-    #screen-santuario::after {
-        content: '';
-        position: fixed;
-        top: -50%;
-        left: -20%;
-        width: 140%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 0;
-        background: radial-gradient(ellipse at 50% 20%, rgba(196,162,101,0.04) 0%, transparent 60%);
-        animation: gentleGlow 8s ease-in-out infinite;
-    }
+        /* ═══════════════════════════════════════════════
+           茶室 CHASHITSU — Santuario
+           ═══════════════════════════════════════════════ */
 
-    .cha-header {
-        width: 100%;
-        padding: 36px 28px 20px;
-        text-align: center;
-        position: relative;
-        z-index: 1;
-    }
-    .cha-title {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 3rem;
-        font-weight: 200;
-        color: var(--cha-gold);
-        letter-spacing: 12px;
-        line-height: 1;
-        opacity: 0;
-        animation: chaFadeIn 0.8s ease-out 0.1s forwards;
-    }
-    .cha-sub {
-        font-size: 0.48rem;
-        letter-spacing: 8px;
-        color: var(--cha-gold);
-        text-transform: uppercase;
-        margin-top: 10px;
-        font-weight: 600;
-        opacity: 0;
-        animation: chaFadeIn 0.6s ease-out 0.3s forwards;
-    }
+        #screen-santuario {
+            background: var(--cha-bg);
+        }
 
-    .cha-count {
-        font-family: 'Shippori Mincho', serif;
-        font-size: 0.8rem;
-        color: var(--cha-gold-dim);
-        margin-top: 18px;
-        letter-spacing: 1px;
-        opacity: 0;
-        animation: chaFadeIn 0.5s ease-out 0.5s forwards;
-    }
-    .cha-count em { font-style: normal; color: var(--cha-gold); font-weight: 700; }
+        .cha-glow {
+            position: absolute;
+            top: 0;
+            left: -20%;
+            width: 140%;
+            height: 300px;
+            pointer-events: none;
+            z-index: 0;
+            background: -webkit-radial-gradient(ellipse at 50% 30%, rgba(196,162,101,0.05) 0%, transparent 70%);
+            background: radial-gradient(ellipse at 50% 30%, rgba(196,162,101,0.05) 0%, transparent 70%);
+            -webkit-animation: gentleGlow 8s ease-in-out infinite;
+            animation: gentleGlow 8s ease-in-out infinite;
+        }
 
-    /* Gold kintsugi divider */
-    .cha-kintsugi {
-        width: 60px;
-        height: 1px;
-        background: var(--cha-gold);
-        margin: 18px auto 0;
-        opacity: 0.35;
-        transform-origin: center;
-        animation: goldLine 1s ease-out 0.4s both;
-    }
+        .cha-header {
+            width: 100%;
+            padding: 36px 28px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+        }
+        .cha-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 3rem;
+            font-weight: 200;
+            color: var(--cha-gold);
+            letter-spacing: 12px;
+            line-height: 1;
+        }
+        .cha-sub {
+            font-size: 0.48rem;
+            letter-spacing: 8px;
+            color: var(--cha-gold);
+            text-transform: uppercase;
+            margin-top: 10px;
+            font-weight: 600;
+        }
 
-    /* Search */
-    .cha-search-wrap {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        padding: 12px 28px 0;
-        position: relative;
-        z-index: 1;
-    }
-    .cha-search {
-        width: 100%;
-        max-width: 240px;
-        padding: 10px 0;
-        border: none;
-        border-bottom: 1px solid var(--cha-gold-ghost);
-        background: transparent;
-        font-family: 'Shippori Mincho', serif;
-        font-size: 0.85rem;
-        outline: none;
-        color: var(--cha-gold);
-        text-align: center;
-        letter-spacing: 2px;
-        transition: border-color 0.3s;
-    }
-    .cha-search:focus { border-color: var(--cha-gold-dim); }
-    .cha-search::placeholder { color: var(--cha-gold-ghost); font-size: 0.75rem; letter-spacing: 3px; }
+        .cha-count {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.8rem;
+            color: var(--cha-gold-dim);
+            margin-top: 18px;
+            letter-spacing: 1px;
+        }
+        .cha-count em { font-style: normal; color: var(--cha-gold); font-weight: 700; }
 
-    /* Content area with left tategaki margin */
-    .cha-content {
-        width: 100%;
-        position: relative;
-        z-index: 1;
-        padding: 16px 0;
-    }
+        .cha-kintsugi {
+            width: 60px;
+            height: 1px;
+            background: var(--cha-gold);
+            margin: 18px auto 0;
+            opacity: 0.35;
+        }
 
-    /* Room section */
-    .cha-room {
-        display: flex;
-        width: 100%;
-        min-height: 80px;
-        position: relative;
-        opacity: 0;
-        animation: chaFadeIn 0.5s ease-out both;
-    }
+        .cha-search-wrap {
+            width: 100%;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-justify-content: center;
+            justify-content: center;
+            padding: 12px 28px 0;
+            position: relative;
+            z-index: 1;
+        }
+        .cha-search {
+            width: 100%;
+            max-width: 240px;
+            padding: 10px 0;
+            border: none;
+            border-bottom: 1px solid var(--cha-gold-ghost);
+            background: transparent;
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.85rem;
+            outline: none;
+            color: var(--cha-gold);
+            text-align: center;
+            letter-spacing: 2px;
+            -webkit-transition: border-color 0.3s;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
+            border-radius: 0;
+        }
+        .cha-search:focus { border-color: var(--cha-gold-dim); }
+        .cha-search::placeholder { color: var(--cha-gold-ghost); font-size: 0.75rem; letter-spacing: 3px; }
 
-    /* Tategaki (vertical text) left column */
-    .cha-room-tate {
-        width: 42px;
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 16px;
-        position: relative;
-    }
-    .cha-room-tate::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 1px;
-        height: 100%;
-        background: linear-gradient(to bottom, transparent, var(--cha-gold-dim) 20%, var(--cha-gold-dim) 80%, transparent);
-    }
-    .cha-tate-kj {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 1.1rem;
-        font-weight: 500;
-        color: var(--cha-gold);
-        writing-mode: vertical-rl;
-        letter-spacing: 4px;
-        opacity: 0.7;
-    }
-    .cha-tate-count {
-        font-size: 0.48rem;
-        color: var(--cha-gold-dim);
-        margin-top: 8px;
-        font-weight: 600;
-    }
+        .cha-content {
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            padding: 16px 0;
+        }
 
-    /* Room items column */
-    .cha-room-items {
-        flex: 1;
-        padding: 8px 20px 16px 18px;
-    }
+        .cha-room {
+            display: -webkit-flex;
+            display: flex;
+            width: 100%;
+            min-height: 80px;
+            position: relative;
+        }
 
-    /* Room name — subtle */
-    .cha-room-label {
-        font-family: 'Noto Sans', sans-serif;
-        font-size: 0.52rem;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-        color: var(--cha-gold-dim);
-        font-weight: 600;
-        padding: 8px 0 10px;
-    }
+        .cha-room-tate {
+            width: 42px;
+            -webkit-flex-shrink: 0;
+            flex-shrink: 0;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            -webkit-align-items: center;
+            align-items: center;
+            padding-top: 16px;
+            position: relative;
+        }
+        .cha-room-tate::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: -webkit-linear-gradient(top, transparent, var(--cha-gold-dim) 20%, var(--cha-gold-dim) 80%, transparent);
+            background: linear-gradient(to bottom, transparent, var(--cha-gold-dim) 20%, var(--cha-gold-dim) 80%, transparent);
+        }
+        .cha-tate-kj {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--cha-gold);
+            -webkit-writing-mode: vertical-rl;
+            writing-mode: vertical-rl;
+            letter-spacing: 4px;
+            opacity: 0.7;
+        }
+        .cha-tate-count {
+            font-size: 0.48rem;
+            color: var(--cha-gold-dim);
+            margin-top: 8px;
+            font-weight: 600;
+        }
 
-    /* Object items */
-    .cha-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 13px 0;
-        gap: 10px;
-        position: relative;
-    }
-    .cha-item + .cha-item {
-        border-top: 1px solid var(--cha-gold-ghost);
-    }
+        .cha-room-items {
+            -webkit-flex: 1;
+            flex: 1;
+            padding: 8px 20px 16px 18px;
+        }
 
-    .cha-item-body {
-        flex: 1;
-        min-width: 0;
-    }
-    .cha-item-name {
-        font-family: 'Shippori Mincho', serif;
-        font-size: 0.95rem;
-        color: var(--cha-paper);
-        line-height: 1.4;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .cha-item-meta {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 2px;
-    }
-    .cha-item-qty {
-        font-size: 0.45rem;
-        color: var(--cha-gold);
-        background: var(--cha-gold-ghost);
-        padding: 1px 7px;
-        border-radius: 6px;
-        font-weight: 600;
-    }
-    .cha-item-date {
-        font-size: 0.42rem;
-        color: var(--cha-gold-dim);
-        letter-spacing: 1.5px;
-        font-weight: 600;
-    }
+        .cha-room-label {
+            font-family: 'Noto Sans', sans-serif;
+            font-size: 0.52rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--cha-gold-dim);
+            font-weight: 600;
+            padding: 8px 0 10px;
+        }
 
-    .cha-item-actions {
-        display: flex;
-        gap: 2px;
-        flex-shrink: 0;
-        align-items: center;
-    }
+        .cha-item {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-justify-content: space-between;
+            justify-content: space-between;
+            padding: 13px 0;
+            position: relative;
+        }
+        .cha-item > * + * { margin-left: 10px; }
+        .cha-item + .cha-item {
+            border-top: 1px solid var(--cha-gold-ghost);
+        }
 
-    .cha-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        border: 1px solid transparent;
-        background: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.15s;
-    }
-    .cha-btn svg {
-        width: 17px;
-        height: 17px;
-        stroke: var(--cha-gold-dim);
-        stroke-width: 1.8;
-        fill: none;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        transition: all 0.15s;
-    }
-    .cha-btn:active {
-        background: var(--cha-gold-ghost);
-    }
-    .cha-btn:active svg { stroke: var(--cha-gold); }
-    .cha-btn.danger:active { background: rgba(200,50,50,0.15); }
-    .cha-btn.danger:active svg { stroke: var(--vermillion); }
+        .cha-item-body {
+            -webkit-flex: 1;
+            flex: 1;
+            min-width: 0;
+        }
+        .cha-item-name {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.95rem;
+            color: var(--cha-paper);
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .cha-item-meta {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-align-items: center;
+            align-items: center;
+            margin-top: 2px;
+        }
+        .cha-item-meta > * + * { margin-left: 8px; }
+        .cha-item-qty {
+            font-size: 0.45rem;
+            color: var(--cha-gold);
+            background: var(--cha-gold-ghost);
+            padding: 1px 7px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .cha-item-date {
+            font-size: 0.42rem;
+            color: var(--cha-gold-dim);
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
 
-    /* Kintsugi separator between rooms */
-    .cha-room + .cha-room::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 56px;
-        right: 20px;
-        height: 1px;
-        background: linear-gradient(to right, var(--cha-gold-dim), transparent 70%);
-    }
+        .cha-item-actions {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-shrink: 0;
+            flex-shrink: 0;
+            -webkit-align-items: center;
+            align-items: center;
+        }
+        .cha-item-actions > * + * { margin-left: 2px; }
 
-    /* Empty state */
-    .cha-empty {
-        text-align: center;
-        padding: 80px 32px;
-    }
-    .cha-empty-char {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 5rem;
-        font-weight: 200;
-        color: var(--cha-gold-dim);
-        opacity: 0.06;
-        line-height: 1;
-    }
-    .cha-empty-text {
-        font-family: 'Shippori Mincho', serif;
-        font-size: 0.85rem;
-        color: var(--cha-gold-dim);
-        margin-top: 20px;
-        letter-spacing: 1px;
-        line-height: 2;
-    }
+        .cha-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            background: none;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-transition: all 0.15s;
+            transition: all 0.15s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .cha-btn svg {
+            width: 17px;
+            height: 17px;
+            stroke: var(--cha-gold-dim);
+            stroke-width: 1.8;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            -webkit-transition: all 0.15s;
+            transition: all 0.15s;
+        }
+        .cha-btn:active {
+            background: var(--cha-gold-ghost);
+        }
+        .cha-btn:active svg { stroke: var(--cha-gold); }
+        .cha-btn.danger:active { background: rgba(200,50,50,0.15); }
+        .cha-btn.danger:active svg { stroke: var(--vermillion); }
 
-    /* Bottom ornament */
-    .cha-end {
-        text-align: center;
-        padding: 30px 0 10px;
-    }
-    .cha-end-line {
-        width: 40px;
-        height: 1px;
-        background: var(--cha-gold);
-        opacity: 0.2;
-        margin: 0 auto;
-    }
-    .cha-end-char {
-        font-family: 'Noto Serif JP', serif;
-        font-size: 0.8rem;
-        font-weight: 200;
-        color: var(--cha-gold-dim);
-        margin-top: 12px;
-        letter-spacing: 6px;
-        opacity: 0.35;
-    }
+        .cha-room + .cha-room::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 56px;
+            right: 20px;
+            height: 1px;
+            background: -webkit-linear-gradient(left, var(--cha-gold-dim), transparent 70%);
+            background: linear-gradient(to right, var(--cha-gold-dim), transparent 70%);
+        }
 
-    /* ═══════════════ PROCESS / CUENTAS ═══════════════ */
-    .tabs { display: flex; width: 100%; border-bottom: 1px solid var(--indigo-ghost); }
-    .tab { flex: 1; padding: 16px 0; background: none; border: none; font-size: 0.55rem; letter-spacing: 4px; text-transform: uppercase; color: var(--indigo-pale); cursor: pointer; position: relative; font-family: 'Noto Sans', sans-serif; font-weight: 600; transition: color 0.2s; }
-    .tab::after { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background: var(--vermillion); transition: width 0.3s; }
-    .tab.on { color: var(--ink); }
-    .tab.on::after { width: 30%; }
+        .cha-empty {
+            text-align: center;
+            padding: 80px 32px;
+        }
+        .cha-empty-char {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 5rem;
+            font-weight: 200;
+            color: var(--cha-gold-dim);
+            opacity: 0.15;
+            line-height: 1;
+        }
+        .cha-empty-text {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 0.85rem;
+            color: var(--cha-gold-dim);
+            margin-top: 20px;
+            letter-spacing: 1px;
+            line-height: 2;
+        }
 
-    .list-hdr { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 12px; }
-    .list-t { font-family: 'Shippori Mincho', serif; font-size: 1.1rem; }
-    .list-t small { font-weight: 300; color: var(--indigo); font-size: 0.85rem; }
-    .sp { font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; background: var(--white); border: 1px solid var(--indigo-ghost); padding: 6px 14px; color: var(--indigo); cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 600; transition: all 0.15s; border-radius: var(--radius); }
-    .sp:active { background: var(--ink); color: white; border-color: var(--ink); }
+        .cha-end {
+            text-align: center;
+            padding: 30px 0 10px;
+        }
+        .cha-end-line {
+            width: 40px;
+            height: 1px;
+            background: var(--cha-gold);
+            opacity: 0.2;
+            margin: 0 auto;
+        }
+        .cha-end-char {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 0.8rem;
+            font-weight: 200;
+            color: var(--cha-gold-dim);
+            margin-top: 12px;
+            letter-spacing: 6px;
+            opacity: 0.5;
+        }
 
-    .gh { width: 92%; padding: 18px 0 5px; font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase; color: var(--indigo); font-weight: 700; border-bottom: 1px solid var(--indigo-ghost); margin: 0 auto 6px; display: flex; justify-content: space-between; align-items: baseline; }
-    .gh-n { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; font-weight: 700; color: var(--ink-soft); }
+        /* ═══════════════ PROCESS / CUENTAS ═══════════════ */
+        .tabs { display: -webkit-flex; display: flex; width: 100%; border-bottom: 1px solid var(--indigo-ghost); }
+        .tab { -webkit-flex: 1; flex: 1; padding: 16px 0; background: none; border: none; font-size: 0.55rem; letter-spacing: 4px; text-transform: uppercase; color: var(--indigo-pale); cursor: pointer; position: relative; font-family: 'Noto Sans', sans-serif; font-weight: 600; -webkit-transition: color 0.2s; transition: color 0.2s; -webkit-appearance: none; appearance: none; }
+        .tab::after { content: ''; position: absolute; bottom: -1px; left: 50%; -webkit-transform: translateX(-50%); transform: translateX(-50%); width: 0; height: 2px; background: var(--vermillion); -webkit-transition: width 0.3s; transition: width 0.3s; }
+        .tab.on { color: var(--ink); }
+        .tab.on::after { width: 30%; }
 
-    .ic { width: 92%; margin: 0 auto 6px; background: var(--white); border: 1px solid rgba(107,143,163,0.08); padding: 14px 16px; border-radius: var(--radius); transition: box-shadow var(--transition); }
-    .ic:active { box-shadow: var(--shadow-sm); }
-    .ic-top { display: flex; align-items: center; justify-content: space-between; }
-    .ic-l { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-    .ic-i svg { width: 18px; height: 18px; stroke: var(--vermillion); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-    .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ic-q { font-size: 0.55rem; color: var(--indigo); background: var(--indigo-ghost); padding: 1px 6px; border-radius: 8px; font-weight: 600; flex-shrink: 0; }
-    .ic-d { font-size: 0.55rem; color: var(--indigo-pale); letter-spacing: 1px; flex-shrink: 0; }
-    .ic-d.alert { color: var(--vermillion); font-weight: 700; }
-    .ic-bot { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(107,143,163,0.06); }
-    .ic-m { font-size: 0.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(--indigo-pale); font-weight: 600; }
-    .ic-p { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; color: var(--indigo); }
-    .ic-p.won { color: var(--vermillion); font-weight: 700; }
-    .ic-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+        .list-hdr { width: 100%; display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; -webkit-align-items: center; align-items: center; padding: 16px 20px 12px; }
+        .list-t { font-family: 'Shippori Mincho', serif; font-size: 1.1rem; }
+        .list-t small { font-weight: 300; color: var(--indigo); font-size: 0.85rem; }
+        .sp { font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; background: var(--white); border: 1px solid var(--indigo-ghost); padding: 6px 14px; color: var(--indigo); cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 600; -webkit-transition: all 0.15s; transition: all 0.15s; border-radius: var(--radius); -webkit-appearance: none; appearance: none; }
+        .sp:active { background: var(--ink); color: white; border-color: var(--ink); }
 
-    .ib { background: none; border: none; font-size: 1rem; color: var(--indigo-pale); cursor: pointer; padding: 4px; transition: color 0.15s; }
-    .ib:active { color: var(--ink); }
+        .gh { width: 92%; padding: 18px 0 5px; font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase; color: var(--indigo); font-weight: 700; border-bottom: 1px solid var(--indigo-ghost); margin: 0 auto 6px; display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; -webkit-align-items: baseline; align-items: baseline; }
+        .gh-n { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; font-weight: 700; color: var(--ink-soft); }
 
-    .cb { background: none; border: 1px solid var(--indigo-ghost); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
-    .cb svg { width: 20px; height: 20px; stroke: var(--indigo); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-    .cb:active { background: var(--indigo-ghost); transform: scale(0.93); }
-    .cb.price-edit { border-color: rgba(200,50,50,0.2); }
-    .cb.price-edit svg { stroke: var(--vermillion); }
-    .cb.price-edit:active { background: var(--vermillion-pale); }
-    .cb.del { border-color: rgba(200,50,50,0.15); }
-    .cb.del svg { stroke: var(--vermillion); }
-    .cb.del:active { background: var(--vermillion-pale); }
+        .ic { width: 92%; margin: 0 auto 6px; background: var(--white); border: 1px solid rgba(107,143,163,0.08); padding: 14px 16px; border-radius: var(--radius); -webkit-transition: box-shadow var(--transition); transition: box-shadow var(--transition); }
+        .ic:active { box-shadow: var(--shadow-sm); }
+        .ic-top { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; }
+        .ic-l { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-flex: 1; flex: 1; min-width: 0; }
+        .ic-l > * + * { margin-left: 8px; }
+        .ic-i svg { width: 18px; height: 18px; stroke: var(--vermillion); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ic-q { font-size: 0.55rem; color: var(--indigo); background: var(--indigo-ghost); padding: 1px 6px; border-radius: 8px; font-weight: 600; -webkit-flex-shrink: 0; flex-shrink: 0; }
+        .ic-d { font-size: 0.55rem; color: var(--indigo-pale); letter-spacing: 1px; -webkit-flex-shrink: 0; flex-shrink: 0; }
+        .ic-d.alert { color: var(--vermillion); font-weight: 700; }
+        .ic-bot { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(107,143,163,0.06); }
+        .ic-m { font-size: 0.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(--indigo-pale); font-weight: 600; }
+        .ic-p { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; color: var(--indigo); }
+        .ic-p.won { color: var(--vermillion); font-weight: 700; }
+        .ic-btns { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-flex-wrap: wrap; flex-wrap: wrap; -webkit-justify-content: flex-end; justify-content: flex-end; }
+        .ic-btns > * + * { margin-left: 8px; }
 
-    .ab { padding: 6px 16px; border: none; font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 700; border-radius: var(--radius); transition: all 0.15s; }
-    .ab.dk { background: var(--ink); color: white; }
-    .ab.rd { background: var(--vermillion); color: white; }
-    .ab:active { transform: scale(0.96); opacity: 0.9; }
+        .ib { background: none; border: none; font-size: 1rem; color: var(--indigo-pale); cursor: pointer; padding: 4px; -webkit-transition: color 0.15s; transition: color 0.15s; -webkit-appearance: none; appearance: none; }
+        .ib:active { color: var(--ink); }
 
-    .as { display: flex; width: 92%; margin: 14px auto; background: var(--white); border: 1px solid rgba(107,143,163,0.08); overflow: hidden; border-radius: var(--radius); }
-    .as-h { flex: 1; padding: 18px; text-align: center; }
-    .as-h + .as-h { border-left: 1px solid rgba(107,143,163,0.06); }
-    .as-v { font-family: 'Shippori Mincho', serif; font-size: 1.7rem; font-weight: 700; }
-    .as-v.red { color: var(--vermillion); }
-    .as-l { font-size: 0.48rem; letter-spacing: 2px; text-transform: uppercase; color: var(--indigo-pale); margin-top: 3px; font-weight: 600; }
+        .cb { background: none; border: 1px solid var(--indigo-ghost); width: 42px; height: 42px; border-radius: 50%; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; cursor: pointer; -webkit-transition: all 0.15s; transition: all 0.15s; -webkit-flex-shrink: 0; flex-shrink: 0; -webkit-appearance: none; appearance: none; }
+        .cb svg { width: 20px; height: 20px; stroke: var(--indigo); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .cb:active { background: var(--indigo-ghost); -webkit-transform: scale(0.93); transform: scale(0.93); }
+        .cb.price-edit { border-color: rgba(200,50,50,0.2); }
+        .cb.price-edit svg { stroke: var(--vermillion); }
+        .cb.price-edit:active { background: var(--vermillion-pale); }
+        .cb.del { border-color: rgba(200,50,50,0.15); }
+        .cb.del svg { stroke: var(--vermillion); }
+        .cb.del:active { background: var(--vermillion-pale); }
 
-    .mt { margin-top: 60px; text-align: center; font-family: 'Shippori Mincho', serif; color: var(--indigo-pale); font-size: 0.95rem; }
-    .mt-k { font-size: 2.8rem; opacity: 0.3; margin-bottom: 8px; }
+        .ab { padding: 6px 16px; border: none; font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 700; border-radius: var(--radius); -webkit-transition: all 0.15s; transition: all 0.15s; -webkit-appearance: none; appearance: none; }
+        .ab.dk { background: var(--ink); color: white; }
+        .ab.rd { background: var(--vermillion); color: white; }
+        .ab:active { -webkit-transform: scale(0.96); transform: scale(0.96); opacity: 0.9; }
 
-    /* ═══════════════ SETTINGS ═══════════════ */
-    .s-desc { font-size: 0.8rem; color: var(--indigo); line-height: 1.7; margin-bottom: 30px; }
-    .s-alert { color: var(--vermillion); font-weight: 700; font-size: 0.75rem; display: none; margin-top: 8px; }
-    .s-section { width: 100%; margin-bottom: 36px; }
-    .s-section-t { font-size: 0.55rem; letter-spacing: 3px; color: var(--indigo-pale); text-transform: uppercase; font-weight: 600; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--indigo-ghost); }
-    .s-stat-row { display: flex; justify-content: space-between; padding: 10px 0; }
-    .s-stat-label { font-size: 0.85rem; color: var(--ink-soft); }
-    .s-stat-val { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; font-weight: 700; }
-    .s-stat-val.red { color: var(--vermillion); }
+        .as { display: -webkit-flex; display: flex; width: 92%; margin: 14px auto; background: var(--white); border: 1px solid rgba(107,143,163,0.08); overflow: hidden; border-radius: var(--radius); }
+        .as-h { -webkit-flex: 1; flex: 1; padding: 18px; text-align: center; }
+        .as-h + .as-h { border-left: 1px solid rgba(107,143,163,0.06); }
+        .as-v { font-family: 'Shippori Mincho', serif; font-size: 1.7rem; font-weight: 700; }
+        .as-v.red { color: var(--vermillion); }
+        .as-l { font-size: 0.48rem; letter-spacing: 2px; text-transform: uppercase; color: var(--indigo-pale); margin-top: 3px; font-weight: 600; }
 
-    /* ═══════════════ OVERLAYS ═══════════════ */
-    .ov { position: fixed; inset: 0; background: rgba(247,245,240,0.97); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: none; flex-direction: column; align-items: center; padding: 40px 24px; overflow-y: auto; }
-    .ov.visible { display: flex; animation: fadeIn 0.25s ease-out; }
-    .ov-t { font-family: 'Shippori Mincho', serif; font-size: 1.4rem; font-weight: 300; margin-bottom: 28px; letter-spacing: 2px; }
+        .mt { margin-top: 60px; text-align: center; font-family: 'Shippori Mincho', serif; color: var(--indigo-pale); font-size: 0.95rem; }
+        .mt-k { font-size: 2.8rem; opacity: 0.3; margin-bottom: 8px; }
 
-    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: white; padding: 12px 26px; border-radius: 24px; font-size: 0.8rem; font-family: 'Noto Sans', sans-serif; z-index: 5000; opacity: 0; transition: all 0.3s ease; pointer-events: none; white-space: nowrap; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        /* ═══════════════ SETTINGS ═══════════════ */
+        .s-desc { font-size: 0.8rem; color: var(--indigo); line-height: 1.7; margin-bottom: 30px; }
+        .s-alert { color: var(--vermillion); font-weight: 700; font-size: 0.75rem; display: none; margin-top: 8px; }
+        .s-section { width: 100%; margin-bottom: 36px; }
+        .s-section-t { font-size: 0.55rem; letter-spacing: 3px; color: var(--indigo-pale); text-transform: uppercase; font-weight: 600; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--indigo-ghost); }
+        .s-stat-row { display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; padding: 10px 0; }
+        .s-stat-label { font-size: 0.85rem; color: var(--ink-soft); }
+        .s-stat-val { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; font-weight: 700; }
+        .s-stat-val.red { color: var(--vermillion); }
 
-    /* ═══════════════ NAV ═══════════════ */
-    .nav { position: fixed; bottom: 0; width: 100%; height: 72px; background: var(--washi); border-top: 1px solid var(--indigo-ghost); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 8px); }
-    .nav.dark-mode { background: var(--cha-bg); border-top-color: var(--cha-gold-ghost); }
-    .nav.dark-mode .ni svg { stroke: var(--cha-gold-dim); }
-    .nav.dark-mode .ni .nt { color: var(--cha-gold-dim); }
-    .nav.dark-mode .ni.on svg { stroke: var(--cha-gold); }
-    .nav.dark-mode .ni.on .nt { color: var(--cha-gold); }
-    .ni { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; position: relative; padding: 8px 16px; }
-    .ni svg { width: 22px; height: 22px; stroke: var(--indigo-pale); stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke var(--transition); }
-    .ni .nt { font-size: 0.45rem; letter-spacing: 1.5px; color: var(--indigo-pale); transition: color var(--transition); text-transform: uppercase; font-weight: 600; margin-top: 2px; }
-    .ni.on svg { stroke: var(--vermillion); }
-    .ni.on .nt { color: var(--vermillion); }
-    .nd { position: absolute; top: 2px; right: 8px; width: 6px; height: 6px; background: var(--vermillion); border-radius: 50%; display: none; }
-</style>
-```
+        /* ═══════════════ OVERLAYS ═══════════════ */
+        .ov { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(247,245,240,0.97); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); z-index: 2000; display: none; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; padding: 40px 24px; overflow-y: auto; padding-top: calc(40px + env(safe-area-inset-top, 0px)); }
+        .ov.visible { display: -webkit-flex; display: flex; -webkit-animation: fadeIn 0.25s ease-out; animation: fadeIn 0.25s ease-out; }
+        .ov-t { font-family: 'Shippori Mincho', serif; font-size: 1.4rem; font-weight: 300; margin-bottom: 28px; letter-spacing: 2px; }
 
+        .toast { position: fixed; bottom: 90px; left: 50%; -webkit-transform: translateX(-50%) translateY(20px); transform: translateX(-50%) translateY(20px); background: var(--ink); color: white; padding: 12px 26px; border-radius: 24px; font-size: 0.8rem; font-family: 'Noto Sans', sans-serif; z-index: 5000; opacity: 0; -webkit-transition: all 0.3s ease; transition: all 0.3s ease; pointer-events: none; white-space: nowrap; margin-bottom: env(safe-area-inset-bottom, 0px); }
+        .toast.show { opacity: 1; -webkit-transform: translateX(-50%) translateY(0); transform: translateX(-50%) translateY(0); }
+
+        /* ═══════════════ NAV ═══════════════ */
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; height: 72px; background: var(--washi); border-top: 1px solid var(--indigo-ghost); display: -webkit-flex; display: flex; -webkit-justify-content: space-around; justify-content: space-around; -webkit-align-items: center; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 8px); }
+        .nav.dark-mode { background: var(--cha-bg); border-top-color: var(--cha-gold-ghost); }
+        .nav.dark-mode .ni svg { stroke: var(--cha-gold-dim); }
+        .nav.dark-mode .ni .nt { color: var(--cha-gold-dim); }
+        .nav.dark-mode .ni.on svg { stroke: var(--cha-gold); }
+        .nav.dark-mode .ni.on .nt { color: var(--cha-gold); }
+        .ni { background: none; border: none; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; cursor: pointer; position: relative; padding: 8px 16px; -webkit-appearance: none; appearance: none; }
+        .ni svg { width: 22px; height: 22px; stroke: var(--indigo-pale); stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; -webkit-transition: stroke var(--transition); transition: stroke var(--transition); }
+        .ni .nt { font-size: 0.45rem; letter-spacing: 1.5px; color: var(--indigo-pale); -webkit-transition: color var(--transition); transition: color var(--transition); text-transform: uppercase; font-weight: 600; margin-top: 2px; }
+        .ni.on svg { stroke: var(--vermillion); }
+        .ni.on .nt { color: var(--vermillion); }
+        .nd { position: absolute; top: 2px; right: 8px; width: 6px; height: 6px; background: var(--vermillion); border-radius: 50%; display: none; }
+    </style>
 </head>
 <body>
 
@@ -599,14 +637,14 @@
     <div class="home-header"><div class="home-greeting jp" id="greeting">空白</div><div class="home-ver">v23</div></div>
     <div class="enso-container">
         <div class="enso">
-            <svg viewBox="0 0 200 200"><path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/><path d="M78 13 C81 12,84 12,88 13" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.2"/></svg>
+            <svg viewBox="0 0 200 200"><path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13" stroke="#0a0a0a" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/><path d="M78 13 C81 12,84 12,88 13" stroke="#0a0a0a" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.2"/></svg>
             <div class="enso-center"><div class="enso-num jp" id="total-money"><span class="enso-cur">€</span>0</div><div class="enso-sub">ganado</div></div>
         </div>
         <div class="hanko-seal">空<br>白</div>
     </div>
     <div class="stats-row">
-        <div class="stat-cell" onclick="go('screen-santuario', navButtons[2])"><div class="stat-num jp" id="stat-kept">0</div><div class="stat-lbl">santuario</div></div>
-        <div class="stat-cell" onclick="go('screen-list', navButtons[3])"><div class="stat-num jp" id="stat-pending">0</div><div class="stat-lbl">pendiente</div></div>
+        <div class="stat-cell" onclick="go('screen-santuario',navButtons[2])"><div class="stat-num jp" id="stat-kept">0</div><div class="stat-lbl">santuario</div></div>
+        <div class="stat-cell" onclick="go('screen-list',navButtons[3])"><div class="stat-num jp" id="stat-pending">0</div><div class="stat-lbl">pendiente</div></div>
         <div class="stat-cell"><div class="stat-num jp red" id="stat-sold">0</div><div class="stat-lbl">vendidos</div></div>
     </div>
     <div class="koan"><div class="koan-text jp" id="koan-text"></div></div>
@@ -623,6 +661,7 @@
 </div>
 
 <div id="screen-santuario" class="screen">
+    <div class="cha-glow"></div>
     <div class="cha-header">
         <div class="cha-title jp">聖域</div>
         <div class="cha-sub">santuario</div>
@@ -638,14 +677,14 @@
 <div id="screen-list" class="screen">
     <div class="tabs"><button class="tab on" onclick="switchTab('process')">Proceso</button><button class="tab" onclick="switchTab('sold')">Cuentas</button></div>
     <div class="list-hdr" id="list-header"><div class="list-t jp">進行 <small>proceso</small></div><button class="sp" id="sort-btn" onclick="toggleSort()">Fecha ↓</button></div>
-    <div id="list-content" style="width:100%;display:flex;flex-direction:column;align-items:center;padding:0 0 10px;"></div>
+    <div id="list-content" style="width:100%;display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column;-webkit-align-items:center;align-items:center;padding:0 0 10px;"></div>
 </div>
 
 <div id="screen-settings" class="screen">
     <div class="section-header"><div class="section-kanji jp">控</div><div class="section-word">ajustes</div></div>
     <div class="s-section"><div class="s-section-t">resumen</div><div class="s-stat-row"><span class="s-stat-label">Objetos en santuario</span><span class="s-stat-val jp" id="ss-kept">0</span></div><div class="s-stat-row"><span class="s-stat-label">En proceso</span><span class="s-stat-val jp" id="ss-pend">0</span></div><div class="s-stat-row"><span class="s-stat-label">Completados</span><span class="s-stat-val jp" id="ss-done">0</span></div><div class="s-stat-row"><span class="s-stat-label">Total ganado</span><span class="s-stat-val jp red" id="ss-earn">0€</span></div></div>
     <div class="s-section"><div class="s-section-t">datos</div><div class="s-desc">Guarda una copia de tus datos para no perderlos.<div class="s-alert" id="backup-status">Copia recomendada</div></div><button class="cta" onclick="exportData()" style="width:100%">GUARDAR COPIA</button><input type="file" id="file-input" style="display:none" accept=".json" onchange="importData(this)"><button class="cta2" onclick="document.getElementById('file-input').click()" style="width:100%;margin-top:10px">CARGAR COPIA</button></div>
-    <div class="s-section"><div class="s-section-t">zona de peligro</div><button class="cta red" onclick="confirmAction('¿Borrar TODOS los datos? Esta acción es irreversible.', resetAll)" style="width:100%">BORRAR TODO</button></div>
+    <div class="s-section"><div class="s-section-t">zona de peligro</div><button class="cta red" onclick="confirmAction('¿Borrar TODOS los datos? Esta acción es irreversible.',resetAll)" style="width:100%">BORRAR TODO</button></div>
 </div>
 
 <div id="ov-edit" class="ov">
@@ -655,8 +694,21 @@
     <div class="fg" style="max-width:340px"><div class="fg-label">espacio</div><div class="chips" id="ed-chips"></div></div>
     <button class="cta" onclick="saveEdit()">GUARDAR</button><button class="cta2" onclick="closeOverlay('ov-edit')">CANCELAR</button>
 </div>
-<div id="ov-sold" class="ov" style="justify-content:center;z-index:3000;"><div class="ov-t jp">売 Vendido</div><p style="font-size:0.8rem;color:var(--indigo);margin-bottom:20px;">¿Precio final de venta?</p><div class="fg" style="max-width:260px"><input class="pb-inp jp" type="number" id="sold-price" placeholder="0€" inputmode="decimal" style="font-size:2.4rem;"></div><button class="cta red" onclick="confirmSold()">CONFIRMAR</button><button class="cta2" onclick="closeOverlay('ov-sold')">CANCELAR</button></div>
-<div id="ov-confirm" class="ov" style="justify-content:center;z-index:3500;"><div class="ov-t jp" id="confirm-title">確認</div><p style="font-size:0.9rem;color:var(--indigo);margin-bottom:24px;text-align:center;" id="confirm-msg"></p><button class="cta" id="confirm-yes" style="min-width:200px;">CONFIRMAR</button><button class="cta2" onclick="closeOverlay('ov-confirm')" style="min-width:200px;">CANCELAR</button></div>
+
+<div id="ov-sold" class="ov" style="justify-content:center;z-index:3000;">
+    <div class="ov-t jp">売 Vendido</div>
+    <p style="font-size:0.8rem;color:var(--indigo);margin-bottom:20px;">¿Precio final de venta?</p>
+    <div class="fg" style="max-width:260px"><input class="pb-inp jp" type="number" id="sold-price" placeholder="0€" inputmode="decimal" style="font-size:2.4rem;"></div>
+    <button class="cta red" onclick="confirmSold()">CONFIRMAR</button>
+    <button class="cta2" onclick="closeOverlay('ov-sold')">CANCELAR</button>
+</div>
+
+<div id="ov-confirm" class="ov" style="justify-content:center;z-index:3500;">
+    <div class="ov-t jp" id="confirm-title">確認</div>
+    <p style="font-size:0.9rem;color:var(--indigo);margin-bottom:24px;text-align:center;" id="confirm-msg"></p>
+    <button class="cta" id="confirm-yes" style="min-width:200px;">CONFIRMAR</button>
+    <button class="cta2" onclick="closeOverlay('ov-confirm')" style="min-width:200px;">CANCELAR</button>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -669,166 +721,660 @@
 </nav>
 
 <script>
-const ICONS={living:'<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 013-3h10a3 3 0 013 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 011-1h10a1 1 0 011 1v3"/></svg>',bedroom:'<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/></svg>',kitchen:'<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/><path d="M12 5V3"/></svg>',bath:'<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 01-4 4H8a4 4 0 01-4-4v-4z"/><path d="M7 14V9a2 2 0 012-2h1"/></svg>',study:'<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M6 16v5M18 16v5"/><path d="M14 14V9a2 2 0 00-2-2H8"/></svg>',garden:'<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 00-5-5 4 4 0 01-3-3 4 4 0 018 0 4 4 0 018 0 4 4 0 01-3 3 5 5 0 00-5 5z"/><path d="M8 21h8"/></svg>',pantry:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16M4 16h16"/></svg>',garage:'<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16M4 14h16M4 18h16"/></svg>',terrace:'<svg viewBox="0 0 24 24"><path d="M4 16h16M4 20h16"/><path d="M6 16v4M10 16v4M14 16v4M18 16v4"/><path d="M12 8v8"/></svg>',basement:'<svg viewBox="0 0 24 24"><path d="M3 5h4v4h4v4h4v4h4"/><path d="M3 5v14h16"/></svg>',dining:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M12 10V6M9 6h6"/><path d="M12 18v4M8 22h8"/></svg>',entrance:'<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h1"/><path d="M5 20h14"/></svg>',edit:'<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',logout:'<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',close:'<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',price:'<svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',temple:'<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',back:'<svg viewBox="0 0 24 24"><path d="M3 12h12"/><path d="M3 12l5-5"/><path d="M3 12l5 5"/><path d="M21 5v14"/></svg>'};
+var ICONS = {
+    living: '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 013-3h10a3 3 0 013 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 011-1h10a1 1 0 011 1v3"/></svg>',
+    bedroom: '<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/></svg>',
+    kitchen: '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/><path d="M12 5V3"/></svg>',
+    bath: '<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 01-4 4H8a4 4 0 01-4-4v-4z"/><path d="M7 14V9a2 2 0 012-2h1"/></svg>',
+    study: '<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M6 16v5M18 16v5"/><path d="M14 14V9a2 2 0 00-2-2H8"/></svg>',
+    garden: '<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 00-5-5 4 4 0 01-3-3 4 4 0 018 0 4 4 0 018 0 4 4 0 01-3 3 5 5 0 00-5 5z"/><path d="M8 21h8"/></svg>',
+    pantry: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16M4 16h16"/></svg>',
+    garage: '<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16M4 14h16M4 18h16"/></svg>',
+    terrace: '<svg viewBox="0 0 24 24"><path d="M4 16h16M4 20h16"/><path d="M6 16v4M10 16v4M14 16v4M18 16v4"/><path d="M12 8v8"/></svg>',
+    basement: '<svg viewBox="0 0 24 24"><path d="M3 5h4v4h4v4h4v4h4"/><path d="M3 5v14h16"/></svg>',
+    dining: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M12 10V6M9 6h6"/><path d="M12 18v4M8 22h8"/></svg>',
+    entrance: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h1"/><path d="M5 20h14"/></svg>',
+    edit: '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
+    logout: '<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+    close: '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    price: '<svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
+    temple: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
+    back: '<svg viewBox="0 0 24 24"><path d="M3 12h12"/><path d="M3 12l5-5"/><path d="M3 12l5 5"/><path d="M21 5v14"/></svg>'
+};
 
-const SPACES=[{id:'living',icon:ICONS.living,label:'Sala',kj:'居間'},{id:'bedroom',icon:ICONS.bedroom,label:'Dormitorio',kj:'寝室'},{id:'kitchen',icon:ICONS.kitchen,label:'Cocina',kj:'台所'},{id:'bath',icon:ICONS.bath,label:'Baño',kj:'浴室'},{id:'study',icon:ICONS.study,label:'Estudio',kj:'書斎'},{id:'garden',icon:ICONS.garden,label:'Jardín',kj:'庭園'},{id:'pantry',icon:ICONS.pantry,label:'Despensa',kj:'貯蔵'},{id:'garage',icon:ICONS.garage,label:'Garaje',kj:'車庫'},{id:'terrace',icon:ICONS.terrace,label:'Terraza',kj:'テラス'},{id:'basement',icon:ICONS.basement,label:'Sótano',kj:'地下室'},{id:'dining',icon:ICONS.dining,label:'Comedor',kj:'食堂'},{id:'entrance',icon:ICONS.entrance,label:'Entrada',kj:'玄関'}];
+var SPACES = [
+    { id: 'living', icon: ICONS.living, label: 'Sala', kj: '居間' },
+    { id: 'bedroom', icon: ICONS.bedroom, label: 'Dormitorio', kj: '寝室' },
+    { id: 'kitchen', icon: ICONS.kitchen, label: 'Cocina', kj: '台所' },
+    { id: 'bath', icon: ICONS.bath, label: 'Baño', kj: '浴室' },
+    { id: 'study', icon: ICONS.study, label: 'Estudio', kj: '書斎' },
+    { id: 'garden', icon: ICONS.garden, label: 'Jardín', kj: '庭園' },
+    { id: 'pantry', icon: ICONS.pantry, label: 'Despensa', kj: '貯蔵' },
+    { id: 'garage', icon: ICONS.garage, label: 'Garaje', kj: '車庫' },
+    { id: 'terrace', icon: ICONS.terrace, label: 'Terraza', kj: 'テラス' },
+    { id: 'basement', icon: ICONS.basement, label: 'Sótano', kj: '地下室' },
+    { id: 'dining', icon: ICONS.dining, label: 'Comedor', kj: '食堂' },
+    { id: 'entrance', icon: ICONS.entrance, label: 'Entrada', kj: '玄関' }
+];
 
-const DECISIONS=[{id:'conservar',label:'Conservar'},{id:'regalar',label:'Regalar'},{id:'donar',label:'Donar'},{id:'tirar',label:'Tirar'},{id:'vender',label:'Vender',wide:true}];
-const GROUP_LABELS={vender:'Vender',donar:'Donar',regalar:'Regalar',tirar:'Tirar'};
-const GROUP_KJ={vender:'売',donar:'寄',regalar:'贈',tirar:'捨'};
-const KOANS=['Poseer menos no es perder, es encontrar espacio para lo esencial.','El vacío no es ausencia. Es posibilidad.','Lo que sueltas con gratitud vuelve como libertad.','Cada objeto que liberas es un paso hacia la claridad.','El espacio vacío es el más valioso de la casa.','Simplificar es el arte de saber qué merece quedarse.','No se trata de tener poco, sino de tener lo justo.'];
+var DECISIONS = [
+    { id: 'conservar', label: 'Conservar' },
+    { id: 'regalar', label: 'Regalar' },
+    { id: 'donar', label: 'Donar' },
+    { id: 'tirar', label: 'Tirar' },
+    { id: 'vender', label: 'Vender', wide: true }
+];
 
-let db=[];
-let state={currentAction:null,currentTab:'process',addSpace:'living',editSpace:'living',editId:null,soldId:null,addQty:1,editQty:1,lastBackup:0,changesSinceBackup:0,sortMode:'date',confirmCallback:null};
-const navButtons=document.querySelectorAll('.ni');
+var GROUP_LABELS = { vender: 'Vender', donar: 'Donar', regalar: 'Regalar', tirar: 'Tirar' };
+var GROUP_KJ = { vender: '売', donar: '寄', regalar: '贈', tirar: '捨' };
+var KOANS = [
+    'Poseer menos no es perder, es encontrar espacio para lo esencial.',
+    'El vacío no es ausencia. Es posibilidad.',
+    'Lo que sueltas con gratitud vuelve como libertad.',
+    'Cada objeto que liberas es un paso hacia la claridad.',
+    'El espacio vacío es el más valioso de la casa.',
+    'Simplificar es el arte de saber qué merece quedarse.',
+    'No se trata de tener poco, sino de tener lo justo.'
+];
 
-function loadData(){try{const r=localStorage.getItem('kuhakuDB');if(r)db=JSON.parse(r);const m=localStorage.getItem('kuhakuMeta');if(m){const p=JSON.parse(m);state.lastBackup=p.lastBackup||0;state.changesSinceBackup=p.changes||0;}}catch{db=[];}}
-function saveData(){localStorage.setItem('kuhakuDB',JSON.stringify(db));state.changesSinceBackup++;localStorage.setItem('kuhakuMeta',JSON.stringify({lastBackup:state.lastBackup,changes:state.changesSinceBackup}));checkBackupStatus();updateHome();}
-function findItem(id){return db.find(i=>i.id===id);}
+var db = [];
+var state = {
+    currentAction: null,
+    currentTab: 'process',
+    addSpace: 'living',
+    editSpace: 'living',
+    editId: null,
+    soldId: null,
+    addQty: 1,
+    editQty: 1,
+    lastBackup: 0,
+    changesSinceBackup: 0,
+    sortMode: 'date',
+    confirmCallback: null
+};
 
-let toastTimer=null;
-function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2000);}
-function checkBackupStatus(){const d=(Date.now()-state.lastBackup)/864e5;const n=(state.changesSinceBackup>5)||(d>7&&state.changesSinceBackup>0);document.getElementById('settings-dot').style.display=n?'block':'none';document.getElementById('backup-status').style.display=n?'block':'none';}
+var navButtons = document.querySelectorAll('.ni');
 
-function go(screenId,btn){
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+function loadData() {
+    try {
+        var r = localStorage.getItem('kuhakuDB');
+        if (r) db = JSON.parse(r);
+        var m = localStorage.getItem('kuhakuMeta');
+        if (m) {
+            var p = JSON.parse(m);
+            state.lastBackup = p.lastBackup || 0;
+            state.changesSinceBackup = p.changes || 0;
+        }
+    } catch (e) {
+        db = [];
+    }
+}
+
+function saveData() {
+    localStorage.setItem('kuhakuDB', JSON.stringify(db));
+    state.changesSinceBackup++;
+    localStorage.setItem('kuhakuMeta', JSON.stringify({ lastBackup: state.lastBackup, changes: state.changesSinceBackup }));
+    checkBackupStatus();
+    updateHome();
+}
+
+function findItem(id) {
+    for (var i = 0; i < db.length; i++) {
+        if (db[i].id === id) return db[i];
+    }
+    return null;
+}
+
+var toastTimer = null;
+function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+        el.classList.remove('show');
+    }, 2000);
+}
+
+function checkBackupStatus() {
+    var d = (Date.now() - state.lastBackup) / 864e5;
+    var n = (state.changesSinceBackup > 5) || (d > 7 && state.changesSinceBackup > 0);
+    document.getElementById('settings-dot').style.display = n ? 'block' : 'none';
+    document.getElementById('backup-status').style.display = n ? 'block' : 'none';
+}
+
+function go(screenId, btn) {
+    var screens = document.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
     document.getElementById(screenId).classList.add('active');
-    navButtons.forEach(b=>b.classList.remove('on'));
-    if(btn)btn.classList.add('on');
-    // Dark nav for sanctuary
-    const nav=document.getElementById('main-nav');
-    if(screenId==='screen-santuario'){nav.classList.add('dark-mode');}
-    else{nav.classList.remove('dark-mode');}
-    if(screenId==='screen-list')renderList();
-    if(screenId==='screen-santuario')renderSantuario();
+    for (var i = 0; i < navButtons.length; i++) navButtons[i].classList.remove('on');
+    if (btn) btn.classList.add('on');
+    
+    var nav = document.getElementById('main-nav');
+    if (screenId === 'screen-santuario') {
+        nav.classList.add('dark-mode');
+    } else {
+        nav.classList.remove('dark-mode');
+    }
+    if (screenId === 'screen-list') renderList();
+    if (screenId === 'screen-santuario') renderSantuario();
 }
 
-function renderChips(cid,sel,onSel){const c=document.getElementById(cid);c.innerHTML='';SPACES.forEach(s=>{const ch=document.createElement('div');ch.className='chip'+(s.id===sel?' sel':'');ch.innerHTML=`${s.icon}<div class="chip-lbl">${s.label}</div><div class="chip-kj">${s.kj}</div>`;ch.onclick=()=>onSel(s.id);c.appendChild(ch);});}
-function refreshAllChips(){renderChips('add-chips',state.addSpace,id=>{state.addSpace=id;refreshAllChips();});renderChips('ed-chips',state.editSpace,id=>{state.editSpace=id;refreshAllChips();});}
-
-function renderDecisionGrid(){const g=document.getElementById('decision-grid');g.innerHTML='';DECISIONS.forEach(d=>{const b=document.createElement('button');b.className='d-btn'+(d.wide?' w2':'');b.textContent=d.label;b.onclick=()=>selectDecision(b,d.id);g.appendChild(b);});}
-function selectDecision(btn,action){document.querySelectorAll('.d-btn').forEach(b=>b.classList.remove('sel','sel-v'));if(action==='vender'){btn.classList.add('sel-v');document.getElementById('price-box').style.display='block';}else{btn.classList.add('sel');document.getElementById('price-box').style.display='none';}state.currentAction=action;}
-function adjustQty(mode,delta){if(mode==='add'){state.addQty=Math.max(1,state.addQty+delta);document.getElementById('add-qty').textContent=state.addQty;}else{state.editQty=Math.max(1,state.editQty+delta);document.getElementById('edit-qty').textContent=state.editQty;}}
-
-function saveNewItem(){
-    const name=document.getElementById('inp-name').value.trim();
-    if(!name||!state.currentAction){showToast('Completa nombre y decisión');return;}
-    const item={id:Date.now(),name,qty:state.addQty,act:state.currentAction,space:state.addSpace,price:document.getElementById('inp-price').value||0,final:0,st:state.currentAction==='conservar'?'kept':'active',date:new Date().toLocaleDateString(),ts:Date.now()};
-    db.push(item);saveData();showToast('Registrado ✓');
-    document.getElementById('inp-name').value='';document.getElementById('inp-price').value='';state.addQty=1;document.getElementById('add-qty').textContent='1';
-    document.querySelectorAll('.d-btn').forEach(b=>b.classList.remove('sel','sel-v'));state.currentAction=null;document.getElementById('price-box').style.display='none';
-    if(item.st==='kept')go('screen-santuario',navButtons[2]);else go('screen-list',navButtons[3]);
+function renderChips(cid, sel, onSel) {
+    var c = document.getElementById(cid);
+    c.innerHTML = '';
+    SPACES.forEach(function (s) {
+        var ch = document.createElement('div');
+        ch.className = 'chip' + (s.id === sel ? ' sel' : '');
+        ch.innerHTML = s.icon + '<div class="chip-lbl">' + s.label + '</div><div class="chip-kj">' + s.kj + '</div>';
+        ch.onclick = function () { onSel(s.id); };
+        c.appendChild(ch);
+    });
 }
 
-/* ═══════════════ 茶室 SANTUARIO ═══════════════ */
-function renderSantuario(){
-    const content=document.getElementById('cha-content');
-    content.innerHTML='';
-    const query=(document.getElementById('sant-q').value||'').toLowerCase();
-    let kept=db.filter(i=>i.st==='kept');
-    if(query)kept=kept.filter(i=>i.name.toLowerCase().includes(query));
+function refreshAllChips() {
+    renderChips('add-chips', state.addSpace, function (id) { state.addSpace = id; refreshAllChips(); });
+    renderChips('ed-chips', state.editSpace, function (id) { state.editSpace = id; refreshAllChips(); });
+}
 
-    const countEl=document.getElementById('cha-count');
-    countEl.innerHTML=kept.length?`<em>${kept.length}</em> objeto${kept.length!==1?'s':''} en el santuario`:'';
+function renderDecisionGrid() {
+    var g = document.getElementById('decision-grid');
+    g.innerHTML = '';
+    DECISIONS.forEach(function (d) {
+        var b = document.createElement('button');
+        b.className = 'd-btn' + (d.wide ? ' w2' : '');
+        b.textContent = d.label;
+        b.onclick = function () { selectDecision(b, d.id); };
+        g.appendChild(b);
+    });
+}
 
-    if(!kept.length){
-        content.innerHTML=`<div class="cha-empty"><div class="cha-empty-char">空</div><div class="cha-empty-text">El santuario espera.<br>Los objetos que conserves<br>encontrarán su lugar aquí.</div></div>`;
+function selectDecision(btn, action) {
+    var btns = document.querySelectorAll('.d-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('sel', 'sel-v');
+    if (action === 'vender') {
+        btn.classList.add('sel-v');
+        document.getElementById('price-box').style.display = 'block';
+    } else {
+        btn.classList.add('sel');
+        document.getElementById('price-box').style.display = 'none';
+    }
+    state.currentAction = action;
+}
+
+function adjustQty(mode, delta) {
+    if (mode === 'add') {
+        state.addQty = Math.max(1, state.addQty + delta);
+        document.getElementById('add-qty').textContent = state.addQty;
+    } else {
+        state.editQty = Math.max(1, state.editQty + delta);
+        document.getElementById('edit-qty').textContent = state.editQty;
+    }
+}
+
+function saveNewItem() {
+    var name = document.getElementById('inp-name').value.trim();
+    if (!name || !state.currentAction) {
+        showToast('Completa nombre y decisión');
+        return;
+    }
+    var item = {
+        id: Date.now(),
+        name: name,
+        qty: state.addQty,
+        act: state.currentAction,
+        space: state.addSpace,
+        price: document.getElementById('inp-price').value || 0,
+        final: 0,
+        st: state.currentAction === 'conservar' ? 'kept' : 'active',
+        date: new Date().toLocaleDateString(),
+        ts: Date.now()
+    };
+    db.push(item);
+    saveData();
+    showToast('Registrado ✓');
+    
+    document.getElementById('inp-name').value = '';
+    document.getElementById('inp-price').value = '';
+    state.addQty = 1;
+    document.getElementById('add-qty').textContent = '1';
+    
+    var btns = document.querySelectorAll('.d-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('sel', 'sel-v');
+    
+    state.currentAction = null;
+    document.getElementById('price-box').style.display = 'none';
+    
+    if (item.st === 'kept') go('screen-santuario', navButtons[2]);
+    else go('screen-list', navButtons[3]);
+}
+
+function renderSantuario() {
+    var content = document.getElementById('cha-content');
+    content.innerHTML = '';
+    var query = (document.getElementById('sant-q').value || '').toLowerCase();
+    var kept = [];
+    
+    for (var i = 0; i < db.length; i++) {
+        if (db[i].st === 'kept') kept.push(db[i]);
+    }
+    
+    if (query) {
+        var filtered = [];
+        for (var i = 0; i < kept.length; i++) {
+            if (kept[i].name.toLowerCase().indexOf(query) !== -1) filtered.push(kept[i]);
+        }
+        kept = filtered;
+    }
+
+    var countEl = document.getElementById('cha-count');
+    countEl.innerHTML = kept.length ? '<em>' + kept.length + '</em> objeto' + (kept.length !== 1 ? 's' : '') + ' en el santuario' : '';
+
+    if (!kept.length) {
+        content.innerHTML = '<div class="cha-empty"><div class="cha-empty-char">空</div><div class="cha-empty-text">El santuario espera.<br>Los objetos que conserves<br>encontrarán su lugar aquí.</div></div>';
         return;
     }
 
-    const grouped={};
-    kept.forEach(item=>{const s=item.space||'living';if(!grouped[s])grouped[s]=[];grouped[s].push(item);});
-    const activeSpaces=SPACES.filter(s=>grouped[s.id]);
+    var grouped = {};
+    for (var i = 0; i < kept.length; i++) {
+        var s = kept[i].space || 'living';
+        if (!grouped[s]) grouped[s] = [];
+        grouped[s].push(kept[i]);
+    }
+    
+    var activeSpaces = [];
+    for (var i = 0; i < SPACES.length; i++) {
+        if (grouped[SPACES[i].id]) activeSpaces.push(SPACES[i]);
+    }
 
-    activeSpaces.forEach((space,idx)=>{
-        const items=grouped[space.id];
-        const room=document.createElement('div');
-        room.className='cha-room';
-        room.style.animationDelay=`${0.15+idx*0.08}s`;
+    for (var si = 0; si < activeSpaces.length; si++) {
+        var space = activeSpaces[si];
+        var items = grouped[space.id];
+        var room = document.createElement('div');
+        room.className = 'cha-room';
 
-        // Tategaki column
-        const tate=document.createElement('div');
-        tate.className='cha-room-tate';
-        tate.innerHTML=`<span class="cha-tate-kj">${space.kj}</span><span class="cha-tate-count">${items.length}</span>`;
+        var tate = document.createElement('div');
+        tate.className = 'cha-room-tate';
+        tate.innerHTML = '<span class="cha-tate-kj">' + space.kj + '</span><span class="cha-tate-count">' + items.length + '</span>';
 
-        // Items column
-        const itemsCol=document.createElement('div');
-        itemsCol.className='cha-room-items';
-        itemsCol.innerHTML=`<div class="cha-room-label">${space.label}</div>`;
+        var itemsCol = document.createElement('div');
+        itemsCol.className = 'cha-room-items';
+        itemsCol.innerHTML = '<div class="cha-room-label">' + space.label + '</div>';
 
-        items.forEach(item=>{
-            const el=document.createElement('div');
-            el.className='cha-item';
-            const qtyBadge=item.qty>1?`<span class="cha-item-qty">×${item.qty}</span>`:'';
-            const daysAgo=Math.floor((Date.now()-(item.ts||Date.now()))/864e5);
-            const dateText=daysAgo===0?'hoy':daysAgo<30?`${daysAgo}d`:`${Math.floor(daysAgo/30)}m`;
+        for (var ii = 0; ii < items.length; ii++) {
+            var item = items[ii];
+            var el = document.createElement('div');
+            el.className = 'cha-item';
+            var qtyBadge = item.qty > 1 ? '<span class="cha-item-qty">×' + item.qty + '</span>' : '';
+            var daysAgo = Math.floor((Date.now() - (item.ts || Date.now())) / 864e5);
+            var dateText = daysAgo === 0 ? 'hoy' : daysAgo < 30 ? daysAgo + 'd' : Math.floor(daysAgo / 30) + 'm';
 
-            el.innerHTML=`
-                <div class="cha-item-body">
-                    <div class="cha-item-name">${item.name}</div>
-                    <div class="cha-item-meta">${qtyBadge}<span class="cha-item-date">${dateText}</span></div>
-                </div>
-                <div class="cha-item-actions">
-                    <button class="cha-btn" onclick="openEdit(${item.id})">${ICONS.edit}</button>
-                    <button class="cha-btn" onclick="moveFromKeep(${item.id})">${ICONS.logout}</button>
-                    <button class="cha-btn danger" onclick="deleteItem(${item.id})">${ICONS.close}</button>
-                </div>`;
+            el.innerHTML = '<div class="cha-item-body"><div class="cha-item-name">' + item.name + '</div><div class="cha-item-meta">' + qtyBadge + '<span class="cha-item-date">' + dateText + '</span></div></div><div class="cha-item-actions"><button class="cha-btn" onclick="openEdit(' + item.id + ')">' + ICONS.edit + '</button><button class="cha-btn" onclick="moveFromKeep(' + item.id + ')">' + ICONS.logout + '</button><button class="cha-btn danger" onclick="deleteItem(' + item.id + ')">' + ICONS.close + '</button></div>';
             itemsCol.appendChild(el);
-        });
+        }
 
         room.appendChild(tate);
         room.appendChild(itemsCol);
         content.appendChild(room);
-    });
+    }
 
-    // End ornament
-    const end=document.createElement('div');
-    end.className='cha-end';
-    end.innerHTML=`<div class="cha-end-line"></div><div class="cha-end-char">茶</div>`;
+    var end = document.createElement('div');
+    end.className = 'cha-end';
+    end.innerHTML = '<div class="cha-end-line"></div><div class="cha-end-char">茶</div>';
     content.appendChild(end);
 }
 
-/* ═══════════════ PROCESS / CUENTAS ═══════════════ */
-function switchTab(tab){state.currentTab=tab;document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['process','sold'][i]===tab));document.getElementById('sort-btn').style.display=tab==='process'?'block':'none';renderList();}
-function toggleSort(){state.sortMode=state.sortMode==='date'?'price':'date';document.getElementById('sort-btn').textContent=state.sortMode==='date'?'Fecha ↓':'Precio ↓';renderList();}
-
-function renderList(){
-    const c=document.getElementById('list-content');c.innerHTML='';const h=document.getElementById('list-header').querySelector('.list-t');
-    if(state.currentTab==='process'){const active=db.filter(i=>i.st==='active');h.innerHTML=`進行 <small>proceso · ${active.length}</small>`;const groups=['vender','donar','regalar','tirar'];let has=false;
-        groups.forEach(g=>{let items=active.filter(i=>i.act===g);if(!items.length)return;has=true;if(state.sortMode==='date')items.sort((a,b)=>(b.ts||0)-(a.ts||0));else items.sort((a,b)=>parseFloat(b.price||0)-parseFloat(a.price||0));const gh=document.createElement('div');gh.className='gh';gh.innerHTML=`<span>${GROUP_KJ[g]} ${GROUP_LABELS[g]}</span><span class="gh-n">${items.length}</span>`;c.appendChild(gh);items.forEach(item=>c.appendChild(createItemCard(item)));});
-        if(!has)c.innerHTML='<div class="mt"><div class="mt-k">空</div>Todo limpio</div>';
-    }else{const pending=db.filter(i=>i.st==='active'&&i.act==='vender');const done=db.filter(i=>i.st==='done');const totalEarned=done.filter(i=>i.act==='vender').reduce((s,i)=>s+parseFloat(i.final||0),0);const totalPending=pending.reduce((s,i)=>s+parseFloat(i.price||0),0);h.innerHTML=`帳簿 <small>cuentas · ${done.length}</small>`;const summary=document.createElement('div');summary.className='as';summary.innerHTML=`<div class="as-h"><div class="as-v red jp">${totalEarned}€</div><div class="as-l">ganado</div></div><div class="as-h"><div class="as-v jp">${totalPending}€</div><div class="as-l">en venta</div></div>`;c.appendChild(summary);[...done].sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(item=>c.appendChild(createItemCard(item)));}
+function switchTab(tab) {
+    state.currentTab = tab;
+    var tabs = document.querySelectorAll('.tab');
+    tabs[0].classList.toggle('on', tab === 'process');
+    tabs[1].classList.toggle('on', tab === 'sold');
+    document.getElementById('sort-btn').style.display = tab === 'process' ? 'block' : 'none';
+    renderList();
 }
 
-function createItemCard(item){const card=document.createElement('div');card.className='ic';const space=SPACES.find(s=>s.id===(item.space||'living'));const spaceIcon=space?space.icon:ICONS.living;const qtyBadge=item.qty>1?`<span class="ic-q">×${item.qty}</span>`:'';const daysAgo=Math.floor((Date.now()-(item.ts||Date.now()))/864e5);const dateText=daysAgo===0?'Hoy':`${daysAgo}d`;const isAlert=state.currentTab==='process'&&daysAgo>30;let meta='';if(state.currentTab==='process'&&item.act==='vender')meta=`<div class="ic-p">Meta: ${item.price}€</div>`;else if(state.currentTab==='sold'&&item.act==='vender')meta=`<div class="ic-p won">+${item.final}€</div>`;else if(state.currentTab==='sold')meta=`<div class="ic-m">${GROUP_LABELS[item.act]||item.act} ✓</div>`;else meta=`<div class="ic-m">${GROUP_LABELS[item.act]||item.act}</div>`;let buttons='';if(state.currentTab==='process'){const eb=`<button class="ib" onclick="openEdit(${item.id})">✎</button>`;if(item.act==='vender')buttons=eb+`<button class="ab rd" onclick="openSoldOverlay(${item.id})">Vendido</button>`;else buttons=eb+`<button class="ab dk" onclick="markDone(${item.id})">Listo</button>`;}else{let ex='';if(item.act==='vender')ex=`<button class="cb price-edit" onclick="editFinalPrice(${item.id})">${ICONS.price}</button>`;buttons=`${ex}<button class="cb" onclick="moveToKeep(${item.id})">${ICONS.temple}</button><button class="cb" onclick="restoreToProcess(${item.id})">${ICONS.back}</button><button class="cb del" onclick="deleteItem(${item.id})">${ICONS.close}</button>`;}card.innerHTML=`<div class="ic-top"><div class="ic-l"><div class="ic-i">${spaceIcon}</div><span class="ic-n">${item.name}</span>${qtyBadge}</div><div class="ic-d${isAlert?' alert':''}">${dateText}</div></div><div class="ic-bot">${meta}<div class="ic-btns">${buttons}</div></div>`;return card;}
+function toggleSort() {
+    state.sortMode = state.sortMode === 'date' ? 'price' : 'date';
+    document.getElementById('sort-btn').textContent = state.sortMode === 'date' ? 'Fecha ↓' : 'Precio ↓';
+    renderList();
+}
 
-function openEdit(id){state.editId=id;const i=findItem(id);if(!i)return;document.getElementById('ed-name').value=i.name;state.editQty=i.qty||1;document.getElementById('edit-qty').textContent=state.editQty;state.editSpace=i.space||'living';refreshAllChips();openOverlay('ov-edit');}
-function saveEdit(){if(!state.editId)return;const i=findItem(state.editId);const n=document.getElementById('ed-name').value.trim();if(!n||!i)return;i.name=n;i.space=state.editSpace;i.qty=state.editQty;saveData();renderList();renderSantuario();closeOverlay('ov-edit');showToast('Guardado ✓');}
+function renderList() {
+    var c = document.getElementById('list-content');
+    c.innerHTML = '';
+    var h = document.getElementById('list-header').querySelector('.list-t');
+    
+    if (state.currentTab === 'process') {
+        var active = [];
+        for (var i = 0; i < db.length; i++) {
+            if (db[i].st === 'active') active.push(db[i]);
+        }
+        h.innerHTML = '進行 <small>proceso · ' + active.length + '</small>';
+        var groups = ['vender', 'donar', 'regalar', 'tirar'];
+        var has = false;
+        
+        for (var gi = 0; gi < groups.length; gi++) {
+            var g = groups[gi];
+            var items = [];
+            for (var i = 0; i < active.length; i++) {
+                if (active[i].act === g) items.push(active[i]);
+            }
+            if (!items.length) continue;
+            has = true;
+            
+            if (state.sortMode === 'date') {
+                items.sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+            } else {
+                items.sort(function (a, b) { return parseFloat(b.price || 0) - parseFloat(a.price || 0); });
+            }
+            
+            var gh = document.createElement('div');
+            gh.className = 'gh';
+            gh.innerHTML = '<span>' + GROUP_KJ[g] + ' ' + GROUP_LABELS[g] + '</span><span class="gh-n">' + items.length + '</span>';
+            c.appendChild(gh);
+            for (var i = 0; i < items.length; i++) c.appendChild(createItemCard(items[i]));
+        }
+        if (!has) c.innerHTML = '<div class="mt"><div class="mt-k">空</div>Todo limpio</div>';
+    } else {
+        var pending = [];
+        var done = [];
+        for (var i = 0; i < db.length; i++) {
+            if (db[i].st === 'active' && db[i].act === 'vender') pending.push(db[i]);
+            if (db[i].st === 'done') done.push(db[i]);
+        }
+        
+        var totalEarned = 0;
+        for (var i = 0; i < done.length; i++) {
+            if (done[i].act === 'vender') totalEarned += parseFloat(done[i].final || 0);
+        }
+        var totalPending = 0;
+        for (var i = 0; i < pending.length; i++) {
+            totalPending += parseFloat(pending[i].price || 0);
+        }
+        
+        h.innerHTML = '帳簿 <small>cuentas · ' + done.length + '</small>';
+        var summary = document.createElement('div');
+        summary.className = 'as';
+        summary.innerHTML = '<div class="as-h"><div class="as-v red jp">' + totalEarned + '€</div><div class="as-l">ganado</div></div><div class="as-h"><div class="as-v jp">' + totalPending + '€</div><div class="as-l">en venta</div></div>';
+        c.appendChild(summary);
+        
+        done.sort(function (a, b) { return (b.ts || 0) - (a.ts || 0); });
+        for (var i = 0; i < done.length; i++) c.appendChild(createItemCard(done[i]));
+    }
+}
 
-function openOverlay(id){const el=document.getElementById(id);el.style.display='flex';el.classList.add('visible');}
-function closeOverlay(id){const el=document.getElementById(id);el.classList.remove('visible');setTimeout(()=>{el.style.display='none';},50);state.editId=null;state.soldId=null;state.confirmCallback=null;}
+function createItemCard(item) {
+    var card = document.createElement('div');
+    card.className = 'ic';
+    var space = null;
+    for (var i = 0; i < SPACES.length; i++) {
+        if (SPACES[i].id === (item.space || 'living')) { space = SPACES[i]; break; }
+    }
+    
+    var spaceIcon = space ? space.icon : ICONS.living;
+    var qtyBadge = item.qty > 1 ? '<span class="ic-q">×' + item.qty + '</span>' : '';
+    var daysAgo = Math.floor((Date.now() - (item.ts || Date.now())) / 864e5);
+    var dateText = daysAgo === 0 ? 'Hoy' : daysAgo + 'd';
+    var isAlert = state.currentTab === 'process' && daysAgo > 30;
+    var meta = '';
+    
+    if (state.currentTab === 'process' && item.act === 'vender') meta = '<div class="ic-p">Meta: ' + item.price + '€</div>';
+    else if (state.currentTab === 'sold' && item.act === 'vender') meta = '<div class="ic-p won">+' + item.final + '€</div>';
+    else if (state.currentTab === 'sold') meta = '<div class="ic-m">' + (GROUP_LABELS[item.act] || item.act) + ' ✓</div>';
+    else meta = '<div class="ic-m">' + (GROUP_LABELS[item.act] || item.act) + '</div>';
+    
+    var buttons = '';
+    if (state.currentTab === 'process') {
+        var eb = '<button class="ib" onclick="openEdit(' + item.id + ')">✎</button>';
+        if (item.act === 'vender') buttons = eb + '<button class="ab rd" onclick="openSoldOverlay(' + item.id + ')">Vendido</button>';
+        else buttons = eb + '<button class="ab dk" onclick="markDone(' + item.id + ')">Listo</button>';
+    } else {
+        var ex = '';
+        if (item.act === 'vender') ex = '<button class="cb price-edit" onclick="editFinalPrice(' + item.id + ')">' + ICONS.price + '</button>';
+        buttons = ex + '<button class="cb" onclick="moveToKeep(' + item.id + ')">' + ICONS.temple + '</button><button class="cb" onclick="restoreToProcess(' + item.id + ')">' + ICONS.back + '</button><button class="cb del" onclick="deleteItem(' + item.id + ')">' + ICONS.close + '</button>';
+    }
+    
+    card.innerHTML = '<div class="ic-top"><div class="ic-l"><div class="ic-i">' + spaceIcon + '</div><span class="ic-n">' + item.name + '</span>' + qtyBadge + '</div><div class="ic-d' + (isAlert ? ' alert' : '') + '">' + dateText + '</div></div><div class="ic-bot">' + meta + '<div class="ic-btns">' + buttons + '</div></div>';
+    return card;
+}
 
-function openSoldOverlay(id){state.soldId=id;document.getElementById('sold-price').value='';openOverlay('ov-sold');setTimeout(()=>document.getElementById('sold-price').focus(),150);}
-function confirmSold(){const p=document.getElementById('sold-price').value;if(p===''||p===null)return;const i=findItem(state.soldId);if(i){i.final=p;i.st='done';saveData();renderList();showToast(`Vendido por ${p}€`);}closeOverlay('ov-sold');}
-function editFinalPrice(id){state.soldId=id;const i=findItem(id);document.getElementById('sold-price').value=i?i.final||'':'';openOverlay('ov-sold');setTimeout(()=>document.getElementById('sold-price').focus(),150);}
-function confirmAction(msg,cb){state.confirmCallback=cb;document.getElementById('confirm-msg').textContent=msg;document.getElementById('confirm-yes').onclick=()=>{const fn=state.confirmCallback;closeOverlay('ov-confirm');if(fn)fn();};openOverlay('ov-confirm');}
+function openEdit(id) {
+    state.editId = id;
+    var i = findItem(id);
+    if (!i) return;
+    document.getElementById('ed-name').value = i.name;
+    state.editQty = i.qty || 1;
+    document.getElementById('edit-qty').textContent = state.editQty;
+    state.editSpace = i.space || 'living';
+    refreshAllChips();
+    openOverlay('ov-edit');
+}
 
-function markDone(id){const i=findItem(id);if(i){i.st='done';saveData();renderList();showToast('Completado ✓');}}
-function moveToKeep(id){confirmAction('¿Mover al santuario?',()=>{const i=findItem(id);if(i){i.st='kept';i.act='conservar';i.final=0;saveData();renderList();renderSantuario();showToast('Movido al santuario');}});}
-function moveFromKeep(id){confirmAction('¿Sacar del santuario?',()=>{const i=findItem(id);if(i){i.st='active';i.act='vender';saveData();renderList();renderSantuario();showToast('Movido a proceso');}});}
-function restoreToProcess(id){confirmAction('¿Devolver al proceso?',()=>{const i=findItem(id);if(i){i.st='active';i.final=0;saveData();renderList();showToast('Devuelto a proceso');}});}
-function deleteItem(id){confirmAction('¿Eliminar definitivamente?',()=>{db=db.filter(i=>i.id!==id);saveData();renderList();renderSantuario();showToast('Eliminado');});}
-function resetAll(){db=[];saveData();renderList();renderSantuario();showToast('Datos borrados');}
+function saveEdit() {
+    if (!state.editId) return;
+    var i = findItem(state.editId);
+    var n = document.getElementById('ed-name').value.trim();
+    if (!n || !i) return;
+    i.name = n;
+    i.space = state.editSpace;
+    i.qty = state.editQty;
+    saveData();
+    renderList();
+    renderSantuario();
+    closeOverlay('ov-edit');
+    showToast('Guardado ✓');
+}
 
-function updateHome(){const earned=db.filter(i=>i.st==='done'&&i.act==='vender').reduce((s,i)=>s+parseFloat(i.final||0),0);const kc=db.filter(i=>i.st==='kept').length,ac=db.filter(i=>i.st==='active').length,dc=db.filter(i=>i.st==='done').length;document.getElementById('total-money').innerHTML=`<span class="enso-cur">€</span>${earned}`;document.getElementById('stat-kept').textContent=kc;document.getElementById('stat-pending').textContent=ac;document.getElementById('stat-sold').textContent=dc;document.getElementById('ss-kept').textContent=kc;document.getElementById('ss-pend').textContent=ac;document.getElementById('ss-done').textContent=dc;document.getElementById('ss-earn').textContent=earned+'€';}
+function openOverlay(id) {
+    var el = document.getElementById(id);
+    el.style.display = '-webkit-flex';
+    el.style.display = 'flex';
+    el.classList.add('visible');
+}
 
-async function exportData(){const json=JSON.stringify(db,null,2);const file=new File([json],'kuhaku.json',{type:'application/json'});if(navigator.share){try{await navigator.share({files:[file],title:'Kūhaku'});state.lastBackup=Date.now();state.changesSinceBackup=0;localStorage.setItem('kuhakuMeta',JSON.stringify({lastBackup:state.lastBackup,changes:0}));checkBackupStatus();showToast('Copia guardada ✓');}catch{downloadFile(json);}}else{downloadFile(json);}}
-function downloadFile(content){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.download='kuhaku.json';document.body.appendChild(a);a.click();a.remove();showToast('Descargado ✓');}
-function importData(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const p=JSON.parse(e.target.result);if(!Array.isArray(p))throw 0;db=p;saveData();renderSantuario();renderList();showToast('Datos cargados ✓');}catch{showToast('Error al cargar');}};r.readAsText(f);input.value='';}
+function closeOverlay(id) {
+    var el = document.getElementById(id);
+    el.classList.remove('visible');
+    setTimeout(function () { el.style.display = 'none'; }, 50);
+    state.editId = null;
+    state.soldId = null;
+    state.confirmCallback = null;
+}
 
-function init(){loadData();refreshAllChips();renderDecisionGrid();checkBackupStatus();updateHome();document.getElementById('koan-text').textContent='「 '+KOANS[Math.floor(Math.random()*KOANS.length)]+' 」';const h=new Date().getHours();document.getElementById('greeting').textContent=h<12?'おはよう Buenos días':h<19?'こんにちは Buenas tardes':'こんばんは Buenas noches';}
+function openSoldOverlay(id) {
+    state.soldId = id;
+    document.getElementById('sold-price').value = '';
+    openOverlay('ov-sold');
+    setTimeout(function () { document.getElementById('sold-price').focus(); }, 150);
+}
+
+function confirmSold() {
+    var p = document.getElementById('sold-price').value;
+    if (p === '' || p === null) return;
+    var i = findItem(state.soldId);
+    if (i) {
+        i.final = p;
+        i.st = 'done';
+        saveData();
+        renderList();
+        showToast('Vendido por ' + p + '€');
+    }
+    closeOverlay('ov-sold');
+}
+
+function editFinalPrice(id) {
+    state.soldId = id;
+    var i = findItem(id);
+    document.getElementById('sold-price').value = i ? i.final || '' : '';
+    openOverlay('ov-sold');
+    setTimeout(function () { document.getElementById('sold-price').focus(); }, 150);
+}
+
+function confirmAction(msg, cb) {
+    state.confirmCallback = cb;
+    document.getElementById('confirm-msg').textContent = msg;
+    document.getElementById('confirm-yes').onclick = function () {
+        var fn = state.confirmCallback;
+        closeOverlay('ov-confirm');
+        if (fn) fn();
+    };
+    openOverlay('ov-confirm');
+}
+
+function markDone(id) {
+    var i = findItem(id);
+    if (i) {
+        i.st = 'done';
+        saveData();
+        renderList();
+        showToast('Completado ✓');
+    }
+}
+
+function moveToKeep(id) {
+    confirmAction('¿Mover al santuario?', function () {
+        var i = findItem(id);
+        if (i) {
+            i.st = 'kept';
+            i.act = 'conservar';
+            i.final = 0;
+            saveData();
+            renderList();
+            renderSantuario();
+            showToast('Movido al santuario');
+        }
+    });
+}
+
+function moveFromKeep(id) {
+    confirmAction('¿Sacar del santuario?', function () {
+        var i = findItem(id);
+        if (i) {
+            i.st = 'active';
+            i.act = 'vender';
+            saveData();
+            renderList();
+            renderSantuario();
+            showToast('Movido a proceso');
+        }
+    });
+}
+
+function restoreToProcess(id) {
+    confirmAction('¿Devolver al proceso?', function () {
+        var i = findItem(id);
+        if (i) {
+            i.st = 'active';
+            i.final = 0;
+            saveData();
+            renderList();
+            showToast('Devuelto a proceso');
+        }
+    });
+}
+
+function deleteItem(id) {
+    confirmAction('¿Eliminar definitivamente?', function () {
+        var newDb = [];
+        for (var i = 0; i < db.length; i++) {
+            if (db[i].id !== id) newDb.push(db[i]);
+        }
+        db = newDb;
+        saveData();
+        renderList();
+        renderSantuario();
+        showToast('Eliminado');
+    });
+}
+
+function resetAll() {
+    db = [];
+    saveData();
+    renderList();
+    renderSantuario();
+    showToast('Datos borrados');
+}
+
+function updateHome() {
+    var earned = 0;
+    var kc = 0, ac = 0, dc = 0;
+    for (var i = 0; i < db.length; i++) {
+        if (db[i].st === 'done' && db[i].act === 'vender') earned += parseFloat(db[i].final || 0);
+        if (db[i].st === 'kept') kc++;
+        if (db[i].st === 'active') ac++;
+        if (db[i].st === 'done') dc++;
+    }
+    document.getElementById('total-money').innerHTML = '<span class="enso-cur">€</span>' + earned;
+    document.getElementById('stat-kept').textContent = kc;
+    document.getElementById('stat-pending').textContent = ac;
+    document.getElementById('stat-sold').textContent = dc;
+    document.getElementById('ss-kept').textContent = kc;
+    document.getElementById('ss-pend').textContent = ac;
+    document.getElementById('ss-done').textContent = dc;
+    document.getElementById('ss-earn').textContent = earned + '€';
+}
+
+function exportData() {
+    var json = JSON.stringify(db, null, 2);
+    var file = new File([json], 'kuhaku.json', { type: 'application/json' });
+    if (navigator.share) {
+        navigator.share({ files: [file], title: 'Kūhaku' }).then(function () {
+            state.lastBackup = Date.now();
+            state.changesSinceBackup = 0;
+            localStorage.setItem('kuhakuMeta', JSON.stringify({ lastBackup: state.lastBackup, changes: 0 }));
+            checkBackupStatus();
+            showToast('Copia guardada ✓');
+        }).catch(function () { downloadFile(json); });
+    } else {
+        downloadFile(json);
+    }
+}
+
+function downloadFile(content) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([content], { type: 'application/json' }));
+    a.download = 'kuhaku.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    showToast('Descargado ✓');
+}
+
+function importData(input) {
+    var f = input.files[0];
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function (e) {
+        try {
+            var p = JSON.parse(e.target.result);
+            if (!Array.isArray(p)) throw new Error('bad');
+            db = p;
+            saveData();
+            renderSantuario();
+            renderList();
+            showToast('Datos cargados ✓');
+        } catch (err) {
+            showToast('Error al cargar');
+        }
+    };
+    r.readAsText(f);
+    input.value = '';
+}
+
+function init() {
+    loadData();
+    refreshAllChips();
+    renderDecisionGrid();
+    checkBackupStatus();
+    updateHome();
+    document.getElementById('koan-text').textContent = '「 ' + KOANS[Math.floor(Math.random() * KOANS.length)] + ' 」';
+    var h = new Date().getHours();
+    document.getElementById('greeting').textContent = h < 12 ? 'おはよう Buenos días' : h < 19 ? 'こんにちは Buenas tardes' : 'こんばんは Buenas noches';
+}
+
 init();
 </script>
-
 </body>
 </html>
+
+
