@@ -33,10 +33,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html {
-            /* Aumentamos el tamaño base para que todo (en rem) sea más grande por defecto */
-            font-size: 18px; 
-        }
+        html { font-size: 18px; }
 
         body {
             background: var(--washi);
@@ -52,7 +49,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Washi texture overlay */
         body::before {
             content: '';
             position: fixed;
@@ -65,851 +61,227 @@
 
         .jp { font-family: 'Shippori Mincho', 'Noto Serif JP', serif; }
 
-        /* ═══════════════ UTILITIES ═══════════════ */
+        /* ANIMATIONS */
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes screenIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes brushStroke {
-            from { stroke-dashoffset: 600; }
-            to { stroke-dashoffset: 0; }
-        }
+        @keyframes brushStroke { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
 
-        /* ═══════════════ SCREENS ═══════════════ */
+        /* SCREENS */
         .screen {
             flex: 1;
             display: none;
             flex-direction: column;
             align-items: center;
-            overflow-y: auto;
-            padding-bottom: 110px; /* Espacio extra para la nueva navbar grande */
+            padding-bottom: 110px;
             position: relative;
             z-index: 1;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
         }
         .screen.active { display: flex; animation: screenIn 0.3s ease; }
         .screen::-webkit-scrollbar { display: none; }
 
-        /* ═══════════════ HOME ═══════════════ */
+        /* HOME */
         #screen-home { padding: 0 28px; }
+        .home-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 24px 0 0; }
+        .home-greeting { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo); letter-spacing: 0.5px; }
+        .home-ver { font-size: 0.6rem; color: var(--indigo-pale); letter-spacing: 1.5px; font-weight: 600; }
 
-        .home-header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px 0 0;
-        }
-        .home-greeting {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 0.95rem; /* Ampliado */
-            color: var(--indigo);
-            font-weight: 400;
-            letter-spacing: 0.5px;
-        }
-        .home-ver {
-            font-size: 0.6rem; /* Ampliado */
-            color: var(--indigo-pale);
-            letter-spacing: 1.5px;
-            font-weight: 600;
-        }
-
-        /* Ensō circle */
-        .enso-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 40px 0 0;
-            position: relative;
-        }
-        .enso {
-            width: 250px; /* Ampliado para pantalla plus */
-            height: 250px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .enso svg {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .enso svg path {
-            stroke-dasharray: 600;
-            animation: brushStroke 2s ease-out forwards;
-        }
+        .enso-container { display: flex; flex-direction: column; align-items: center; margin: 40px 0 0; position: relative; }
+        .enso { width: 250px; height: 250px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .enso svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .enso svg path { stroke-dasharray: 600; animation: brushStroke 2s ease-out forwards; }
         .enso-center { text-align: center; z-index: 1; }
-        .enso-num {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 4rem; /* Ampliado enormemente para ser el foco */
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -3px;
-        }
+        .enso-num { font-family: 'Shippori Mincho', serif; font-size: 4rem; font-weight: 800; line-height: 1; letter-spacing: -3px; }
         .enso-cur { font-size: 2.2rem; font-weight: 400; }
-        .enso-sub {
-            font-size: 0.6rem; /* Ampliado */
-            letter-spacing: 6px;
-            color: var(--indigo);
-            text-transform: uppercase;
-            margin-top: 10px;
-            font-weight: 600;
-        }
+        .enso-sub { font-size: 0.6rem; letter-spacing: 6px; color: var(--indigo); text-transform: uppercase; margin-top: 10px; font-weight: 600; }
 
-        /* Hanko seal */
         .hanko-seal {
-            position: absolute;
-            bottom: -6px;
-            right: -6px;
-            width: 52px; /* Más grande */
-            height: 52px;
-            border: 2px solid var(--vermillion);
-            border-radius: 6px;
-            transform: rotate(-6deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Shippori Mincho', serif;
-            font-size: 1rem; /* Ampliado */
-            color: var(--vermillion);
-            font-weight: 800;
-            background: var(--washi);
-            box-shadow: 0 0 0 1px rgba(200,50,50,0.08);
-            line-height: 1.1;
-            opacity: 0.85;
+            position: absolute; bottom: -6px; right: -6px; width: 52px; height: 52px;
+            border: 2px solid var(--vermillion); border-radius: 6px; transform: rotate(-6deg);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Shippori Mincho', serif; font-size: 1rem; color: var(--vermillion);
+            font-weight: 800; background: var(--washi); box-shadow: 0 0 0 1px rgba(200,50,50,0.08);
+            line-height: 1.1; opacity: 0.85;
         }
 
-        /* Stats row */
-        .stats-row {
-            display: flex;
-            gap: 0;
-            width: 100%;
-            margin-top: 40px;
-            border-top: 1px solid var(--indigo-ghost);
-            border-bottom: 1px solid var(--indigo-ghost);
-        }
-        .stat-cell {
-            flex: 1;
-            text-align: center;
-            padding: 24px 8px; /* Más alto, más fácil de tocar */
-            cursor: pointer;
-            transition: background var(--transition);
-            position: relative;
-        }
+        .stats-row { display: flex; gap: 0; width: 100%; margin-top: 40px; border-top: 1px solid var(--indigo-ghost); border-bottom: 1px solid var(--indigo-ghost); }
+        .stat-cell { flex: 1; text-align: center; padding: 24px 8px; cursor: pointer; transition: background var(--transition); position: relative; }
         .stat-cell:active { background: var(--indigo-ghost); }
         .stat-cell + .stat-cell { border-left: 1px solid var(--indigo-ghost); }
-        .stat-num {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 1.8rem; /* Ampliado */
-            font-weight: 700;
-            line-height: 1;
-        }
+        .stat-num { font-family: 'Shippori Mincho', serif; font-size: 1.8rem; font-weight: 700; line-height: 1; }
         .stat-num.red { color: var(--vermillion); }
-        .stat-lbl {
-            font-size: 0.55rem; /* Ampliado */
-            letter-spacing: 3px;
-            color: var(--indigo);
-            text-transform: uppercase;
-            margin-top: 8px;
-            font-weight: 600;
-        }
+        .stat-lbl { font-size: 0.55rem; letter-spacing: 3px; color: var(--indigo); text-transform: uppercase; margin-top: 8px; font-weight: 600; }
 
-        /* Koan */
-        .koan {
-            margin-top: auto;
-            padding: 40px 20px 20px;
-            text-align: center;
-        }
-        .koan-text {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 0.95rem; /* Ampliado para legibilidad en cursiva */
-            color: var(--indigo-light);
-            font-weight: 400;
-            font-style: italic;
-            line-height: 1.7;
-        }
+        .koan { margin-top: auto; padding: 40px 20px 20px; text-align: center; }
+        .koan-text { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo-light); font-style: italic; line-height: 1.7; }
 
-        /* ═══════════════ ADD SCREEN ═══════════════ */
+        /* ADD SCREEN */
         #screen-add { padding: 0 28px; }
+        .section-header { width: 100%; padding: 24px 0 20px; display: flex; align-items: baseline; gap: 12px; }
+        .section-kanji { font-family: 'Shippori Mincho', serif; font-size: 2.4rem; font-weight: 800; line-height: 1; }
+        .section-word { font-size: 0.65rem; letter-spacing: 4px; color: var(--indigo); text-transform: uppercase; font-weight: 600; padding-bottom: 4px; }
 
-        .section-header {
-            width: 100%;
-            padding: 24px 0 20px;
-            display: flex;
-            align-items: baseline;
-            gap: 12px;
-        }
-        .section-kanji {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 2.4rem; /* Ampliado */
-            font-weight: 800;
-            line-height: 1;
-        }
-        .section-word {
-            font-size: 0.65rem; /* Ampliado */
-            letter-spacing: 4px;
-            color: var(--indigo);
-            text-transform: uppercase;
-            font-weight: 600;
-            padding-bottom: 4px;
-        }
-
-        /* Form groups */
         .fg { width: 100%; margin-bottom: 24px; }
-        .fg-label {
-            font-size: 0.6rem; /* Ampliado */
-            letter-spacing: 3px;
-            color: var(--indigo);
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
+        .fg-label { font-size: 0.6rem; letter-spacing: 3px; color: var(--indigo); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
         .fg-input {
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid var(--indigo-pale);
-            font-family: 'Shippori Mincho', serif;
-            font-size: 1.3rem; /* Inputs grandes y claros */
-            color: var(--ink);
-            padding: 14px 0;
-            width: 100%;
-            outline: none;
-            transition: border-color 0.3s;
+            background: transparent; border: none; border-bottom: 2px solid var(--indigo-pale);
+            font-family: 'Shippori Mincho', serif; font-size: 1.3rem; color: var(--ink);
+            padding: 14px 0; width: 100%; outline: none; transition: border-color 0.3s;
         }
         .fg-input:focus { border-color: var(--ink); }
-        .fg-input::placeholder { color: var(--indigo-pale); }
 
-        /* Quantity controls */
         .qty-row { display: flex; align-items: center; gap: 20px; }
         .q-btn {
-            width: 44px; /* Botones más anchos */
-            height: 44px;
-            border-radius: 50%;
-            border: 1.5px solid var(--indigo-pale);
-            background: transparent;
-            font-size: 1.4rem;
-            color: var(--indigo);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.15s;
+            width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--indigo-pale);
+            background: transparent; font-size: 1.4rem; color: var(--indigo); display: flex;
+            align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s;
         }
         .q-btn:active { background: var(--ink); color: white; border-color: var(--ink); }
-        .q-val {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 2rem;
-            font-weight: 700;
-            width: 50px;
-            text-align: center;
-        }
+        .q-val { font-family: 'Shippori Mincho', serif; font-size: 2rem; font-weight: 700; width: 50px; text-align: center; }
 
-        /* Space chips */
-        .chips {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            width: 100%;
-            padding: 6px 0;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
+        .chips { display: flex; gap: 10px; overflow-x: auto; width: 100%; padding: 6px 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .chips::-webkit-scrollbar { display: none; }
         .chip {
-            min-width: 76px; /* Celdas más generosas */
-            height: 96px;
-            background: var(--white);
-            border: 1.5px solid var(--indigo-ghost);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 8px 6px;
-            cursor: pointer;
-            transition: all var(--transition);
-            flex-shrink: 0;
-            border-radius: var(--radius);
+            min-width: 76px; height: 96px; background: var(--white); border: 1.5px solid var(--indigo-ghost);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 8px; padding: 8px 6px; cursor: pointer; transition: all var(--transition);
+            flex-shrink: 0; border-radius: var(--radius);
         }
-        .chip svg {
-            width: 26px; /* Iconos más visibles */
-            height: 26px;
-            stroke: var(--indigo);
-            stroke-width: 1.5;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: all var(--transition);
-        }
-        .chip-lbl { font-size: 0.6rem; color: var(--indigo); text-align: center; line-height: 1.15; transition: all var(--transition); font-weight: 600; }
-        .chip-kj { font-family: 'Shippori Mincho', serif; font-size: 0.55rem; color: var(--indigo-pale); transition: all var(--transition); }
-        .chip.sel {
-            border-color: var(--ink);
-            background: var(--ink);
-            box-shadow: var(--shadow-md);
-        }
+        .chip svg { width: 26px; height: 26px; stroke: var(--indigo); stroke-width: 1.5; fill: none; transition: all var(--transition); }
+        .chip-lbl { font-size: 0.6rem; color: var(--indigo); text-align: center; font-weight: 600; }
+        .chip-kj { font-family: 'Shippori Mincho', serif; font-size: 0.55rem; color: var(--indigo-pale); }
+        .chip.sel { border-color: var(--ink); background: var(--ink); box-shadow: var(--shadow-md); }
         .chip.sel svg { stroke: #fff; }
         .chip.sel .chip-lbl { color: #fff; }
         .chip.sel .chip-kj { color: rgba(255,255,255,0.3); }
 
-        /* Decision buttons */
         .dg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
         .d-btn {
-            padding: 18px 8px; /* Botones más contundentes */
-            background: var(--white);
-            border: 1.5px solid var(--indigo-ghost);
-            cursor: pointer;
-            text-align: center;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            color: var(--indigo);
-            text-transform: uppercase;
-            font-family: 'Noto Sans', sans-serif;
-            transition: all var(--transition);
-            font-weight: 700;
-            border-radius: var(--radius);
+            padding: 18px 8px; background: var(--white); border: 1.5px solid var(--indigo-ghost);
+            cursor: pointer; text-align: center; font-size: 0.7rem; letter-spacing: 2px;
+            color: var(--indigo); text-transform: uppercase; font-family: 'Noto Sans', sans-serif;
+            transition: all var(--transition); font-weight: 700; border-radius: var(--radius);
         }
-        .d-btn:active { transform: scale(0.97); }
         .d-btn.sel { border-color: var(--ink); color: var(--ink); }
         .d-btn.sel-v { border-color: var(--vermillion); color: var(--vermillion); background: var(--vermillion-pale); }
         .d-btn.w2 { grid-column: span 2; }
 
         .pb { width: 100%; display: none; margin-top: 10px; }
         .pb-inp {
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid var(--vermillion);
-            font-family: 'Shippori Mincho', serif;
-            font-size: 1.6rem;
-            color: var(--vermillion);
-            text-align: center;
-            padding: 14px 0;
-            width: 100%;
-            outline: none;
-            font-weight: 700;
+            background: transparent; border: none; border-bottom: 2px solid var(--vermillion);
+            font-family: 'Shippori Mincho', serif; font-size: 1.6rem; color: var(--vermillion);
+            text-align: center; padding: 14px 0; width: 100%; outline: none; font-weight: 700;
         }
-        .pb-inp::placeholder { color: rgba(200,50,50,0.2); font-weight: 400; }
 
-        /* CTA Buttons */
         .cta {
-            margin-top: 32px;
-            padding: 20px 52px;
-            background: var(--ink);
-            color: white;
-            border: none;
-            font-size: 0.7rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-family: 'Noto Sans', sans-serif;
-            font-weight: 700;
-            transition: all 0.15s;
-            border-radius: var(--radius);
-            width: 100%;
+            margin-top: 32px; padding: 20px 52px; background: var(--ink); color: white;
+            border: none; font-size: 0.7rem; letter-spacing: 5px; text-transform: uppercase;
+            cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 700;
+            transition: all 0.15s; border-radius: var(--radius); width: 100%;
         }
         .cta:active { transform: scale(0.97); opacity: 0.9; }
         .cta.red { background: var(--vermillion); }
-
         .cta2 {
-            margin-top: 16px;
-            padding: 16px 30px;
-            background: transparent;
-            border: 1.5px solid var(--indigo-pale);
-            color: var(--indigo);
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-family: 'Noto Sans', sans-serif;
-            font-weight: 600;
-            border-radius: var(--radius);
-            width: 100%;
+            margin-top: 16px; padding: 16px 30px; background: transparent; border: 1.5px solid var(--indigo-pale);
+            color: var(--indigo); font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase;
+            cursor: pointer; font-family: 'Noto Sans', sans-serif; font-weight: 600;
+            border-radius: var(--radius); width: 100%;
         }
 
-        /* ═══════════════ SANTUARIO ═══════════════ */
-        #screen-santuario { padding: 0; }
-
+        /* SANTUARIO */
         .sant-top {
-            width: 100%;
-            padding: 32px 28px 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: linear-gradient(to bottom, var(--washi), var(--washi-warm));
+            width: 100%; padding: 32px 28px 24px; display: flex; flex-direction: column;
+            align-items: center; background: linear-gradient(to bottom, var(--washi), var(--washi-warm));
             position: relative;
         }
-        .sant-top::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--indigo-pale), transparent);
-        }
-        .sant-kanji {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 3.2rem; /* Ampliado */
-            font-weight: 800;
-            line-height: 1;
-            margin-top: 8px;
-            letter-spacing: 4px;
-        }
-        .sant-word {
-            font-size: 0.65rem;
-            letter-spacing: 6px;
-            color: var(--indigo);
-            text-transform: uppercase;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-        .sant-count {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 0.95rem;
-            color: var(--indigo-light);
-            margin-top: 18px;
-        }
+        .sant-kanji { font-family: 'Shippori Mincho', serif; font-size: 3.2rem; font-weight: 800; line-height: 1; margin-top: 8px; letter-spacing: 4px; }
+        .sant-word { font-size: 0.65rem; letter-spacing: 6px; color: var(--indigo); text-transform: uppercase; margin-top: 10px; font-weight: 600; }
+        .sant-count { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo-light); margin-top: 18px; }
         .sant-search {
-            width: 85%;
-            max-width: 340px;
-            margin-top: 20px;
-            padding: 14px 0;
-            border: none;
-            border-bottom: 2px solid var(--indigo-pale);
-            background: transparent;
-            font-family: 'Shippori Mincho', serif;
-            font-size: 1.05rem; /* Ampliado */
-            outline: none;
-            color: var(--ink);
-            text-align: center;
+            width: 85%; max-width: 340px; margin-top: 20px; padding: 14px 0; border: none;
+            border-bottom: 2px solid var(--indigo-pale); background: transparent;
+            font-family: 'Shippori Mincho', serif; font-size: 1.05rem; outline: none;
+            color: var(--ink); text-align: center;
         }
-        .sant-search::placeholder { color: var(--indigo-pale); }
 
         .rooms { width: 100%; padding: 16px 20px; }
-
-        .room {
-            margin-bottom: 6px;
-            background: var(--white);
-            border: 1px solid rgba(107,143,163,0.08);
-            overflow: hidden;
-            transition: box-shadow var(--transition);
-        }
-        .room:first-child { border-radius: var(--radius) var(--radius) 0 0; }
-        .room:last-child { border-radius: 0 0 var(--radius) var(--radius); }
-        .room.open { box-shadow: var(--shadow-sm); }
-
-        .room-h {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 20px; /* Barras mucho más amigables al tacto */
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-        .room-h:active { background: var(--indigo-ghost); }
+        .room { margin-bottom: 6px; background: var(--white); border: 1px solid rgba(107,143,163,0.08); overflow: hidden; }
+        .room-h { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px; cursor: pointer; }
         .room-hl { display: flex; align-items: center; gap: 14px; }
-        .room-hi svg {
-            width: 22px;
-            height: 22px;
-            stroke: var(--ink);
-            stroke-width: 1.5;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .room-hi svg { width: 22px; height: 22px; stroke: var(--ink); stroke-width: 1.5; fill: none; }
         .room-hn { font-family: 'Shippori Mincho', serif; font-size: 1.05rem; }
-        .room-hk { font-family: 'Shippori Mincho', serif; font-size: 0.75rem; color: var(--indigo-light); margin-left: 6px; }
-        .room-hr { display: flex; align-items: center; gap: 10px; }
-        .room-hc {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 0.8rem;
-            color: var(--indigo);
-            background: var(--indigo-ghost);
-            padding: 3px 12px;
-            border-radius: 12px;
-        }
-        .room-ha {
-            display: inline-block;
-            font-size: 0.8rem;
-            color: var(--indigo-pale);
-            transition: transform 0.3s ease;
-        }
+        .room-ha { font-size: 0.8rem; color: var(--indigo-pale); transition: transform 0.3s ease; }
         .room.open .room-ha { transform: rotate(90deg); }
-
-        .room-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
-        }
+        .room-body { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); }
         .room.open .room-body { max-height: 2000px; }
 
-        .r-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px 16px 48px;
-            border-top: 1px solid rgba(107,143,163,0.06);
-            gap: 12px;
-        }
-        .r-item-l { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-        .r-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--vermillion); flex-shrink: 0; opacity: 0.6; }
-        .r-name {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 0.95rem; /* Ampliado */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .r-qty {
-            font-size: 0.65rem;
-            color: var(--indigo);
-            background: var(--indigo-ghost);
-            padding: 2px 8px;
-            border-radius: 10px;
-            flex-shrink: 0;
-            font-weight: 700;
-        }
-        .r-btns { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+        .r-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 16px 48px; border-top: 1px solid rgba(107,143,163,0.06); gap: 12px; }
+        .r-name { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+        .r-btns { display: flex; gap: 8px; align-items: center; }
 
-        .sant-empty { text-align: center; padding: 80px 24px; }
-        .sant-empty-k {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 4.5rem;
-            color: var(--indigo-pale);
-            opacity: 0.35;
-            line-height: 1;
-        }
-        .sant-empty-t {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 1rem;
-            color: var(--indigo-light);
-            margin-top: 16px;
-        }
-
-        /* ═══════════════ PROCESS / CUENTAS ═══════════════ */
-        #screen-list { padding: 0; }
-
+        /* LIST / CUENTAS */
         .tabs { display: flex; width: 100%; border-bottom: 1px solid var(--indigo-ghost); }
         .tab {
-            flex: 1;
-            padding: 20px 0; /* Tabs enormes y cómodas */
-            background: none;
-            border: none;
-            font-size: 0.6rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--indigo-pale);
-            cursor: pointer;
-            position: relative;
-            font-family: 'Noto Sans', sans-serif;
-            font-weight: 700;
-            transition: color 0.2s;
-        }
-        .tab::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background: var(--vermillion);
-            transition: width 0.3s;
+            flex: 1; padding: 20px 0; background: none; border: none; font-size: 0.6rem;
+            letter-spacing: 4px; text-transform: uppercase; color: var(--indigo-pale);
+            cursor: pointer; position: relative; font-family: 'Noto Sans', sans-serif;
+            font-weight: 700; transition: color 0.2s;
         }
         .tab.on { color: var(--ink); }
-        .tab.on::after { width: 30%; }
+        .tab.on::after { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 30%; height: 2px; background: var(--vermillion); }
 
-        .list-hdr {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 24px 14px;
-        }
-        .list-t { font-family: 'Shippori Mincho', serif; font-size: 1.2rem; }
-        .list-t small { font-weight: 300; color: var(--indigo); font-size: 0.85rem; }
-        .sp {
-            font-size: 0.55rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: var(--white);
-            border: 1px solid var(--indigo-ghost);
-            padding: 6px 14px;
-            color: var(--indigo);
-            cursor: pointer;
-            font-family: 'Noto Sans', sans-serif;
-            font-weight: 700;
-            transition: all 0.15s;
-            border-radius: var(--radius);
-        }
-        .sp:active { background: var(--ink); color: white; border-color: var(--ink); }
-
-        .gh {
-            width: 92%;
-            padding: 24px 0 8px;
-            font-size: 0.55rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--indigo);
-            font-weight: 700;
-            border-bottom: 1px solid var(--indigo-ghost);
-            margin: 0 auto 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-        }
-        .gh-n { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; font-weight: 700; color: var(--ink-soft); }
-
-        /* Item cards */
-        .ic {
-            width: 92%;
-            margin: 0 auto 8px;
-            background: var(--white);
-            border: 1px solid rgba(107,143,163,0.08);
-            padding: 18px 20px;
-            border-radius: var(--radius);
-            transition: box-shadow var(--transition);
-        }
-        .ic:active { box-shadow: var(--shadow-sm); }
+        .ic { width: 92%; margin: 0 auto 8px; background: var(--white); border: 1px solid rgba(107,143,163,0.08); padding: 18px 20px; border-radius: var(--radius); }
         .ic-top { display: flex; align-items: center; justify-content: space-between; }
         .ic-l { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-        .ic-i svg {
-            width: 18px;
-            height: 18px;
-            stroke: var(--vermillion);
-            stroke-width: 1.8;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
         .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-        .ic-q { font-size: 0.65rem; color: var(--indigo); background: var(--indigo-ghost); padding: 2px 8px; border-radius: 10px; font-weight: 700; flex-shrink: 0; }
-        .ic-d { font-size: 0.6rem; color: var(--indigo-pale); letter-spacing: 1px; flex-shrink: 0; font-weight: 600;}
-        .ic-d.alert { color: var(--vermillion); font-weight: 800; }
-        .ic-bot {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid rgba(107,143,163,0.06);
-        }
-        .ic-m { font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: var(--indigo-pale); font-weight: 700; }
         .ic-p { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--indigo); font-weight: 600; }
         .ic-p.won { color: var(--vermillion); font-weight: 800; }
-        .ic-btns { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .ic-bot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(107,143,163,0.06); }
 
-        .ib {
-            background: none;
-            border: none;
-            font-size: 1.1rem;
-            color: var(--indigo-pale);
-            cursor: pointer;
-            padding: 6px;
-            transition: color 0.15s;
-        }
-        .ib:active { color: var(--ink); }
-
-        /* Circle action buttons */
         .cb {
-            background: none;
-            border: 1.5px solid var(--indigo-ghost);
-            width: 44px; /* Muy fáciles de tocar */
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.15s;
-            flex-shrink: 0;
+            background: none; border: 1.5px solid var(--indigo-ghost); width: 44px; height: 44px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.15s;
         }
-        .cb svg {
-            width: 22px;
-            height: 22px;
-            stroke: var(--indigo);
-            stroke-width: 1.8;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .cb svg { width: 22px; height: 22px; stroke: var(--indigo); stroke-width: 1.8; fill: none; }
         .cb:active { background: var(--indigo-ghost); transform: scale(0.93); }
-        .cb.price-edit { border-color: rgba(200,50,50,0.2); }
-        .cb.price-edit svg { stroke: var(--vermillion); }
-        .cb.price-edit:active { background: var(--vermillion-pale); }
-        .cb.del { border-color: rgba(200,50,50,0.15); }
-        .cb.del svg { stroke: var(--vermillion); }
-        .cb.del:active { background: var(--vermillion-pale); }
 
-        .ab {
-            padding: 8px 16px;
-            border: none;
-            font-size: 0.6rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-family: 'Noto Sans', sans-serif;
-            font-weight: 800;
-            border-radius: var(--radius);
-            transition: all 0.15s;
-        }
-        .ab.dk { background: var(--ink); color: white; }
-        .ab.rd { background: var(--vermillion); color: white; }
-        .ab:active { transform: scale(0.96); opacity: 0.9; }
-
-        /* Summary strip */
-        .as {
-            display: flex;
-            width: 92%;
-            margin: 20px auto;
-            background: var(--white);
-            border: 1px solid rgba(107,143,163,0.08);
-            overflow: hidden;
-            border-radius: var(--radius);
-        }
-        .as-h { flex: 1; padding: 20px; text-align: center; }
-        .as-h + .as-h { border-left: 1px solid rgba(107,143,163,0.06); }
-        .as-v { font-family: 'Shippori Mincho', serif; font-size: 1.8rem; font-weight: 800; }
-        .as-v.red { color: var(--vermillion); }
-        .as-l { font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: var(--indigo-pale); margin-top: 4px; font-weight: 700; }
-
-        .mt { margin-top: 80px; text-align: center; font-family: 'Shippori Mincho', serif; color: var(--indigo-pale); font-size: 1rem; }
-        .mt-k { font-size: 3.5rem; opacity: 0.3; margin-bottom: 12px; }
-
-        /* ═══════════════ SETTINGS ═══════════════ */
-        #screen-settings { padding: 0 28px; }
-
-        .s-desc { font-size: 0.85rem; color: var(--indigo); line-height: 1.7; margin-bottom: 30px; }
-        .s-alert { color: var(--vermillion); font-weight: 700; font-size: 0.8rem; display: none; margin-top: 10px; }
-
-        .s-section { width: 100%; margin-bottom: 40px; }
-        .s-section-t {
-            font-size: 0.6rem;
-            letter-spacing: 3px;
-            color: var(--indigo-pale);
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 16px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--indigo-ghost);
-        }
-
-        .s-stat-row { display: flex; justify-content: space-between; padding: 12px 0; }
-        .s-stat-label { font-size: 0.95rem; color: var(--ink-soft); font-weight: 600; }
-        .s-stat-val { font-family: 'Shippori Mincho', serif; font-size: 1.1rem; font-weight: 800; }
-        .s-stat-val.red { color: var(--vermillion); }
-
-        /* ═══════════════ OVERLAYS ═══════════════ */
+        /* OVERLAYS */
         .ov {
-            position: fixed;
-            inset: 0;
-            background: rgba(247,245,240,0.97);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 60px 28px;
-            overflow-y: auto;
+            position: fixed; inset: 0; background: rgba(247,245,240,0.97);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 2000; display: none; flex-direction: column; align-items: center;
+            padding: 60px 28px; overflow-y: auto;
         }
         .ov.visible { display: flex; animation: fadeIn 0.25s ease-out; }
-        .ov-t {
-            font-family: 'Shippori Mincho', serif;
-            font-size: 1.6rem;
-            font-weight: 400;
-            margin-bottom: 36px;
-            letter-spacing: 2px;
-        }
+        .ov-t { font-family: 'Shippori Mincho', serif; font-size: 1.6rem; margin-bottom: 36px; letter-spacing: 2px; }
 
-        /* Toast notification */
         .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: var(--ink);
-            color: white;
-            padding: 14px 32px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-family: 'Noto Sans', sans-serif;
-            font-weight: 600;
-            z-index: 5000;
-            opacity: 0;
-            transition: all 0.3s ease;
-            pointer-events: none;
-            white-space: nowrap;
-            box-shadow: var(--shadow-md);
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--ink); color: white; padding: 14px 32px; border-radius: 30px;
+            font-size: 0.85rem; font-family: 'Noto Sans', sans-serif; z-index: 5000;
+            opacity: 0; transition: all 0.3s ease; pointer-events: none;
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* ═══════════════ NAV ═══════════════ */
+        /* NAV */
         .nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 80px; /* Navbar muy cómoda para iPhone Plus */
-            background: var(--washi);
-            border-top: 1px solid var(--indigo-ghost);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-            padding-bottom: env(safe-area-inset-bottom, 16px); /* Soporte Notch/Home Bar */
+            position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--washi);
+            border-top: 1px solid var(--indigo-ghost); display: flex; justify-content: space-around;
+            align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 16px);
         }
-        .ni {
-            background: none;
-            border: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            position: relative;
-            padding: 8px 16px;
-        }
-        .ni svg {
-            width: 24px; /* Iconos mucho más grandes */
-            height: 24px;
-            stroke: var(--indigo-pale);
-            stroke-width: 1.5;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: stroke var(--transition);
-        }
-        .ni .nt {
-            font-size: 0.55rem;
-            letter-spacing: 1.5px;
-            color: var(--indigo-pale);
-            transition: color var(--transition);
-            text-transform: uppercase;
-            font-weight: 700;
-        }
+        .ni { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; padding: 8px 16px; }
+        .ni svg { width: 24px; height: 24px; stroke: var(--indigo-pale); stroke-width: 1.5; fill: none; transition: stroke 0.2s; }
         .ni.on svg { stroke: var(--vermillion); stroke-width: 2; }
+        .nt { font-size: 0.55rem; letter-spacing: 1.5px; color: var(--indigo-pale); text-transform: uppercase; font-weight: 700; }
         .ni.on .nt { color: var(--vermillion); }
-        .nd {
-            position: absolute;
-            top: 2px;
-            right: 8px;
-            width: 6px;
-            height: 6px;
-            background: var(--vermillion);
-            border-radius: 50%;
-            display: none;
-        }
+        .nd { position: absolute; top: 12px; right: 25%; width: 6px; height: 6px; background: var(--vermillion); border-radius: 50%; display: none; }
     </style>
 </head>
 <body>
-
-<!-- ═══ HOME ═══ -->
 
 <div id="screen-home" class="screen active">
     <div class="home-header">
@@ -921,8 +293,6 @@
             <svg viewBox="0 0 200 200">
                 <path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13"
                       stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.9"/>
-                <path d="M78 13 C81 12,84 12,88 13"
-                      stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.2"/>
             </svg>
             <div class="enso-center">
                 <div class="enso-num jp" id="total-money"><span class="enso-cur">€</span>0</div>
@@ -946,11 +316,9 @@
         </div>
     </div>
     <div class="koan">
-        <div class="koan-text jp" id="koan-text"></div>
+        <div class="koan-text jp" id="koan-text">「 El espacio vacío es el más valioso de la casa. 」</div>
     </div>
 </div>
-
-<!-- ═══ ADD ═══ -->
 
 <div id="screen-add" class="screen">
     <div class="section-header">
@@ -979,12 +347,10 @@
     </div>
     <div class="pb" id="price-box">
         <div class="fg-label" style="color:var(--vermillion)">precio estimado</div>
-        <input class="pb-inp jp" type="number" id="inp-price" placeholder="0€" inputmode="decimal">
+        <input class="pb-inp jp" type="text" id="inp-price" placeholder="0€" inputmode="decimal" pattern="[0-9]*">
     </div>
     <button class="cta" onclick="saveNewItem()">REGISTRAR</button>
 </div>
-
-<!-- ═══ SANTUARIO ═══ -->
 
 <div id="screen-santuario" class="screen">
     <div class="sant-top">
@@ -996,104 +362,49 @@
     <div class="rooms" id="rooms"></div>
 </div>
 
-<!-- ═══ PROCESS ═══ -->
-
-<div id="screen-list" class="screen" style="padding:0; padding-bottom:110px;">
+<div id="screen-list" class="screen">
     <div class="tabs">
         <button class="tab on" onclick="switchTab('process')">Proceso</button>
         <button class="tab" onclick="switchTab('sold')">Cuentas</button>
     </div>
-    <div class="list-hdr" id="list-header">
-        <div class="list-t jp">進行 <small>proceso</small></div>
-        <button class="sp" id="sort-btn" onclick="toggleSort()">Fecha ↓</button>
-    </div>
-    <div id="list-content" style="width:100%;display:flex;flex-direction:column;align-items:center;padding:0 0 20px;"></div>
+    <div id="list-content" style="width:100%; padding-top:20px;"></div>
 </div>
-
-<!-- ═══ SETTINGS ═══ -->
 
 <div id="screen-settings" class="screen">
     <div class="section-header">
         <div class="section-kanji jp">控</div>
         <div class="section-word">ajustes</div>
     </div>
-
-    <div class="s-section">
-        <div class="s-section-t">resumen</div>
-        <div class="s-stat-row"><span class="s-stat-label">Objetos en santuario</span><span class="s-stat-val jp" id="ss-kept">0</span></div>
-        <div class="s-stat-row"><span class="s-stat-label">En proceso</span><span class="s-stat-val jp" id="ss-pend">0</span></div>
-        <div class="s-stat-row"><span class="s-stat-label">Completados</span><span class="s-stat-val jp" id="ss-done">0</span></div>
-        <div class="s-stat-row"><span class="s-stat-label">Total ganado</span><span class="s-stat-val jp red" id="ss-earn">0€</span></div>
-    </div>
-
-    <div class="s-section">
-        <div class="s-section-t">datos</div>
-        <div class="s-desc">
-            Guarda una copia de tus datos para no perderlos.
-            <div class="s-alert" id="backup-status">Copia recomendada</div>
-        </div>
-        <button class="cta" onclick="exportData()">GUARDAR COPIA</button>
-        <input type="file" id="file-input" style="display:none" accept=".json" onchange="importData(this)">
-        <button class="cta2" onclick="document.getElementById('file-input').click()">CARGAR COPIA</button>
-    </div>
-
-    <div class="s-section">
-        <div class="s-section-t">zona de peligro</div>
-        <button class="cta red" onclick="confirmAction('¿Borrar TODOS los datos? Esta acción es irreversible.', resetAll)">BORRAR TODO</button>
-    </div>
-
+    <button class="cta" onclick="exportData()">GUARDAR COPIA</button>
+    <input type="file" id="file-input" style="display:none" accept=".json" onchange="importData(this)">
+    <button class="cta2" onclick="document.getElementById('file-input').click()">CARGAR COPIA</button>
+    <button class="cta red" style="margin-top:40px" onclick="confirmAction('¿Borrar TODOS los datos?', resetAll)">BORRAR TODO</button>
 </div>
-
-<!-- ═══ EDIT OVERLAY ═══ -->
 
 <div id="ov-edit" class="ov">
     <div class="ov-t jp">編集 Editar</div>
     <div class="fg" style="max-width:380px; width:100%;">
         <div class="fg-label">nombre</div>
-        <input class="fg-input jp" type="text" id="ed-name" autocomplete="off">
-    </div>
-    <div class="fg" style="max-width:380px; width:100%;">
-        <div class="fg-label">unidades</div>
-        <div class="qty-row">
-            <button class="q-btn" onclick="adjustQty('edit', -1)">−</button>
-            <span class="q-val jp" id="edit-qty">1</span>
-            <button class="q-btn" onclick="adjustQty('edit', 1)">+</button>
-        </div>
-    </div>
-    <div class="fg" style="max-width:380px; width:100%;">
-        <div class="fg-label">espacio</div>
-        <div class="chips" id="ed-chips"></div>
+        <input class="fg-input jp" type="text" id="ed-name">
     </div>
     <button class="cta" onclick="saveEdit()">GUARDAR</button>
     <button class="cta2" onclick="closeOverlay('ov-edit')">CANCELAR</button>
 </div>
 
-<!-- ═══ SOLD OVERLAY ═══ -->
-
-<div id="ov-sold" class="ov" style="justify-content:center;z-index:3000;">
+<div id="ov-sold" class="ov" style="justify-content:center;">
     <div class="ov-t jp">売 Vendido</div>
-    <p style="font-size:0.9rem;color:var(--indigo);margin-bottom:24px; font-weight:600;">¿Precio final de venta?</p>
-    <div class="fg" style="max-width:300px">
-        <input class="pb-inp jp" type="number" id="sold-price" placeholder="0€" inputmode="decimal" style="font-size:3rem; padding: 20px 0;">
-    </div>
+    <input class="pb-inp jp" type="text" id="sold-price" placeholder="0€" inputmode="decimal" pattern="[0-9]*" style="font-size:3rem; margin-bottom:20px;">
     <button class="cta red" onclick="confirmSold()">CONFIRMAR</button>
     <button class="cta2" onclick="closeOverlay('ov-sold')">CANCELAR</button>
 </div>
 
-<!-- ═══ CONFIRM OVERLAY ═══ -->
-
-<div id="ov-confirm" class="ov" style="justify-content:center;z-index:3500;">
-    <div class="ov-t jp" id="confirm-title">確認</div>
-    <p style="font-size:1.05rem;color:var(--indigo);margin-bottom:32px;text-align:center; font-weight:600;" id="confirm-msg"></p>
-    <button class="cta" id="confirm-yes" style="min-width:240px;">CONFIRMAR</button>
-    <button class="cta2" onclick="closeOverlay('ov-confirm')" style="min-width:240px;">CANCELAR</button>
+<div id="ov-confirm" class="ov" style="justify-content:center;">
+    <p id="confirm-msg" style="text-align:center; margin-bottom:30px; font-weight:600;"></p>
+    <button class="cta" id="confirm-yes">CONFIRMAR</button>
+    <button class="cta2" onclick="closeOverlay('ov-confirm')">CANCELAR</button>
 </div>
 
-<!-- ═══ TOAST ═══ -->
-
 <div class="toast" id="toast"></div>
-
-<!-- ═══ NAV ═══ -->
 
 <nav class="nav">
     <button class="ni on" onclick="go('screen-home', this)">
@@ -1113,7 +424,7 @@
         <span class="nt">proceso</span>
     </button>
     <button class="ni" onclick="go('screen-settings', this)">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83"/></svg>
         <span class="nt">ajustes</span>
         <div class="nd" id="settings-dot"></div>
     </button>
@@ -1121,140 +432,63 @@
 
 <script>
 /* ═══════════════════════════════════════════
-   空白 Kūhaku — Decluttering App v20 Plus
-   Refactored for large screens & readability
+   空白 Kūhaku — Logic Core
    ═══════════════════════════════════════════ */
 
-// ─── ICONS ───
 const ICONS = {
     living:   '<svg viewBox="0 0 24 24"><path d="M4 18v-5a3 3 0 013-3h10a3 3 0 013 3v5"/><path d="M2 18h20v2H2z"/><path d="M6 10V7a1 1 0 011-1h10a1 1 0 011 1v3"/></svg>',
     bedroom:  '<svg viewBox="0 0 24 24"><path d="M2 18h20"/><path d="M4 18v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><rect x="6" y="6" width="12" height="3" rx="1"/></svg>',
-    kitchen:  '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/><path d="M12 5V3"/></svg>',
+    kitchen:  '<svg viewBox="0 0 24 24"><path d="M4 12h16v5a5 5 0 01-5 5H9a5 5 0 01-5-5v-5z"/><path d="M5 12l2-5h10l2 5"/></svg>',
     bath:     '<svg viewBox="0 0 24 24"><path d="M4 14h16v4a4 4 0 01-4 4H8a4 4 0 01-4-4v-4z"/><path d="M7 14V9a2 2 0 012-2h1"/></svg>',
-    study:    '<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M6 16v5M18 16v5"/><path d="M14 14V9a2 2 0 00-2-2H8"/></svg>',
-    garden:   '<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 00-5-5 4 4 0 01-3-3 4 4 0 018 0 4 4 0 018 0 4 4 0 01-3 3 5 5 0 00-5 5z"/><path d="M8 21h8"/></svg>',
-    pantry:   '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 10h16M4 16h16"/></svg>',
-    garage:   '<svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M4 10h16M4 14h16M4 18h16"/></svg>',
-    terrace:  '<svg viewBox="0 0 24 24"><path d="M4 16h16M4 20h16"/><path d="M6 16v4M10 16v4M14 16v4M18 16v4"/><path d="M12 8v8"/></svg>',
-    basement: '<svg viewBox="0 0 24 24"><path d="M3 5h4v4h4v4h4v4h4"/><path d="M3 5v14h16"/></svg>',
-    dining:   '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="8" ry="4"/><path d="M12 10V6M9 6h6"/><path d="M12 18v4M8 22h8"/></svg>',
-    entrance: '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/><path d="M15 12h1"/><path d="M5 20h14"/></svg>',
+    study:    '<svg viewBox="0 0 24 24"><rect x="4" y="14" width="16" height="2"/><path d="M14 14V9a2 2 0 00-2-2H8"/></svg>',
+    garden:   '<svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13a5 5 0 00-5-5 4 4 0 01-3-3 4 4 0 018 0 4 4 0 018 0 4 4 0 01-3 3 5 5 0 00-5 5z"/></svg>',
     edit:     '<svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
     logout:   '<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
-    close:    '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-    price:    '<svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
-    temple:   '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
-    back:     '<svg viewBox="0 0 24 24"><path d="M3 12h12"/><path d="M3 12l5-5"/><path d="M3 12l5 5"/><path d="M21 5v14"/></svg>',
+    close:    '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
 };
 
-// ─── SPACES ───
 const SPACES = [
-    { id: 'living',   icon: ICONS.living,   label: 'Sala',       kj: '居間' },
-    { id: 'bedroom',  icon: ICONS.bedroom,  label: 'Dormitorio', kj: '寝室' },
-    { id: 'kitchen',  icon: ICONS.kitchen,  label: 'Cocina',     kj: '台所' },
-    { id: 'bath',     icon: ICONS.bath,     label: 'Baño',       kj: '浴室' },
-    { id: 'study',    icon: ICONS.study,    label: 'Estudio',    kj: '書斎' },
-    { id: 'garden',   icon: ICONS.garden,   label: 'Jardín',     kj: '庭園' },
-    { id: 'pantry',   icon: ICONS.pantry,   label: 'Despensa',   kj: '貯蔵' },
-    { id: 'garage',   icon: ICONS.garage,   label: 'Garaje',     kj: '車庫' },
-    { id: 'terrace',  icon: ICONS.terrace,  label: 'Terraza',    kj: 'テラス' },
-    { id: 'basement', icon: ICONS.basement, label: 'Sótano',     kj: '地下室' },
-    { id: 'dining',   icon: ICONS.dining,   label: 'Comedor',    kj: '食堂' },
-    { id: 'entrance', icon: ICONS.entrance, label: 'Entrada',    kj: '玄関' },
+    { id: 'living', icon: ICONS.living, label: 'Sala', kj: '居間' },
+    { id: 'bedroom', icon: ICONS.bedroom, label: 'Dormitorio', kj: '寝室' },
+    { id: 'kitchen', icon: ICONS.kitchen, label: 'Cocina', kj: '台所' },
+    { id: 'bath', icon: ICONS.bath, label: 'Baño', kj: '浴室' },
+    { id: 'study', icon: ICONS.study, label: 'Estudio', kj: '書斎' },
+    { id: 'garden', icon: ICONS.garden, label: 'Jardín', kj: '庭園' }
 ];
 
 const DECISIONS = [
     { id: 'conservar', label: 'Conservar' },
-    { id: 'regalar',   label: 'Regalar' },
-    { id: 'donar',     label: 'Donar' },
-    { id: 'tirar',     label: 'Tirar' },
-    { id: 'vender',    label: 'Vender', wide: true },
+    { id: 'regalar', label: 'Regalar' },
+    { id: 'donar', label: 'Donar' },
+    { id: 'tirar', label: 'Tirar' },
+    { id: 'vender', label: 'Vender', wide: true }
 ];
 
-const GROUP_LABELS = { vender: 'Vender', donar: 'Donar', regalar: 'Regalar', tirar: 'Tirar' };
-const GROUP_KJ = { vender: '売', donar: '寄', regalar: '贈', tirar: '捨' };
-
-const KOANS = [
-    'Poseer menos no es perder, es encontrar espacio para lo esencial.',
-    'El vacío no es ausencia. Es posibilidad.',
-    'Lo que sueltas con gratitud vuelve como libertad.',
-    'Cada objeto que liberas es un paso hacia la claridad.',
-    'El espacio vacío es el más valioso de la casa.',
-    'Simplificar es el arte de saber qué merece quedarse.',
-    'No se trata de tener poco, sino de tener lo justo.',
-];
-
-// ─── STATE ───
 let db = [];
 let state = {
     currentAction: null,
     currentTab: 'process',
     addSpace: 'living',
-    editSpace: 'living',
+    addQty: 1,
     editId: null,
     soldId: null,
-    addQty: 1,
-    editQty: 1,
-    lastBackup: 0,
-    changesSinceBackup: 0,
-    sortMode: 'date',
-    openRooms: new Set(),
-    confirmCallback: null,
+    openRooms: new Set()
 };
 
-// Cache nav buttons
 const navButtons = document.querySelectorAll('.ni');
 
-// ─── PERSISTENCE ───
+// --- DATABASE & STORAGE ---
 function loadData() {
-    try {
-        const raw = localStorage.getItem('kuhakuDB');
-        if (raw) db = JSON.parse(raw);
-        const meta = localStorage.getItem('kuhakuMeta');
-        if (meta) {
-            const parsed = JSON.parse(meta);
-            state.lastBackup = parsed.lastBackup || 0;
-            state.changesSinceBackup = parsed.changes || 0;
-        }
-    } catch {
-        db = [];
-    }
+    const raw = localStorage.getItem('kuhakuDB');
+    if (raw) db = JSON.parse(raw);
 }
 
 function saveData() {
     localStorage.setItem('kuhakuDB', JSON.stringify(db));
-    state.changesSinceBackup++;
-    localStorage.setItem('kuhakuMeta', JSON.stringify({
-        lastBackup: state.lastBackup,
-        changes: state.changesSinceBackup,
-    }));
-    checkBackupStatus();
     updateHome();
 }
 
-function findItem(id) {
-    return db.find(item => item.id === id);
-}
-
-// ─── TOAST ───
-let toastTimer = null;
-function showToast(msg) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-// ─── BACKUP ───
-function checkBackupStatus() {
-    const daysSince = (Date.now() - state.lastBackup) / 864e5;
-    const needsBackup = (state.changesSinceBackup > 5) || (daysSince > 7 && state.changesSinceBackup > 0);
-    document.getElementById('settings-dot').style.display = needsBackup ? 'block' : 'none';
-    document.getElementById('backup-status').style.display = needsBackup ? 'block' : 'none';
-}
-
-// ─── NAVIGATION ───
+// --- NAVIGATION ---
 function go(screenId, btn) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
@@ -1264,67 +498,53 @@ function go(screenId, btn) {
     if (screenId === 'screen-santuario') renderSantuario();
 }
 
-// ─── CHIPS RENDERER ───
-function renderChips(containerId, selectedId, onSelect) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    SPACES.forEach(space => {
+function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// --- ADD ITEM LOGIC ---
+function renderAddForm() {
+    const chips = document.getElementById('add-chips');
+    chips.innerHTML = '';
+    SPACES.forEach(s => {
         const chip = document.createElement('div');
-        chip.className = 'chip' + (space.id === selectedId ? ' sel' : '');
-        chip.innerHTML = `${space.icon}<div class="chip-lbl">${space.label}</div><div class="chip-kj">${space.kj}</div>`;
-        chip.onclick = () => onSelect(space.id);
-        container.appendChild(chip);
+        chip.className = `chip ${s.id === state.addSpace ? 'sel' : ''}`;
+        chip.innerHTML = `${s.icon}<div class="chip-lbl">${s.label}</div>`;
+        chip.onclick = () => {
+            state.addSpace = s.id;
+            renderAddForm();
+        };
+        chips.appendChild(chip);
     });
-}
 
-function refreshAllChips() {
-    renderChips('add-chips', state.addSpace, id => { state.addSpace = id; refreshAllChips(); });
-    renderChips('ed-chips', state.editSpace, id => { state.editSpace = id; refreshAllChips(); });
-}
-
-// ─── DECISION GRID ───
-function renderDecisionGrid() {
     const grid = document.getElementById('decision-grid');
     grid.innerHTML = '';
-    DECISIONS.forEach(dec => {
+    DECISIONS.forEach(d => {
         const btn = document.createElement('button');
-        btn.className = 'd-btn' + (dec.wide ? ' w2' : '');
-        btn.textContent = dec.label;
-        btn.onclick = () => selectDecision(btn, dec.id);
+        btn.className = `d-btn ${d.wide ? 'w2' : ''} ${state.currentAction === d.id ? (d.id === 'vender' ? 'sel-v' : 'sel') : ''}`;
+        btn.textContent = d.label;
+        btn.onclick = () => {
+            state.currentAction = d.id;
+            document.getElementById('price-box').style.display = d.id === 'vender' ? 'block' : 'none';
+            renderAddForm();
+        };
         grid.appendChild(btn);
     });
 }
 
-function selectDecision(btn, action) {
-    document.querySelectorAll('.d-btn').forEach(b => b.classList.remove('sel', 'sel-v'));
-    if (action === 'vender') {
-        btn.classList.add('sel-v');
-        document.getElementById('price-box').style.display = 'block';
-    } else {
-        btn.classList.add('sel');
-        document.getElementById('price-box').style.display = 'none';
-    }
-    state.currentAction = action;
-}
-
-// ─── QUANTITY ───
 function adjustQty(mode, delta) {
-    if (mode === 'add') {
-        state.addQty = Math.max(1, state.addQty + delta);
-        document.getElementById('add-qty').textContent = state.addQty;
-    } else {
-        state.editQty = Math.max(1, state.editQty + delta);
-        document.getElementById('edit-qty').textContent = state.editQty;
-    }
+    state.addQty = Math.max(1, state.addQty + delta);
+    document.getElementById('add-qty').textContent = state.addQty;
 }
 
-// ─── ADD NEW ITEM ───
 function saveNewItem() {
     const name = document.getElementById('inp-name').value.trim();
-    if (!name || !state.currentAction) {
-        showToast('Completa nombre y decisión');
-        return;
-    }
+    if (!name || !state.currentAction) return showToast('Falta nombre o decisión');
+
+    const priceVal = parseFloat(document.getElementById('inp-price').value) || 0;
 
     const item = {
         id: Date.now(),
@@ -1332,489 +552,214 @@ function saveNewItem() {
         qty: state.addQty,
         act: state.currentAction,
         space: state.addSpace,
-        price: document.getElementById('inp-price').value || 0,
+        price: priceVal,
         final: 0,
         st: state.currentAction === 'conservar' ? 'kept' : 'active',
-        date: new Date().toLocaleDateString(),
-        ts: Date.now(),
+        ts: Date.now()
     };
+
     db.push(item);
     saveData();
     showToast('Registrado ✓');
-
-    // Reset form
+    
+    // Reset
     document.getElementById('inp-name').value = '';
     document.getElementById('inp-price').value = '';
     state.addQty = 1;
     document.getElementById('add-qty').textContent = '1';
-    document.querySelectorAll('.d-btn').forEach(b => b.classList.remove('sel', 'sel-v'));
     state.currentAction = null;
-    document.getElementById('price-box').style.display = 'none';
-
-    // Navigate
-    if (item.st === 'kept') {
-        go('screen-santuario', navButtons[2]);
-    } else {
-        go('screen-list', navButtons[3]);
-    }
+    renderAddForm();
+    go('screen-home', navButtons[0]);
 }
 
-// ─── SANTUARIO ───
+// --- SANTUARIO ---
 function renderSantuario() {
     const container = document.getElementById('rooms');
     container.innerHTML = '';
-    const query = (document.getElementById('sant-q').value || '').toLowerCase();
+    const query = document.getElementById('sant-q').value.toLowerCase();
+    
     let kept = db.filter(i => i.st === 'kept');
     if (query) kept = kept.filter(i => i.name.toLowerCase().includes(query));
-
-    document.getElementById('sant-n').textContent = kept.length + ' objeto' + (kept.length !== 1 ? 's' : '');
-
-    if (!kept.length) {
-        container.innerHTML = '<div class="sant-empty"><div class="sant-empty-k">空</div><div class="sant-empty-t">Tu santuario está vacío</div></div>';
-        return;
-    }
-
-    // Group by space
-    const grouped = {};
-    kept.forEach(item => {
-        const s = item.space || 'living';
-        if (!grouped[s]) grouped[s] = [];
-        grouped[s].push(item);
-    });
+    
+    document.getElementById('sant-n').textContent = `${kept.length} objetos`;
 
     SPACES.forEach(space => {
-        const items = grouped[space.id];
-        if (!items) return;
+        const items = kept.filter(i => i.space === space.id);
+        if (items.length === 0) return;
 
         const room = document.createElement('div');
-        room.className = 'room' + (state.openRooms.has(space.id) ? ' open' : '');
-
-        const header = document.createElement('div');
-        header.className = 'room-h';
-        header.innerHTML = `
-            <div class="room-hl">
-                <div class="room-hi">${space.icon}</div>
-                <span class="room-hn">${space.label}</span>
-                <span class="room-hk">${space.kj}</span>
+        room.className = `room ${state.openRooms.has(space.id) ? 'open' : ''}`;
+        room.innerHTML = `
+            <div class="room-h" onclick="toggleRoom('${space.id}')">
+                <div class="room-hl">${space.icon} <span class="room-hn">${space.label}</span></div>
+                <div class="room-ha">›</div>
             </div>
-            <div class="room-hr">
-                <span class="room-hc">${items.length}</span>
-                <span class="room-ha">›</span>
-            </div>`;
-        header.onclick = () => {
-            room.classList.toggle('open');
-            if (room.classList.contains('open')) state.openRooms.add(space.id);
-            else state.openRooms.delete(space.id);
-        };
-
-        const body = document.createElement('div');
-        body.className = 'room-body';
-
-        items.forEach(item => {
-            const row = document.createElement('div');
-            row.className = 'r-item';
-            const qtyBadge = item.qty > 1 ? `<span class="r-qty">×${item.qty}</span>` : '';
-            row.innerHTML = `
-                <div class="r-item-l">
-                    <div class="r-dot"></div>
-                    <span class="r-name">${item.name}</span>
-                    ${qtyBadge}
-                </div>
-                <div class="r-btns">
-                    <button class="cb" onclick="openEdit(${item.id})">${ICONS.edit}</button>
-                    <button class="cb" onclick="moveFromKeep(${item.id})">${ICONS.logout}</button>
-                    <button class="cb del" onclick="deleteItem(${item.id})">${ICONS.close}</button>
-                </div>`;
-            body.appendChild(row);
-        });
-
-        room.appendChild(header);
-        room.appendChild(body);
+            <div class="room-body">
+                ${items.map(i => `
+                    <div class="r-item">
+                        <span class="r-name">${i.name}</span>
+                        <div class="r-btns">
+                            <button class="cb" onclick="moveItem('${i.id}', 'active')">${ICONS.logout}</button>
+                            <button class="cb" onclick="deleteItem(${i.id})">${ICONS.close}</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
         container.appendChild(room);
     });
 }
 
-// ─── PROCESS / CUENTAS LIST ───
-function switchTab(tab) {
-    state.currentTab = tab;
-    document.querySelectorAll('.tab').forEach((btn, i) => {
-        btn.classList.toggle('on', ['process', 'sold'][i] === tab);
-    });
-    document.getElementById('sort-btn').style.display = tab === 'process' ? 'block' : 'none';
-    renderList();
+function toggleRoom(id) {
+    if (state.openRooms.has(id)) state.openRooms.delete(id);
+    else state.openRooms.add(id);
+    renderSantuario();
 }
 
-function toggleSort() {
-    state.sortMode = state.sortMode === 'date' ? 'price' : 'date';
-    document.getElementById('sort-btn').textContent = state.sortMode === 'date' ? 'Fecha ↓' : 'Precio ↓';
+// --- LISTS & TABS ---
+function switchTab(tab) {
+    state.currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.textContent.toLowerCase().includes(tab === 'process' ? 'proceso' : 'cuentas')));
     renderList();
 }
 
 function renderList() {
     const container = document.getElementById('list-content');
     container.innerHTML = '';
-    const headerEl = document.getElementById('list-header').querySelector('.list-t');
 
     if (state.currentTab === 'process') {
         const active = db.filter(i => i.st === 'active');
-        headerEl.innerHTML = `進行 <small>proceso · ${active.length}</small>`;
-
-        const groups = ['vender', 'donar', 'regalar', 'tirar'];
-        let hasItems = false;
-
-        groups.forEach(group => {
-            let items = active.filter(i => i.act === group);
-            if (!items.length) return;
-            hasItems = true;
-
-            // Sort
-            if (state.sortMode === 'date') items.sort((a, b) => (b.ts || 0) - (a.ts || 0));
-            else items.sort((a, b) => parseFloat(b.price || 0) - parseFloat(a.price || 0));
-
-            const gh = document.createElement('div');
-            gh.className = 'gh';
-            gh.innerHTML = `<span>${GROUP_KJ[group]} ${GROUP_LABELS[group]}</span><span class="gh-n">${items.length}</span>`;
-            container.appendChild(gh);
-
-            items.forEach(item => container.appendChild(createItemCard(item)));
+        active.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'ic';
+            card.innerHTML = `
+                <div class="ic-top">
+                    <div class="ic-l"><span class="ic-n">${item.name}</span></div>
+                    <div class="ic-p">${item.act === 'vender' ? item.price + '€' : item.act}</div>
+                </div>
+                <div class="ic-bot">
+                    <button class="cb" onclick="openEdit(${item.id})">${ICONS.edit}</button>
+                    ${item.act === 'vender' ? 
+                        `<button class="cta red" style="margin:0; width:auto; padding:10px 20px;" onclick="openSold(${item.id})">Vendido</button>` : 
+                        `<button class="cta" style="margin:0; width:auto; padding:10px 20px;" onclick="moveItem(${item.id}, 'done')">Listo</button>`
+                    }
+                </div>
+            `;
+            container.appendChild(card);
         });
-
-        if (!hasItems) {
-            container.innerHTML = '<div class="mt"><div class="mt-k">空</div>Todo limpio</div>';
-        }
     } else {
-        // Cuentas tab
-        const pending = db.filter(i => i.st === 'active' && i.act === 'vender');
         const done = db.filter(i => i.st === 'done');
-        const totalEarned = done.filter(i => i.act === 'vender').reduce((sum, i) => sum + parseFloat(i.final || 0), 0);
-        const totalPending = pending.reduce((sum, i) => sum + parseFloat(i.price || 0), 0);
-
-        headerEl.innerHTML = `帳簿 <small>cuentas · ${done.length}</small>`;
-
-        const summary = document.createElement('div');
-        summary.className = 'as';
-        summary.innerHTML = `
-            <div class="as-h"><div class="as-v red jp">${totalEarned}€</div><div class="as-l">ganado</div></div>
-            <div class="as-h"><div class="as-v jp">${totalPending}€</div><div class="as-l">en venta</div></div>`;
-        container.appendChild(summary);
-
-        const sorted = [...done].sort((a, b) => (b.ts || 0) - (a.ts || 0));
-        sorted.forEach(item => container.appendChild(createItemCard(item)));
+        done.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'ic';
+            card.innerHTML = `
+                <div class="ic-top">
+                    <div class="ic-l"><span class="ic-n">${item.name}</span></div>
+                    <div class="ic-p won">${item.act === 'vender' ? '+' + item.final + '€' : '✓'}</div>
+                </div>
+                <div class="ic-bot">
+                    <button class="cb" onclick="moveItem(${item.id}, 'kept')">Santuario</button>
+                    <button class="cb" onclick="deleteItem(${item.id})">${ICONS.close}</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
     }
 }
 
-function createItemCard(item) {
-    const card = document.createElement('div');
-    card.className = 'ic';
-
-    const space = SPACES.find(s => s.id === (item.space || 'living'));
-    const spaceIcon = space ? space.icon : ICONS.living;
-    const qtyBadge = item.qty > 1 ? `<span class="ic-q">×${item.qty}</span>` : '';
-    const daysAgo = Math.floor((Date.now() - (item.ts || Date.now())) / 864e5);
-    const dateText = daysAgo === 0 ? 'Hoy' : `${daysAgo}d`;
-    const isAlert = state.currentTab === 'process' && daysAgo > 30;
-
-    // Meta line
-    let meta = '';
-    if (state.currentTab === 'process' && item.act === 'vender') {
-        meta = `<div class="ic-p">Meta: ${item.price}€</div>`;
-    } else if (state.currentTab === 'sold' && item.act === 'vender') {
-        meta = `<div class="ic-p won">+${item.final}€</div>`;
-    } else if (state.currentTab === 'sold') {
-        meta = `<div class="ic-m">${GROUP_LABELS[item.act] || item.act} ✓</div>`;
-    } else {
-        meta = `<div class="ic-m">${GROUP_LABELS[item.act] || item.act}</div>`;
-    }
-
-    // Action buttons
-    let buttons = '';
-    if (state.currentTab === 'process') {
-        const editBtn = `<button class="ib" onclick="openEdit(${item.id})">✎</button>`;
-        if (item.act === 'vender') {
-            buttons = editBtn + `<button class="ab rd" onclick="openSoldOverlay(${item.id})">Vendido</button>`;
-        } else {
-            buttons = editBtn + `<button class="ab dk" onclick="markDone(${item.id})">Listo</button>`;
-        }
-    } else {
-        let extraBtns = '';
-        if (item.act === 'vender') {
-            extraBtns = `<button class="cb price-edit" onclick="editFinalPrice(${item.id})">${ICONS.price}</button>`;
-        }
-        buttons = `${extraBtns}<button class="cb" onclick="moveToKeep(${item.id})">${ICONS.temple}</button><button class="cb" onclick="restoreToProcess(${item.id})">${ICONS.back}</button><button class="cb del" onclick="deleteItem(${item.id})">${ICONS.close}</button>`;
-    }
-
-    card.innerHTML = `
-        <div class="ic-top">
-            <div class="ic-l">
-                <div class="ic-i">${spaceIcon}</div>
-                <span class="ic-n">${item.name}</span>
-                ${qtyBadge}
-            </div>
-            <div class="ic-d${isAlert ? ' alert' : ''}">${dateText}</div>
-        </div>
-        <div class="ic-bot">
-            ${meta}
-            <div class="ic-btns">${buttons}</div>
-        </div>`;
-    return card;
-}
-
-// ─── EDIT OVERLAY ───
-function openEdit(id) {
-    state.editId = id;
-    const item = findItem(id);
-    if (!item) return;
-    document.getElementById('ed-name').value = item.name;
-    state.editQty = item.qty || 1;
-    document.getElementById('edit-qty').textContent = state.editQty;
-    state.editSpace = item.space || 'living';
-    refreshAllChips();
-    openOverlay('ov-edit');
-}
-
-function saveEdit() {
-    if (!state.editId) return;
-    const item = findItem(state.editId);
-    const name = document.getElementById('ed-name').value.trim();
-    if (!name || !item) return;
-    item.name = name;
-    item.space = state.editSpace;
-    item.qty = state.editQty;
-    saveData();
-    renderList();
-    renderSantuario();
-    closeOverlay('ov-edit');
-    showToast('Guardado ✓');
-}
-
-// ─── OVERLAYS ───
-function openOverlay(id) {
-    const el = document.getElementById(id);
-    el.style.display = 'flex';
-    el.classList.add('visible');
-}
-
-function closeOverlay(id) {
-    const el = document.getElementById(id);
-    el.classList.remove('visible');
-    setTimeout(() => { el.style.display = 'none'; }, 50);
-    state.editId = null;
-    state.soldId = null;
-    state.confirmCallback = null;
-}
-
-// ─── SOLD FLOW ───
-function openSoldOverlay(id) {
-    state.soldId = id;
-    document.getElementById('sold-price').value = '';
-    openOverlay('ov-sold');
-    setTimeout(() => document.getElementById('sold-price').focus(), 150);
-}
-
-function confirmSold() {
-    const price = document.getElementById('sold-price').value;
-    if (price === '' || price === null) return;
-    const item = findItem(state.soldId);
+// --- ACTIONS ---
+function moveItem(id, status) {
+    const item = db.find(i => i.id == id);
     if (item) {
-        item.final = price;
-        item.st = 'done';
-        saveData();
-        renderList();
-        showToast(`Vendido por ${price}€`);
-    }
-    closeOverlay('ov-sold');
-}
-
-function editFinalPrice(id) {
-    state.soldId = id;
-    const item = findItem(id);
-    document.getElementById('sold-price').value = item ? item.final || '' : '';
-    openOverlay('ov-sold');
-    setTimeout(() => document.getElementById('sold-price').focus(), 150);
-}
-
-// ─── CONFIRM MODAL ───
-function confirmAction(msg, callback) {
-    state.confirmCallback = callback;
-    document.getElementById('confirm-msg').textContent = msg;
-    document.getElementById('confirm-yes').onclick = () => {
-        const fn = state.confirmCallback;
-        closeOverlay('ov-confirm');
-        if (fn) fn();
-    };
-    openOverlay('ov-confirm');
-}
-
-// ─── ITEM ACTIONS ───
-function markDone(id) {
-    const item = findItem(id);
-    if (item) {
-        item.st = 'done';
-        saveData();
-        renderList();
-        showToast('Completado ✓');
-    }
-}
-
-function moveToKeep(id) {
-    confirmAction('¿Mover al santuario?', () => {
-        const item = findItem(id);
-        if (item) {
-            item.st = 'kept';
-            item.act = 'conservar';
-            item.final = 0;
-            saveData();
-            renderList();
-            renderSantuario();
-            showToast('Movido al santuario');
-        }
-    });
-}
-
-function moveFromKeep(id) {
-    confirmAction('¿Sacar del santuario y mover a proceso?', () => {
-        const item = findItem(id);
-        if (item) {
-            item.st = 'active';
-            item.act = 'vender';
-            saveData();
-            renderList();
-            renderSantuario();
-            showToast('Movido a proceso');
-        }
-    });
-}
-
-function restoreToProcess(id) {
-    confirmAction('¿Devolver al proceso?', () => {
-        const item = findItem(id);
-        if (item) {
-            item.st = 'active';
-            item.final = 0;
-            saveData();
-            renderList();
-            showToast('Devuelto a proceso');
-        }
-    });
-}
-
-function deleteItem(id) {
-    confirmAction('¿Eliminar definitivamente?', () => {
-        db = db.filter(item => item.id !== id);
+        item.st = status;
         saveData();
         renderList();
         renderSantuario();
-        showToast('Eliminado');
+        showToast('Actualizado');
+    }
+}
+
+function deleteItem(id) {
+    confirmAction('¿Eliminar para siempre?', () => {
+        db = db.filter(i => i.id != id);
+        saveData();
+        renderList();
+        renderSantuario();
     });
+}
+
+function openSold(id) {
+    state.soldId = id;
+    document.getElementById('ov-sold').style.display = 'flex';
+    document.getElementById('ov-sold').classList.add('visible');
+}
+
+function confirmSold() {
+    const finalPrice = parseFloat(document.getElementById('sold-price').value) || 0;
+    const item = db.find(i => i.id == state.soldId);
+    if (item) {
+        item.final = finalPrice;
+        item.st = 'done';
+        saveData();
+        closeOverlay('ov-sold');
+        renderList();
+        showToast('¡Vendido! 🎉');
+    }
+}
+
+function openEdit(id) {
+    state.editId = id;
+    const item = db.find(i => i.id == id);
+    document.getElementById('ed-name').value = item.name;
+    document.getElementById('ov-edit').style.display = 'flex';
+    document.getElementById('ov-edit').classList.add('visible');
+}
+
+function saveEdit() {
+    const item = db.find(i => i.id == state.editId);
+    item.name = document.getElementById('ed-name').value;
+    saveData();
+    closeOverlay('ov-edit');
+    renderList();
+}
+
+function closeOverlay(id) {
+    document.getElementById(id).classList.remove('visible');
+    setTimeout(() => document.getElementById(id).style.display = 'none', 300);
+}
+
+function confirmAction(msg, cb) {
+    document.getElementById('confirm-msg').textContent = msg;
+    document.getElementById('ov-confirm').style.display = 'flex';
+    document.getElementById('ov-confirm').classList.add('visible');
+    document.getElementById('confirm-yes').onclick = () => {
+        cb();
+        closeOverlay('ov-confirm');
+    };
 }
 
 function resetAll() {
     db = [];
     saveData();
-    renderList();
-    renderSantuario();
-    showToast('Datos borrados');
+    go('screen-home', navButtons[0]);
 }
 
-// ─── HOME ───
 function updateHome() {
-    const earned = db.filter(i => i.st === 'done' && i.act === 'vender')
-        .reduce((sum, i) => sum + parseFloat(i.final || 0), 0);
-    const keptCount = db.filter(i => i.st === 'kept').length;
-    const activeCount = db.filter(i => i.st === 'active').length;
-    const doneCount = db.filter(i => i.st === 'done').length;
-
-    document.getElementById('total-money').innerHTML = `<span class="enso-cur">€</span>${earned}`;
-    document.getElementById('stat-kept').textContent = keptCount;
-    document.getElementById('stat-pending').textContent = activeCount;
-    document.getElementById('stat-sold').textContent = doneCount;
-
-    // Settings stats
-    document.getElementById('ss-kept').textContent = keptCount;
-    document.getElementById('ss-pend').textContent = activeCount;
-    document.getElementById('ss-done').textContent = doneCount;
-    document.getElementById('ss-earn').textContent = earned + '€';
+    const total = db.filter(i => i.st === 'done').reduce((acc, i) => acc + (parseFloat(i.final) || 0), 0);
+    document.getElementById('total-money').innerHTML = `<span class="enso-cur">€</span>${total}`;
+    document.getElementById('stat-kept').textContent = db.filter(i => i.st === 'kept').length;
+    document.getElementById('stat-pending').textContent = db.filter(i => i.st === 'active').length;
+    document.getElementById('stat-sold').textContent = db.filter(i => i.st === 'done').length;
 }
 
-// ─── BACKUP / IMPORT ───
-async function exportData() {
-    const json = JSON.stringify(db, null, 2);
-    const file = new File([json], 'kuhaku.json', { type: 'application/json' });
+// --- INITIALIZE ---
+loadData();
+renderAddForm();
+updateHome();
 
-    if (navigator.share) {
-        try {
-            await navigator.share({ files: [file], title: 'Kūhaku' });
-            state.lastBackup = Date.now();
-            state.changesSinceBackup = 0;
-            localStorage.setItem('kuhakuMeta', JSON.stringify({
-                lastBackup: state.lastBackup,
-                changes: 0,
-            }));
-            checkBackupStatus();
-            showToast('Copia guardada ✓');
-        } catch {
-            downloadFile(json);
-        }
-    } else {
-        downloadFile(json);
-    }
-}
+const hour = new Date().getHours();
+document.getElementById('greeting').textContent = hour < 12 ? 'おはよう Buenos días' : hour < 19 ? 'こんにちは Buenas tardes' : 'こんばんは Buenas noches';
 
-function downloadFile(content) {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([content], { type: 'application/json' }));
-    a.download = 'kuhaku.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    showToast('Descargado ✓');
-}
-
-function importData(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const parsed = JSON.parse(e.target.result);
-            if (!Array.isArray(parsed)) throw new Error('Invalid');
-            db = parsed;
-            saveData();
-            renderSantuario();
-            renderList();
-            showToast('Datos cargados ✓');
-        } catch {
-            showToast('Error al cargar');
-        }
-    };
-    reader.readAsText(file);
-    input.value = ''; // Reset for re-import
-}
-
-// ─── INIT ───
-function init() {
-    loadData();
-    refreshAllChips();
-    renderDecisionGrid();
-    checkBackupStatus();
-    updateHome();
-
-    // Koan
-    const koan = KOANS[Math.floor(Math.random() * KOANS.length)];
-    document.getElementById('koan-text').textContent = '「 ' + koan + ' 」';
-
-    // Greeting
-    const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'おはよう Buenos días'
-                   : hour < 19 ? 'こんにちは Buenas tardes'
-                   : 'こんばんは Buenas noches';
-    document.getElementById('greeting').textContent = greeting;
-}
-
-init();
 </script>
-
 </body>
 </html>
-
-
