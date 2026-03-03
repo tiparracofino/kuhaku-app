@@ -113,7 +113,6 @@
         .enso svg path { stroke-dasharray: 600; animation: brushStroke 2s ease-out forwards; }
         .enso-center { text-align: center; z-index: 1; }
         
-        /* Modificados para enfocar en objetos en vez de dinero */
         .enso-num { font-family: 'Shippori Mincho', serif; font-size: 3.8rem; font-weight: 800; line-height: 1; letter-spacing: -3px; color: var(--text-main); }
         .enso-sub { font-size: 0.55rem; letter-spacing: 6px; color: var(--gold); text-transform: uppercase; margin-top: 8px; font-weight: 600; }
         .enso-items { font-family: 'Shippori Mincho', serif; font-size: 0.85rem; color: var(--gold-dim); margin-top: 14px; letter-spacing: 1px; }
@@ -190,11 +189,11 @@
 
         .cha-header { 
             width: 100%; 
-            padding: 24px 28px 8px; /* Reducido espacio superior y casi sin espacio inferior */
+            padding: 24px 28px 8px; 
             text-align: center; 
             position: relative; 
             z-index: 10; 
-            background: var(--bg); /* Oculta objetos que hacen scroll por detrás */
+            background: var(--bg); 
         }
         .cha-title { font-family: 'Noto Serif JP', serif; font-size: 3rem; font-weight: 200; color: var(--gold); letter-spacing: 12px; line-height: 1; }
         .cha-sub { font-size: 0.48rem; letter-spacing: 8px; color: var(--gold); text-transform: uppercase; margin-top: 10px; font-weight: 600; }
@@ -206,10 +205,10 @@
             width: 100%; 
             display: flex; 
             justify-content: center; 
-            padding: 4px 28px 8px; /* Subido más arriba */
+            padding: 4px 28px 8px; 
             position: relative; 
             z-index: 10; 
-            background: var(--bg); /* Oculta objetos que hacen scroll por detrás */
+            background: var(--bg); 
         }
         .cha-search { width: 100%; max-width: 240px; padding: 8px 0; border: none; border-bottom: 1px solid var(--gold-ghost); background: transparent; font-family: 'Shippori Mincho', serif; font-size: 0.85rem; outline: none; color: var(--gold); text-align: center; letter-spacing: 2px; transition: border-color 0.3s; appearance: none; border-radius: 0; }
         .cha-search:focus { border-color: var(--gold-dim); }
@@ -221,7 +220,7 @@
             width: 100%; 
             position: relative; 
             z-index: 1; 
-            padding: 8px 0 calc(90px + env(safe-area-inset-bottom, 20px)); /* Subido al máximo (de 16px a 8px) y bajado al fondo para la navbar */
+            padding: 8px 0 calc(90px + env(safe-area-inset-bottom, 20px)); 
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -237,7 +236,7 @@
             background: linear-gradient(to bottom, transparent, var(--gold-dim) 20%, var(--gold-dim) 80%, transparent);
         }
         .cha-tate-kj { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; font-weight: 500; color: var(--gold); writing-mode: vertical-rl; letter-spacing: 4px; opacity: 0.7; }
-        .cha-tate-count { font-size: 0.48rem; color: var(--gold-dim); margin-top: 8px; font-weight: 600; }
+        .cha-tate-count { font-family: 'Shippori Mincho', serif; font-size: 0.75rem; color: var(--gold-dim); margin-top: 10px; font-weight: 700; }
 
         .cha-room-items { flex: 1; padding: 8px 20px 16px 18px; }
         .cha-room-label { font-family: 'Noto Sans', sans-serif; font-size: 0.52rem; letter-spacing: 4px; text-transform: uppercase; color: var(--gold-dim); font-weight: 600; padding: 8px 0 10px; }
@@ -250,8 +249,9 @@
         .cha-item-name { font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--text-main); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .cha-item-meta { display: flex; align-items: center; margin-top: 2px; }
         .cha-item-meta > * + * { margin-left: 8px; }
-        .cha-item-qty { font-size: 0.45rem; color: var(--gold); background: var(--gold-ghost); padding: 1px 7px; border-radius: 6px; font-weight: 600; }
-        .cha-item-date { font-size: 0.42rem; color: var(--gold-dim); letter-spacing: 1.5px; font-weight: 600; }
+        
+        /* Ajuste de los números de los objetos individuales */
+        .cha-item-qty { font-family: 'Shippori Mincho', serif; font-size: 0.75rem; color: var(--gold-dim); font-weight: 700; letter-spacing: 1px; }
 
         .cha-item-actions { display: flex; flex-shrink: 0; align-items: center; }
         .cha-item-actions > * + * { margin-left: 2px; }
@@ -298,7 +298,10 @@
         .ic-l > * + * { margin-left: 8px; }
         .ic-i svg { width: 18px; height: 18px; stroke: var(--red); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
         .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* List view Qty badge maintains the original design for layout reasons */
         .ic-q { font-size: 0.55rem; color: var(--gold); background: var(--gold-ghost); padding: 1px 6px; border-radius: 8px; font-weight: 600; flex-shrink: 0; }
+        
         .ic-d { font-size: 0.55rem; color: var(--text-muted); letter-spacing: 1px; flex-shrink: 0; }
         .ic-d.alert { color: var(--red); font-weight: 700; }
         .ic-bot { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gold-ghost); }
@@ -548,11 +551,11 @@ function renderSantuario(){
             var item=items[ii];
             var el=document.createElement('div');
             el.className='cha-item';
-            var qtyBadge=item.qty>1?'<span class="cha-item-qty">×'+item.qty+'</span>':'';
-            var daysAgo=Math.floor((Date.now()-(item.ts||Date.now()))/864e5);
-            var dateText=daysAgo===0?'hoy':daysAgo<30?daysAgo+'d':Math.floor(daysAgo/30)+'m';
+            
+            // Reemplazo del badge visual por número tipográfico limpio (añadiendo espacio tras la X)
+            var qtyBadge=item.qty>1?'<span class="cha-item-qty">× '+item.qty+'</span>':'';
 
-            el.innerHTML='<div class="cha-item-body"><div class="cha-item-name">'+item.name+'</div><div class="cha-item-meta">'+qtyBadge+'<span class="cha-item-date">'+dateText+'</span></div></div><div class="cha-item-actions"><button class="cha-btn" onclick="openEdit('+item.id+')">'+ICONS.edit+'</button><button class="cha-btn" onclick="moveFromKeep('+item.id+')">'+ICONS.logout+'</button><button class="cha-btn danger" onclick="deleteItem('+item.id+')">'+ICONS.close+'</button></div>';
+            el.innerHTML='<div class="cha-item-body"><div class="cha-item-name">'+item.name+'</div><div class="cha-item-meta">'+qtyBadge+'</div></div><div class="cha-item-actions"><button class="cha-btn" onclick="openEdit('+item.id+')">'+ICONS.edit+'</button><button class="cha-btn" onclick="moveFromKeep('+item.id+')">'+ICONS.logout+'</button><button class="cha-btn danger" onclick="deleteItem('+item.id+')">'+ICONS.close+'</button></div>';
             itemsCol.appendChild(el);
         }
 
@@ -642,7 +645,6 @@ function updateHome(){
         if(db[i].st==='done') dc += q;
     }
 
-    // Nuevo orden: Objetos primero, Dinero segundo
     document.getElementById('total-items').textContent = totalItems;
     document.getElementById('total-money').innerHTML = '<strong>' + earned + '€</strong> ganados';
     
