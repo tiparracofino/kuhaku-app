@@ -233,13 +233,17 @@
         }
         .cha-room-tate::after {
             content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%;
-            background: linear-gradient(to bottom, transparent, var(--gold-dim) 20%, var(--gold-dim) 80%, transparent);
+            background: linear-gradient(to bottom, transparent, rgba(200, 50, 50, 0.3) 20%, rgba(200, 50, 50, 0.3) 80%, transparent);
         }
-        .cha-tate-kj { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; font-weight: 500; color: var(--gold); writing-mode: vertical-rl; letter-spacing: 4px; opacity: 0.7; }
-        .cha-tate-count { font-family: 'Shippori Mincho', serif; font-size: 0.75rem; color: var(--gold-dim); margin-top: 10px; font-weight: 700; }
+        .cha-tate-kj { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; font-weight: 500; color: var(--red); writing-mode: vertical-rl; letter-spacing: 4px; opacity: 0.85; }
+        
+        /* Aumentado tamaño del conteo bajo el kanji */
+        .cha-tate-count { font-family: 'Shippori Mincho', serif; font-size: 0.9rem; color: var(--red); margin-top: 10px; font-weight: 700; opacity: 0.7; }
 
         .cha-room-items { flex: 1; padding: 8px 20px 16px 18px; }
-        .cha-room-label { font-family: 'Noto Sans', sans-serif; font-size: 0.52rem; letter-spacing: 4px; text-transform: uppercase; color: var(--gold-dim); font-weight: 600; padding: 8px 0 10px; }
+        
+        /* Aumentado tamaño de la etiqueta de la estancia */
+        .cha-room-label { font-family: 'Noto Sans', sans-serif; font-size: 0.62rem; letter-spacing: 4px; text-transform: uppercase; color: var(--red); font-weight: 700; padding: 8px 0 10px; opacity: 0.8; }
 
         .cha-item { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; position: relative; }
         .cha-item > * + * { margin-left: 10px; }
@@ -250,7 +254,6 @@
         .cha-item-meta { display: flex; align-items: center; margin-top: 2px; }
         .cha-item-meta > * + * { margin-left: 8px; }
         
-        /* Ajuste de los números de los objetos individuales */
         .cha-item-qty { font-family: 'Shippori Mincho', serif; font-size: 0.75rem; color: var(--gold-dim); font-weight: 700; letter-spacing: 1px; }
 
         .cha-item-actions { display: flex; flex-shrink: 0; align-items: center; }
@@ -264,7 +267,7 @@
 
         .cha-room + .cha-room::before {
             content: ''; position: absolute; top: 0; left: 56px; right: 20px; height: 1px;
-            background: linear-gradient(to right, var(--gold-dim), transparent 70%);
+            background: linear-gradient(to right, rgba(200, 50, 50, 0.3), transparent 70%);
         }
 
         .cha-empty { text-align: center; padding: 80px 32px; }
@@ -299,7 +302,6 @@
         .ic-i svg { width: 18px; height: 18px; stroke: var(--red); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
         .ic-n { font-family: 'Shippori Mincho', serif; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* List view Qty badge maintains the original design for layout reasons */
         .ic-q { font-size: 0.55rem; color: var(--gold); background: var(--gold-ghost); padding: 1px 6px; border-radius: 8px; font-weight: 600; flex-shrink: 0; }
         
         .ic-d { font-size: 0.55rem; color: var(--text-muted); letter-spacing: 1px; flex-shrink: 0; }
@@ -552,7 +554,6 @@ function renderSantuario(){
             var el=document.createElement('div');
             el.className='cha-item';
             
-            // Reemplazo del badge visual por número tipográfico limpio (añadiendo espacio tras la X)
             var qtyBadge=item.qty>1?'<span class="cha-item-qty">× '+item.qty+'</span>':'';
 
             el.innerHTML='<div class="cha-item-body"><div class="cha-item-name">'+item.name+'</div><div class="cha-item-meta">'+qtyBadge+'</div></div><div class="cha-item-actions"><button class="cha-btn" onclick="openEdit('+item.id+')">'+ICONS.edit+'</button><button class="cha-btn" onclick="moveFromKeep('+item.id+')">'+ICONS.logout+'</button><button class="cha-btn danger" onclick="deleteItem('+item.id+')">'+ICONS.close+'</button></div>';
@@ -645,6 +646,7 @@ function updateHome(){
         if(db[i].st==='done') dc += q;
     }
 
+    // Nuevo orden: Objetos primero, Dinero segundo
     document.getElementById('total-items').textContent = totalItems;
     document.getElementById('total-money').innerHTML = '<strong>' + earned + '€</strong> ganados';
     
