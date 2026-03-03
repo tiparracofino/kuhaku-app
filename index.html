@@ -112,9 +112,13 @@
         .enso svg { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; }
         .enso svg path { stroke-dasharray: 600; animation: brushStroke 2s ease-out forwards; }
         .enso-center { text-align: center; z-index: 1; }
-        .enso-num { font-family: 'Shippori Mincho', serif; font-size: 3.5rem; font-weight: 800; line-height: 1; letter-spacing: -3px; color: var(--text-main); }
-        .enso-cur { font-size: 2rem; font-weight: 400; }
+        
+        /* Modificados para enfocar en objetos en vez de dinero */
+        .enso-num { font-family: 'Shippori Mincho', serif; font-size: 3.8rem; font-weight: 800; line-height: 1; letter-spacing: -3px; color: var(--text-main); }
         .enso-sub { font-size: 0.55rem; letter-spacing: 6px; color: var(--gold); text-transform: uppercase; margin-top: 8px; font-weight: 600; }
+        .enso-items { font-family: 'Shippori Mincho', serif; font-size: 0.85rem; color: var(--gold-dim); margin-top: 14px; letter-spacing: 1px; }
+        .enso-items strong { color: var(--gold); font-weight: 700; }
+        
         .hanko-seal { position: absolute; bottom: -4px; right: -4px; width: 44px; height: 44px; border: 2px solid var(--red); border-radius: 4px; transform: rotate(-6deg); display: flex; align-items: center; justify-content: center; font-family: 'Shippori Mincho', serif; font-size: 0.95rem; color: var(--red); font-weight: 800; background: var(--bg); box-shadow: 0 0 0 1px var(--red-pale); line-height: 1; opacity: 0.85; }
 
         .stats-row { display: flex; width: 100%; margin-top: 32px; border-top: 1px solid var(--gold-ghost); border-bottom: 1px solid var(--gold-ghost); }
@@ -371,7 +375,11 @@
                 <path d="M100 12 C160 12,190 48,190 100 C190 155,158 190,100 190 C42 190,10 155,10 100 C10 50,38 18,78 13" stroke="var(--gold)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.9"/>
                 <path d="M78 13 C81 12,84 12,88 13" stroke="var(--gold)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.3"/>
             </svg>
-            <div class="enso-center"><div class="enso-num jp" id="total-money"><span class="enso-cur">€</span>0</div><div class="enso-sub">ganado</div></div>
+            <div class="enso-center">
+                <div class="enso-num jp" id="total-items">0</div>
+                <div class="enso-sub">objetos</div>
+                <div class="enso-items jp" id="total-money"><strong>0€</strong> ganados</div>
+            </div>
         </div>
         <div class="hanko-seal">空<br>白</div>
     </div>
@@ -503,8 +511,11 @@ function renderSantuario(){
     for(var i=0;i<db.length;i++){if(db[i].st==='kept')kept.push(db[i]);}
     if(query){var filtered=[];for(var i=0;i<kept.length;i++){if(kept[i].name.toLowerCase().indexOf(query)!==-1)filtered.push(kept[i]);}kept=filtered;}
 
+    var keptCount = 0;
+    for(var i=0; i<kept.length; i++){ keptCount += parseInt(kept[i].qty) || 1; }
+
     var countEl=document.getElementById('cha-count');
-    countEl.innerHTML=kept.length?'<em>'+kept.length+'</em> objeto'+(kept.length!==1?'s':'')+' en el santuario':'';
+    countEl.innerHTML=keptCount?'<em>'+keptCount+'</em> objeto'+(keptCount!==1?'s':'')+' en el santuario':'';
 
     if(!kept.length){
         content.innerHTML='<div class="cha-empty"><div class="cha-empty-char">空</div><div class="cha-empty-text">El santuario espera.<br>Los objetos que conserves<br>encontrarán su lugar aquí.</div></div>';
@@ -522,9 +533,12 @@ function renderSantuario(){
         var room=document.createElement('div');
         room.className='cha-room';
 
+        var roomCount = 0;
+        for(var ii=0; ii<items.length; ii++){ roomCount += parseInt(items[ii].qty) || 1; }
+
         var tate=document.createElement('div');
         tate.className='cha-room-tate';
-        tate.innerHTML='<span class="cha-tate-kj">'+space.kj+'</span><span class="cha-tate-count">'+items.length+'</span>';
+        tate.innerHTML='<span class="cha-tate-kj">'+space.kj+'</span><span class="cha-tate-count">'+roomCount+'</span>';
 
         var itemsCol=document.createElement('div');
         itemsCol.className='cha-room-items';
@@ -560,12 +574,20 @@ function renderList(){
     var c=document.getElementById('list-content');c.innerHTML='';var h=document.getElementById('list-header').querySelector('.list-t');
     if(state.currentTab==='process'){
         var active=[];for(var i=0;i<db.length;i++){if(db[i].st==='active')active.push(db[i]);}
-        h.innerHTML='進行 <small>proceso · '+active.length+'</small>';
+        
+        var activeCount = 0;
+        for(var i=0; i<active.length; i++){ activeCount += parseInt(active[i].qty) || 1; }
+        h.innerHTML='進行 <small>proceso · '+activeCount+'</small>';
+
         var groups=['vender','donar','regalar','tirar'];var has=false;
         for(var gi=0;gi<groups.length;gi++){var g=groups[gi];var items=[];for(var i=0;i<active.length;i++){if(active[i].act===g)items.push(active[i]);}
             if(!items.length)continue;has=true;
             if(state.sortMode==='date')items.sort(function(a,b){return(b.ts||0)-(a.ts||0);});else items.sort(function(a,b){return parseFloat(b.price||0)-parseFloat(a.price||0);});
-            var gh=document.createElement('div');gh.className='gh';gh.innerHTML='<span>'+GROUP_KJ[g]+' '+GROUP_LABELS[g]+'</span><span class="gh-n">'+items.length+'</span>';c.appendChild(gh);
+            
+            var groupCount = 0;
+            for(var i=0; i<items.length; i++){ groupCount += parseInt(items[i].qty) || 1; }
+
+            var gh=document.createElement('div');gh.className='gh';gh.innerHTML='<span>'+GROUP_KJ[g]+' '+GROUP_LABELS[g]+'</span><span class="gh-n">'+groupCount+'</span>';c.appendChild(gh);
             for(var i=0;i<items.length;i++)c.appendChild(createItemCard(items[i]));
         }
         if(!has)c.innerHTML='<div class="mt"><div class="mt-k">空</div>Todo limpio</div>';
@@ -573,7 +595,11 @@ function renderList(){
         var pending=[];var done=[];for(var i=0;i<db.length;i++){if(db[i].st==='active'&&db[i].act==='vender')pending.push(db[i]);if(db[i].st==='done')done.push(db[i]);}
         var totalEarned=0;for(var i=0;i<done.length;i++){if(done[i].act==='vender')totalEarned+=parseFloat(done[i].final||0);}
         var totalPending=0;for(var i=0;i<pending.length;i++)totalPending+=parseFloat(pending[i].price||0);
-        h.innerHTML='帳簿 <small>cuentas · '+done.length+'</small>';
+        
+        var doneCount = 0;
+        for(var i=0; i<done.length; i++){ doneCount += parseInt(done[i].qty) || 1; }
+        h.innerHTML='帳簿 <small>cuentas · '+doneCount+'</small>';
+
         var summary=document.createElement('div');summary.className='as';
         summary.innerHTML='<div class="as-h"><div class="as-v red jp">'+totalEarned+'€</div><div class="as-l">ganado</div></div><div class="as-h"><div class="as-v jp">'+totalPending+'€</div><div class="as-l">en venta</div></div>';
         c.appendChild(summary);
@@ -602,7 +628,33 @@ function restoreToProcess(id){confirmAction('¿Devolver al proceso?',function(){
 function deleteItem(id){confirmAction('¿Eliminar definitivamente?',function(){var newDb=[];for(var i=0;i<db.length;i++){if(db[i].id!==id)newDb.push(db[i]);}db=newDb;saveData();renderList();renderSantuario();showToast('Eliminado');});}
 function resetAll(){db=[];saveData();renderList();renderSantuario();showToast('Datos borrados');}
 
-function updateHome(){var earned=0;var kc=0,ac=0,dc=0;for(var i=0;i<db.length;i++){if(db[i].st==='done'&&db[i].act==='vender')earned+=parseFloat(db[i].final||0);if(db[i].st==='kept')kc++;if(db[i].st==='active')ac++;if(db[i].st==='done')dc++;}document.getElementById('total-money').innerHTML='<span class="enso-cur">€</span>'+earned;document.getElementById('stat-kept').textContent=kc;document.getElementById('stat-pending').textContent=ac;document.getElementById('stat-sold').textContent=dc;document.getElementById('ss-kept').textContent=kc;document.getElementById('ss-pend').textContent=ac;document.getElementById('ss-done').textContent=dc;document.getElementById('ss-earn').textContent=earned+'€';}
+function updateHome(){
+    var earned=0;
+    var kc=0, ac=0, dc=0, totalItems=0;
+    
+    for(var i=0;i<db.length;i++){
+        var q = parseInt(db[i].qty) || 1;
+        totalItems += q;
+        
+        if(db[i].st==='done'&&db[i].act==='vender') earned+=parseFloat(db[i].final||0);
+        if(db[i].st==='kept') kc += q;
+        if(db[i].st==='active') ac += q;
+        if(db[i].st==='done') dc += q;
+    }
+
+    // Nuevo orden: Objetos primero, Dinero segundo
+    document.getElementById('total-items').textContent = totalItems;
+    document.getElementById('total-money').innerHTML = '<strong>' + earned + '€</strong> ganados';
+    
+    document.getElementById('stat-kept').textContent=kc;
+    document.getElementById('stat-pending').textContent=ac;
+    document.getElementById('stat-sold').textContent=dc;
+    
+    document.getElementById('ss-kept').textContent=kc;
+    document.getElementById('ss-pend').textContent=ac;
+    document.getElementById('ss-done').textContent=dc;
+    document.getElementById('ss-earn').textContent=earned+'€';
+}
 
 function exportData(){
     var json=JSON.stringify(db,null,2);var file=new File([json],'kuhaku.json',{type:'application/json'});
